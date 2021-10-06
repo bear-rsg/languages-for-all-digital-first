@@ -13,3 +13,4 @@ __pycache__
 setup.cfg
 fixtures
 site.webmanifest
+pyproject.toml
