@@ -8,6 +8,8 @@
 *.jpg
 *.json
 *.js
+*.md
+*.html
 lib
 __pycache__
 setup.cfg

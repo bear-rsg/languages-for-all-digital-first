@@ -43,6 +43,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'settings_value': 'core.templatetags.settings_value',
+            }
         },
     },
 ]

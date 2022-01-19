@@ -20,6 +20,8 @@ else:
 
 ALLOWED_HOSTS = ['*']
 
+ADMIN_EMAIL = 'bear-rsg@contacts.bham.ac.uk'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
