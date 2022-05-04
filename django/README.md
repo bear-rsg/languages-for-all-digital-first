@@ -65,8 +65,6 @@ You can use coverage to see how much of the code is included in the tests:
 
 Our websites must comply with accessibility regulations. See the [BEAR Accessibility](https://accessibility.bear.bham.ac.uk/) site for more information.
 
-Please note that the RSG's template Django project will link to the home page of the BEAR Accessibility website in the footer. This will likely need to be changed (on a per site basis) to the specific page that holds the correct accessibility statement for each site. E.g. standard CAL Django websites can point to: <https://accessibility.bear.bham.ac.uk/statements-cal.html> or you may need to create a new statement page and link to that.
-
 
 ## Database
 
