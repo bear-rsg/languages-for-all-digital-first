@@ -1,13 +1,11 @@
-# RSG Django Template - Django Project
-
-RSG Django Template.
+# Languages for All Digital First - Django Project
 
 This document is primarily designed for technical staff working on the development of the project (e.g. software engineers and system admins).
 
 
 ## Django Project
 
-The project is called 'django-template', but project files are stored in the 'core' folder. Please refer to `core/settings.py` for further details
+The project is called 'languages-for-all-digital-first', but project files are stored in the 'core' folder. Please refer to `core/settings.py` for further details
 
 
 ## Django Apps
@@ -72,7 +70,7 @@ Please note that the RSG's template Django project will link to the home page of
 
 ## Database
 
-The SQLite3 database used sits in the Django project root folder (alongside this README file). It is not included within the Git repo, so must instead be requested from the system admin. Once you have a copy of this database, give it a suitable name like `django-template.sqlite3` and place in the `django/` directory (same directory that stores `manage.py`). Remember to name this database in `local_settings.py` (see Settings section of this document for more details)
+The SQLite3 database used sits in the Django project root folder (alongside this README file). It is not included within the Git repo, so must instead be requested from the system admin. Once you have a copy of this database, give it a suitable name like `languages-for-all-digital-first.sqlite3` and place in the `django/` directory (same directory that stores `manage.py`). Remember to name this database in `local_settings.py` (see Settings section of this document for more details)
 
 
 ## Settings

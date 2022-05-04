@@ -2,7 +2,7 @@
 ###################### Project-specific Ignore Paths ######################
 
 venv/
-resources/private/
+private/
 *.sqlite3
 django/media/
 django/static/
