@@ -1,0 +1,46 @@
+@media (max-width: 991px) {
+    /* ---------- Navigation ---------- */
+
+    nav h1 img {
+        height: 1.8em;
+    }
+
+    .nav-item {
+        margin: 0.5em 0;
+    }
+
+    .navbar-toggler {
+        color: #FFF;
+        font-size: 1.7em;
+        padding-right: 0.35em;
+    }
+
+    .navbar-toggler:focus {
+        outline: none;
+        opacity: 0.8;
+    }
+
+    /* ---------- Main ---------- */
+
+    main {
+        margin-top: 3.39em;
+        min-height: calc(100vh - 3.39em);
+    }
+
+    /* ---------- Popup ---------- */
+
+    .popup-content {
+        width: 90%;
+        max-height: 90vh;
+        left: 5%;
+    }
+
+    /* ---------- Footer ---------- */
+
+    #footer-content img {
+        width: 17em;
+        max-width: 100%;
+        margin: 0 auto 2em auto;
+        display: block;
+    }
+}
