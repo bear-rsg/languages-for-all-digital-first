@@ -1,0 +1,341 @@
+/* ---------- General ---------- */
+
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: #000;
+    margin: 0;
+    font-weight: 400;
+    background: #F7F7F7;
+}
+
+a {
+    color: #1779C5;
+}
+
+a:hover {
+    color: #0d5892;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 1em;
+    margin: 0;
+    padding: 0;
+    line-height: 1em;
+    color: #1779C5;
+}
+
+h2 {
+    padding-top: 2.5em;
+    color: #9F6508;
+    text-align: center;
+    font-size: 1.8em;
+    margin: 1em 0 1em 0;
+}
+
+h3 {
+    padding: 2em 0 0.5em 0;
+    color: #9F6508;
+    text-align: left;
+    font-size: 1.4em;
+}
+
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border-radius: 0;
+    padding: 0.3em 1.3em 0.3em 0.3em;
+    margin: 0;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    display: block;
+    border: 1px solid #BBB;
+    background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+    background-repeat: no-repeat;
+    background-position-x: 100%;
+    background-position-y: 5px;
+    background-color: white;
+}
+
+.image-circle {
+    border: 0.3rem solid rgba(255,255,255,0.6);
+    border-radius: 100%;
+    width: 13em;
+    max-width: 90%;
+    display: block;
+    margin: 1em auto;
+}
+
+.hidden {
+    display: none;
+}
+
+.audio-control {
+    display: inline-block;
+    vertical-align: middle;
+    height: 2em;
+}
+
+.audio-control span {
+    background: #DDD;
+    display: inline-block;
+    color: #303030;
+    border-radius: 100%;
+    width: 2em;
+    height: 2em;
+    padding-top: 0.35em;
+    padding-left: 0.03em;
+    font-size: 1em;
+    text-align: center;
+    cursor: pointer;
+}
+
+.audio-control span.active {
+    background: #1779C5;
+    color: white;
+}
+
+.audio-control span:not(.active):hover {
+    background: #BBB;
+}
+
+/* ---------- Font styles (e.g. for exercises) ---------- */
+
+.font_style_modern {
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+.font_style_traditional {
+    font-family: 'Times New Roman', Times, serif;
+}
+
+.font_style_handwriting {
+    font-family: 'Indie Flower', cursive;
+    font-size: 1.1em;
+}
+
+/* ---------- Popup ---------- */
+
+.popup {
+    display: none;
+    background: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 100000000;
+}
+
+.popup-content {
+    background: #F7F7F7;
+    position: fixed;
+    top: 15vh;
+    overflow-y: auto;
+    padding: 3em;
+    text-align: center;
+}
+
+.popup-content-title {
+    font-size: 1.3em;
+    text-align: center;
+    margin-bottom: 1.5em;
+    color: #9F6508;
+}
+
+.popup-submit {
+    background-color: #1779C5;
+    color: white;
+    appearance: none;
+    border: none;
+    display: block;
+    width: fit-content;
+    margin: 3em auto 0.5em auto;
+    padding: 0.8em 1.6em;
+    padding-bottom: 0.7em;
+    border-radius: 0.2em;
+}
+
+.popup-submit:hover {
+    color: white;
+    opacity: 0.89;
+}
+
+.popup-hide {
+    cursor: pointer;
+    position: absolute;
+    right: 0.8em;
+    top: 0.4em;
+    font-size: 1.8em;
+    padding: 0.2em;
+    color: #909090;
+}
+
+.popup-hide:hover {
+    color: #9F6508;
+}
+
+/* ---------- Forms ---------- */
+
+form.full-form p {
+    margin: 1em 0 2em 0;
+}
+
+form.full-form label,
+form.full-form textarea,
+form.full-form input[type=text],
+form.full-form input[type=url],
+form.full-form input[type=email],
+form.full-form input[type=password],
+form.full-form input[type=number] {
+    display: block;
+    width: 100%;
+}
+
+form.full-form textarea {
+    height: 4em;
+}
+
+form.full-form label {
+    margin-bottom: 0;
+}
+
+form.full-form ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+form.full-form .helptext {
+    color: #505050;
+    font-size: 0.85em;
+    font-style: italic;
+    margin: 0.2em;
+    display: block;
+}
+
+form.full-form .errorlist {
+    color: #c0392b;
+}
+
+button {
+    border-radius: 0.4em;
+}
+
+form.full-form button[type=submit] {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    padding: 0.7em;
+    margin: 1em auto;
+    background: #1779C5;
+    color: white;
+    width: 100%;
+}
+
+form.full-form button[type=submit]:hover {
+    opacity: 0.9;
+}
+
+.full-form-footer-links a {
+    display: block;
+    padding: 0.5em;
+    margin: 2em auto;
+    text-align: center;
+    background: #DDD;
+    border-radius: 0.4em;
+}
+
+.full-form-footer-links a:hover {
+    color: #1779C5;
+    opacity: 0.8;
+}
+
+form.full-form button[type=submit].button-danger {
+    background: #c23616;
+}
+
+/* ---------- Navigation ---------- */
+
+nav {
+    background: #1779C5;
+    vertical-align: middle;
+}
+
+.navbar-brand {
+    display: inline-block;
+    font-size: 1.5em;
+}
+
+.navbar-nav {
+    letter-spacing: 0.05em;
+}
+
+.nav-link {
+    font-weight: 400;
+    font-size: 1.2em;
+    color: #FFF;
+    opacity: 0.8;
+    text-align: center;
+}
+
+.nav-link i {
+    font-size: 1.2em;
+    display: block;
+}
+
+.nav-link span {
+    font-size: 0.75em;
+}
+
+.nav-link.active {
+    font-weight: 400;
+    color: #FFF;
+    opacity: 1;
+}
+
+nav a:hover {
+    color: #FFF;
+    opacity: 1;
+}
+
+/* ---------- Main ---------- */
+
+main {
+    padding-bottom: 8em;
+}
+
+/* ---------- Footer ---------- */
+
+footer {
+    padding: 4em 0;
+    text-align: center;
+    font-size: 1em;
+    background: #1779C5;
+    color: #FFF;
+}
+
+#footer-content-text {
+    margin-top: 2em;
+}
+
+footer a,
+footer a:hover {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* ---------- Error Pages ---------- */
+
+.errorpage-path {
+    font-weight: bold;
+}
+
+.errorpage-code {
+    margin-top: 3em;
+    font-size: 0.8em;
+}
