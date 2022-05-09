@@ -21,6 +21,48 @@
         min-height: calc(100vh - 4.7em);
     }
 
+    /* ---------- Welcome ---------- */
+
+    #welcome-banner {
+        height: calc(100vh - 4.5em);
+    }
+
+    #welcome-banner-content {
+        width: 17em;
+        max-width: 90%;
+        margin: 9vh 0 0 9vw;
+        padding: 2em;
+    }
+
+    #welcome-banner-content img {
+        margin-bottom: 2em;
+    }
+
+    #welcome-banner-content a {
+        margin: 2.7em auto 1em;
+        font-size: 1.13rem;
+    }
+
+    #welcome-banner-proceed {
+        font-size: 3em;
+        position: absolute;
+        bottom: 0.8em;
+        left: calc(50% - 40px);
+        border-radius: 100%;
+        width: 80px;
+        height: 80px;
+        text-align: center;
+        background-color: white;
+        color: #1779C5;
+        padding-top: 0.10em;
+        cursor: pointer;
+        line-height: 80px;
+    }
+
+    #welcome-banner-proceed:hover {
+        background-color: #F8F8F8;
+    }
+
     /* ---------- Popup ---------- */
 
     .popup-content {

@@ -2,10 +2,10 @@
 
 body {
     font-family: 'Be Vietnam Pro', sans-serif;
-    color: #000;
+    color: black;
     margin: 0;
     font-weight: 400;
-    background: #F7F7F7;
+    background: white;
 }
 
 a {
@@ -13,7 +13,7 @@ a {
 }
 
 a:hover {
-    color: #0d5892;
+    color: #0B5186;
     text-decoration: none;
 }
 
@@ -27,7 +27,7 @@ h1 {
 
 h2 {
     padding-top: 2.5em;
-    color: #9F6508;
+    color: #1779C5;
     text-align: center;
     font-size: 1.8em;
     margin: 1em 0 1em 0;
@@ -35,7 +35,7 @@ h2 {
 
 h3 {
     padding: 2em 0 0.5em 0;
-    color: #9F6508;
+    color: #1779C5;
     text-align: left;
     font-size: 1.4em;
 }
@@ -144,7 +144,7 @@ select {
     font-size: 1.3em;
     text-align: center;
     margin-bottom: 1.5em;
-    color: #9F6508;
+    color: #1779C5;
 }
 
 .popup-submit {
@@ -176,7 +176,7 @@ select {
 }
 
 .popup-hide:hover {
-    color: #9F6508;
+    color: #1779C5;
 }
 
 /* ---------- Forms ---------- */
@@ -307,6 +307,50 @@ nav a:hover {
 
 main {
     padding-bottom: 8em;
+}
+
+/* ---------- Welcome ---------- */
+
+#welcome-banner {
+    width: 100%;
+    padding-top: 5vh;
+    position: relative;
+    background-image: url('../images/welcome/banner-bg.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    background-color: white;
+    background-attachment: fixed;
+}
+
+#welcome-banner-content {
+    background: #1779C5;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    font-size: 1.5em;
+    color: white;
+}
+
+#welcome-banner-content img {
+    width: 13em;
+    max-width: 90%;
+}
+
+#welcome-banner-content a {
+    display: block;
+    background: white;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: #1779C5;
+    width: 11em;
+    text-align: center;
+    max-width: 90%;
+    padding: 0.7em 0.5em 0.5em 0.5em;
+    border-radius: 0.2em;
+}
+
+#welcome-banner-content a:hover {
+    background: #F7F7F7;
 }
 
 /* ---------- Footer ---------- */
