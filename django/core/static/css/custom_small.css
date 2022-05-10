@@ -27,6 +27,32 @@
         min-height: calc(100vh - 3.39em);
     }
 
+    /* ---------- Welcome ---------- */
+
+    #welcome-banner {
+        height: 75vh;
+    }
+
+    #welcome-banner-content {
+        width: 90%;
+        margin-left: 5%;
+        margin-top: 1vh;
+        padding: 0.7em;
+    }
+
+    #welcome-banner-content img {
+        margin: 1em 0;
+    }
+
+    #welcome-banner-content a {
+        margin: 2em auto 1em;
+        font-size: 1rem;
+    }
+
+    #welcome-banner-proceed {
+        display: none;
+    }
+
     /* ---------- Popup ---------- */
 
     .popup-content {

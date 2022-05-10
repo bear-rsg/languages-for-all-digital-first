@@ -67,21 +67,21 @@
                     </li>
                     <!-- Exercises -->
                     <li class="nav-item">
-                        <a class="nav-link{% if "/exercises/" in request.path %} active{% endif %}" href="/exercises/">
-                            <!-- <i class="fas fa-tasks"></i> --><i class="fas fa-check-circle"></i>
+                        <a class="nav-link{% if "/exercises/" in request.path %} active{% endif %}" href="/">
+                            <i class="fas fa-check-circle"></i>
                             <span>Exercises</span>
                         </a>
                     </li>
                     <!-- Help -->
                     <li class="nav-item">
-                        <a class="nav-link{% if "/help/" in request.path %} active{% endif %}" href="/help/">
+                        <a class="nav-link{% if "/help/" in request.path %} active{% endif %}" href="/">
                             <i class="fas fa-question-circle"></i>
                             <span>Help</span>
                         </a>
                     </li>
                     <!-- Login/Account -->
                     <li class="nav-item">
-                        <a class="nav-link{% if "/account/" in request.path %} active{% endif %}" href="{% if user.is_authenticated %}/account/{% else %}/login/{% endif %}">
+                        <a class="nav-link{% if "/account/" in request.path %} active{% endif %}" href="{% if user.is_authenticated %}/{% else %}/{% endif %}">
                             <i class="fas fa-user-circle"></i>
                             <span>{% if user.is_authenticated %}My Account{% else %}Login{% endif %}</span>
                         </a>

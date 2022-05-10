@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section id="welcome-banner">
+    <div id="welcome-banner-content">
+        <img src="{% static 'images/logos/lfadf.png' %}" alt="Languages for All Digital First logo">
+        <p>
+            A brief tagline here, about a sentence long, like this dummy text is, but not much longer
+        </p>
+        <a href="/"><i class="fas fa-check-circle"></i> Exercises</a>
+    </div>
+    <div id="welcome-banner-proceed">
+        <i class="fas fa-angle-down"></i>
+    </div>
+</section>
+
+<section id="welcome-content" class="container">
+    <h2>Welcome</h2>
+    <p>
+        Welcome paragraph text
+    </p>
+    <p>
+        Languages available include:
+    </p>
+    <ul>
+        <li>Portuguese</li>
+        <li>French</li>
+        <li>etc.</li>
+    </ul>
+    <p>
+        More info
+    </p>
+
+</section>
+
+
+<script>
+    $(document).ready(function() {
+        // Scroll down when clicking on the proceed button in the welcome banner
+        $('#welcome-banner-proceed').on('click', function(){
+            $('html,body').animate({ scrollTop: $('#welcome-content').offset().top - 50 }, 800); 
+        });
+
+    });
+</script>
+
+
+{% endblock %}
