@@ -81,15 +81,18 @@
                     </li>
                     <!-- Login/Account -->
                     <li class="nav-item">
-                        <a class="nav-link{% if "/account/" in request.path %} active{% endif %}" href="{% if user.is_authenticated %}/{% else %}/{% endif %}">
+                        <a class="nav-link{% if "/account/" in request.path %} active{% endif %}" href="{% if user.is_authenticated %}{% url 'account:myaccount' %}{% else %}{% url 'login' %}{% endif %}">
                             <i class="fas fa-user-circle"></i>
-                            <span>{% if user.is_authenticated %}My Account{% else %}Login{% endif %}</span>
+                            <span>{% if user.is_authenticated %}Account{% else %}Login{% endif %}</span>
                         </a>
                     </li>
                     {% if user.is_staff %}
                         <!-- Admin Dashboard -->
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">Admin</a>
+                            <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">
+                                <i class="fas fa-user-cog"></i>
+                                <span>Admin</span>
+                            </a>
                         </li>
                     {% endif %}
                 </ul>

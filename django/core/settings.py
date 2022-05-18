@@ -9,6 +9,8 @@ TEMPLATE_DIR = os.path.join(BASE_DIR, 'core/templates')
 # Application definition
 
 INSTALLED_APPS = [
+    'django_light',  # must be before django.contrib.admin
+    # Default Django
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -16,7 +18,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    'general',
+    # 3rd Party
+    # captchanotimeout is a custom app to override "captcha" to prevent 2 minute timeouts
+    # See: https://github.com/praekelt/django-recaptcha/issues/183
+    'captchanotimeout',
+    'captcha',
+    'embed_video',
+    # Custom
+    'account',
+    'general'
 ]
 
 MIDDLEWARE = [
@@ -51,6 +61,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+
+# Redirects for login and logout
+
+LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/account/'
+LOGOUT_REDIRECT_URL = '/account/login/'
+
+
+# Custom user model
+
+AUTH_USER_MODEL = 'account.User'
 
 
 # Password validation
