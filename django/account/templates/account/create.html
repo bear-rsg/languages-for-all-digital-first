@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section class="container">
+    <h2>Create Account</h2>
+    <form method="post" class="full-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Create your account</button>
+    </form>
+</section>
+
+{% endblock %}

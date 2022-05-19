@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section id="myaccount-details" class="container">
+    <h2>My Details</h2>
+    <form method="post" class="full-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit"><i class="fas fa-check"></i> Save changes</button>
+    </form>
+    <div class="full-form-footer-links">
+        <a href="{% url 'logout' %}">Logout</a>
+        <a href="{% url 'account:change-password' %}">Change password</a>
+    </div>
+</section>
+
+{% endblock %}

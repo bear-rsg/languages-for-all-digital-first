@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load settings_value %}
+{% load static %}
+
+{% block main %}
+
+<section class="container">
+    <h2>Login</h2>
+    <form method="post" class="full-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <p>
+            {{ form.username.errors }}
+            <label for="{{ form.username.id_for_label }}">Email:</label>
+            {{ form.username }}
+        </p>
+        <p>
+            {{ form.password.errors }}
+            <label for="{{ form.password.id_for_label }}">Password:</label>
+            {{ form.password }}
+        </p>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="account-login-help">
+        <p>
+            <a href="{% url 'account:reset-password-request' %}">Forgot your password?</a>
+        </p>
+        <p>
+            If you don't have an account or have forgotten your email address, please <a href="{% settings_value 'ADMIN_EMAIL' %}">contact us</a>.
+        </p>
+        
+    </div>
+</section>
+
+{% endblock %}
