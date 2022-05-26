@@ -103,21 +103,6 @@ select {
     background: #BBB;
 }
 
-/* ---------- Font styles (e.g. for exercises) ---------- */
-
-.font_style_modern {
-    font-family: Helvetica, Arial, sans-serif;
-}
-
-.font_style_traditional {
-    font-family: 'Times New Roman', Times, serif;
-}
-
-.font_style_handwriting {
-    font-family: 'Indie Flower', cursive;
-    font-size: 1.1em;
-}
-
 /* ---------- Popup ---------- */
 
 .popup {

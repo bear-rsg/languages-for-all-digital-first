@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetView, PasswordResetConfirmView)
 from account import (forms, models)
+from exercises.models import UserExerciseAttempt
 
 
 class MyAccountUpdateView(LoginRequiredMixin, UpdateView):
@@ -22,6 +23,12 @@ class MyAccountUpdateView(LoginRequiredMixin, UpdateView):
         Return the current user
         """
         return self.model.objects.get(pk=self.request.user.id)
+
+    def get_context_data(self, **kwargs):
+        context = super(MyAccountUpdateView, self).get_context_data(**kwargs)
+        # Exercise history
+        context['exercise_attempts'] = UserExerciseAttempt.objects.filter(user=self.get_object())
+        return context
 
 
 class MyAccountUpdateSuccessTemplateView(TemplateView):
@@ -43,11 +50,14 @@ class UserCreateView(CreateView):
     success_url = reverse_lazy('account:create-success')
 
     def form_valid(self, form):
-        form.instance.role = models.UserRole.objects.get(name='student')
 
         # Save the new user
         self.object = form.save(commit=False)
         self.object.save()
+
+        # Add the many to many relationships with classes
+        for c in form.cleaned_data['classes']:
+            self.object.classes.add(c)
 
         return super().form_valid(form)
 

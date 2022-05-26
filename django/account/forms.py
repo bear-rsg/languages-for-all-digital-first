@@ -2,6 +2,7 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm, Password
 from django import forms
 from .models import User, UserRole
 from captcha.fields import ReCaptchaField, ReCaptchaV3
+from exercises.models import SchoolClass
 
 
 class DashboardUserCreationForm(UserCreationForm):
@@ -16,7 +17,9 @@ class DashboardUserCreationForm(UserCreationForm):
         fields = ('first_name',
                   'last_name',
                   'email',
-                  'role')
+                  'role',
+                  'default_language',
+                  'classes',)
 
 
 class DashboardUserChangeForm(UserChangeForm):
@@ -27,7 +30,7 @@ class DashboardUserChangeForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'role')
+        fields = ('first_name', 'last_name', 'email', 'role', 'default_language', 'classes')
 
 
 class PublicUserCreationForm(UserCreationForm):
@@ -37,17 +40,26 @@ class PublicUserCreationForm(UserCreationForm):
     It's used in views.py
     """
 
+    # M2M relationship with SchoolClass
+    classes = forms.ModelMultipleChoiceField(
+        queryset=SchoolClass.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Select all classes that you're registered on",
+        required=False
+    )
+
     # Google ReCaptcha v3
     captcha = ReCaptchaField(widget=ReCaptchaV3, label='')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""  # removes : from label, e.g. Email: becomes Email
+        self.fields['default_language'].help_text = "The main language that you're registered to study/teach within Languages for All. Exercises will be filtered by this language by default."
         self.fields['password1'].help_text = "Your password:<br>- can't be too similar to your other personal information.<br>- must contain at least 8 characters.<br>- can't be a commonly used password.<br>- can't be entirely numeric."
 
     class Meta(UserCreationForm.Meta):
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('first_name', 'last_name', 'email', 'default_language', 'classes')
 
     def clean_email(self):
         """
@@ -68,16 +80,25 @@ class PublicUserChangeForm(UserChangeForm):
     It's used in views.py
     """
 
+    # M2M relationship with SchoolClass
+    classes = forms.ModelMultipleChoiceField(
+        queryset=SchoolClass.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        help_text="Select all classes that you're registered on",
+        required=False
+    )
+
     # Hide password, as template gives a direct link to it styled more appropriately
     password = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""  # removes : from label, e.g. Email: becomes Email
+        self.fields['default_language'].help_text = "The main language that you're registered to study/teach within Languages for All. Exercises will be filtered by this language by default."
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('first_name', 'last_name', 'email', 'default_language', 'classes')
 
 
 class PublicPasswordChangeForm(PasswordChangeForm):
@@ -96,4 +117,4 @@ class PublicPasswordChangeForm(PasswordChangeForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email')
+        fields = ('first_name', 'last_name', 'email', 'default_language', 'classes')
