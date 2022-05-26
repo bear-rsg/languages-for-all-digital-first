@@ -1,0 +1,599 @@
+from django.db import models
+from account.models import User, UserRole
+from datetime import date
+from django.core.validators import MaxValueValidator, MinValueValidator
+import random
+
+OPTIONAL_HELP_TEXT = "(Optional)"
+OPTIONAL_IF_AUDIO_HELP_TEXT = "Optional if supplying audio instead, otherwise required"
+ORDER_HELP_TEXT = OPTIONAL_HELP_TEXT + " Specify the order you'd like this item to appear on the exercise page. Leave blank to order automatically."
+AUDIO_HELP_TEXT = OPTIONAL_HELP_TEXT + " <a href='https://online-voice-recorder.com/' target='_blank'>Record your audio clip</a> and then upload the file here"
+AUDIO_UPLOAD_PATH = "exercises-exercise-audio"
+
+
+def text_or_audiomsg(text_field, audio_field):
+    """
+    Handle automatic message based on if text and/or audio is provided for a given field
+    E.g. if no text provided, but audio is, then give instruction for user to click the audio button
+    """
+
+    if text_field:
+        return text_field
+    elif audio_field:
+        return "Please play the audio clip"
+    else:
+        return ""
+
+
+class Language(models.Model):
+    """
+    A non-English language being taught, e.g. Portuguese, Italian, French
+    """
+
+    name = models.CharField(max_length=255, unique=True)
+    is_published = models.BooleanField(default=True, verbose_name="Published")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name', 'id']
+
+
+class Difficulty(models.Model):
+    """
+    A level of difficulty (e.g. beginners, intermediate, advanced)
+    """
+
+    name = models.CharField(max_length=255, unique=True)
+    order = models.IntegerField(default=0)
+    colour_hex = models.CharField(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['order', 'name', 'id']
+        verbose_name_plural = 'difficulties'
+
+
+class SchoolClass(models.Model):
+    """
+    A class of students and teacher(s) within the School
+    """
+
+    language = models.ForeignKey(Language, on_delete=models.RESTRICT)
+    difficulty = models.ForeignKey(Difficulty, on_delete=models.RESTRICT, blank=True, null=True)
+    unique_feature = models.CharField(max_length=255, blank=True, null=True,
+                                      help_text="If other classes have the same name as this one because they have the same language, difficulty, and teachers, please specify something unique about this class (e.g. the day of the week its run) to make the class name unique")
+    is_published = models.BooleanField(default=True, verbose_name="Published")
+    is_active = models.BooleanField(default=True, verbose_name="Active")
+
+    @property
+    def name(self):
+        # Language by default
+        name = f"{self.language}"
+        # Append difficulty (if exists)
+        if self.difficulty:
+            name += f" ({self.difficulty})"
+        # Append unique feature (if exists)
+        if self.unique_feature:
+            name += f" [{self.unique_feature}]"
+        # Append teachers' names (if exists)
+        if self.teachers_names:
+            name += f" - Taught by: {', '.join(self.teachers_names)}"
+
+        return name
+
+    @property
+    def students(self):
+        """
+        Return a queryset of students of this class
+        """
+        user_role_student = UserRole.objects.get(name='student')
+        return User.objects.filter(classes__id=self.id, role=user_role_student)
+
+    @property
+    def students_count(self):
+        return len(self.students)
+
+    @property
+    def teachers(self):
+        """
+        Return a queryset of teachers of this class
+        """
+        user_role_teacher = UserRole.objects.get(name='teacher')
+        return User.objects.filter(classes__id=self.id, role=user_role_teacher)
+
+    @property
+    def teachers_names(self):
+        """
+        Return a list of names of teachers of this class
+        (using the above 'teachers' queryset)
+        """
+        return [f'{teacher.first_name} {teacher.last_name}' for teacher in self.teachers]
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['language', 'difficulty', 'id']
+        verbose_name_plural = 'classes'
+
+
+class Theme(models.Model):
+    """
+    A theme/section of exercises, e.g. Grammar, Vocabulary
+    """
+
+    name = models.CharField(max_length=255, unique=True)
+    name_full = models.TextField()
+    parent_theme = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
+    is_published = models.BooleanField(default=True, verbose_name="Published")
+
+    @property
+    def level(self):
+        if self.parent_theme:
+            if ":" in str(self.parent_theme):
+                return 3
+            else:
+                return 2
+        else:
+            return 1
+
+    def __str__(self):
+        return self.name_full
+
+    def save(self, *args, **kwargs):
+        """
+        To be executed each time an object is created/updated
+        """
+
+        # Set the 'name_full' property
+        if self.level == 1:
+            self.name_full = self.name
+        elif self.level == 2:
+            self.name_full = f"{self.parent_theme}: {self.name}"
+        elif self.level == 3:
+            self.name_full = f"{self.parent_theme} ({self.name})"
+
+        # Save new object
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['name_full', 'id']
+
+
+class ExerciseFormat(models.Model):
+    """
+    A format/type of exercise, e.g. multiple choice, fill in the blank, etc.
+    """
+
+    name = models.CharField(max_length=255, unique=True)
+    icon = models.CharField(max_length=255)
+    instructions = models.TextField(blank=True, null=True)
+    is_marked_automatically_by_system = models.BooleanField(default=False)
+    is_published = models.BooleanField(default=True, verbose_name="Published")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name', 'id']
+
+
+class Exercise(models.Model):
+    """
+    An exercise/task/game that students complete
+    """
+
+    name = models.CharField(max_length=255)
+    language = models.ForeignKey(Language, on_delete=models.RESTRICT)
+    exercise_format = models.ForeignKey(ExerciseFormat, on_delete=models.RESTRICT)
+    theme = models.ForeignKey(Theme, on_delete=models.SET_NULL, blank=True, null=True, help_text=OPTIONAL_HELP_TEXT)
+    difficulty = models.ForeignKey(Difficulty, on_delete=models.RESTRICT)
+    is_visible_to_registered_users_only = models.BooleanField(default=True, help_text="Tick if this exercise should only be available to users with accounts (e.g. registered students)")
+    instructions = models.TextField(blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " If left blank then the default instructions for this exercise format will be used (suitable for most cases)")
+    instructions_image = models.ImageField(upload_to='exercises-exercise-instructions', blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " Include an image here to illustrate the instructions for the entire exercise. E.g. if all questions relate to this image.")
+    is_published = models.BooleanField(default=True, verbose_name="Published")
+    owned_by = models.ForeignKey(User, related_name="exercise_owned_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The only teacher who can manage this exercise")
+    created_by = models.ForeignKey(User, related_name="exercise_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The teacher who originally created this exercise")
+
+    @property
+    def image_match_label_options(self):
+        """
+        If this is an ImageMatch exercise:
+        Return an ordered list of all labels of image match objects that are used in this exercise
+        """
+        if self.exercise_format == ExerciseFormat.objects.get(name='Image Match'):
+            labels = []
+            for image_match_object in ExerciseFormatImageMatch.objects.filter(exercise=self):
+                labels.append(image_match_object.label)
+            random.shuffle(labels)  # important to mix up order
+            return labels
+
+    @property
+    def items(self):
+        if self.exercise_format.name == "Image Match":
+            return ExerciseFormatImageMatch.objects.filter(exercise=self)
+        elif self.exercise_format.name == "Multiple Choice":
+            return ExerciseFormatMultipleChoice.objects.filter(exercise=self)
+        elif self.exercise_format.name == "Sentence Builder":
+            return ExerciseFormatSentenceBuilder.objects.filter(exercise=self)
+        elif self.exercise_format.name == "Fill in the Blank":
+            return ExerciseFormatFillInTheBlank.objects.filter(exercise=self)
+        elif self.exercise_format.name == "Manuscript Match":
+            return ExerciseFormatTranslation.objects.filter(exercise=self)
+        elif self.exercise_format.name == "External":
+            return ExerciseFormatExternal.objects.filter(exercise=self)
+        else:
+            return None
+
+    @property
+    def items_count(self):
+        return self.items.count()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name', 'id']
+
+
+class ExerciseFormatImageMatch(models.Model):
+    """
+    An individual image match question within an exercise
+    """
+
+    exercise = models.ForeignKey(Exercise,
+                                 limit_choices_to={'exercise_format__name': "Image Match"},
+                                 on_delete=models.CASCADE,
+                                 blank=True,
+                                 null=True)
+    image = models.ImageField(upload_to='exercises-exerciseformat-imagematch')
+    label = models.CharField(max_length=255)
+    label_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    # no order field as these load in random order
+
+    def has_audio(self):
+        return bool(self.label_audio)
+    has_audio.boolean = True  # sets tick/cross in admin dashboard
+
+    def __str__(self):
+        if self.exercise:
+            return f"{self.exercise.name}: {self.label}"
+        else:
+            return self.label
+
+    class Meta:
+        ordering = ['exercise', '?', 'id']
+        verbose_name_plural = 'exercise format image matches'
+
+
+class ExerciseFormatMultipleChoice(models.Model):
+    """
+    A multiple choice question/answer set within an exercise
+    """
+
+    exercise = models.ForeignKey(Exercise,
+                                 limit_choices_to={'exercise_format__name': "Multiple Choice"},
+                                 on_delete=models.CASCADE,
+                                 blank=True,
+                                 null=True)
+    question = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
+    question_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    option_1 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
+    option_1_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    option_2 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
+    option_2_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    option_3 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
+    option_3_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    option_4 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
+    option_4_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    answer = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)], help_text="Please type the number of the correct option, e.g. for 'Option 3' type '3'")
+    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+
+    @property
+    def question_text_or_audiomsg(self):
+        return text_or_audiomsg(self.question, self.question_audio)
+
+    @property
+    def option_1_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_1, self.option_1_audio)
+
+    @property
+    def option_2_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_2, self.option_2_audio)
+
+    @property
+    def option_3_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_3, self.option_3_audio)
+
+    @property
+    def option_4_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_4, self.option_4_audio)
+
+    def has_audio(self):
+        return bool(self.question_audio or self.option_1_audio or self.option_2_audio or self.option_3_audio or self.option_4_audio)
+    has_audio.boolean = True  # sets tick/cross in admin dashboard
+
+    @property
+    def options(self):
+        return [
+                [f"1. {self.option_1_text_or_audiomsg}", self.option_1_audio, f"{self.id}-1"],
+                [f"2. {self.option_2_text_or_audiomsg}", self.option_2_audio, f"{self.id}-2"],
+                [f"3. {self.option_3_text_or_audiomsg}", self.option_3_audio, f"{self.id}-3"],
+                [f"4. {self.option_4_text_or_audiomsg}", self.option_4_audio, f"{self.id}-4"]
+            ]
+
+    @property
+    def answer_text(self):
+        if self.answer == 1:
+            return self.option_1
+        elif self.answer == 2:
+            return self.option_2
+        elif self.answer == 3:
+            return self.option_3
+        elif self.answer == 4:
+            return self.option_4
+        else:
+            return None
+
+    @property
+    def answer_text_full(self):
+        if self.answer_text:
+            return f"{self.answer}. {self.answer_text}"
+        else:
+            return self.answer
+
+    def has_audio(self):
+        return bool(self.question_audio or self.option_1_audio or self.option_2_audio or self.option_3_audio or self.option_4_audio)
+    has_audio.boolean = True  # sets tick/cross in admin dashboard
+
+    def __str__(self):
+        s = ""
+        if self.exercise:
+            s += f"{self.exercise.name}: "
+        if self.question:
+            s += self.question[0:60]
+        else:
+            s += "A 'Multiple Choice' item"
+        return s
+
+    class Meta:
+        ordering = ['exercise', 'order', 'id']
+
+
+class ExerciseFormatFillInTheBlank(models.Model):
+    """
+    A fill in the blank question/answer within an exercise
+    """
+
+    exercise = models.ForeignKey(Exercise,
+                                 limit_choices_to={'exercise_format__name': "Fill in the Blank"},
+                                 on_delete=models.CASCADE,
+                                 blank=True,
+                                 null=True)
+    source = models.TextField(help_text="E.g. an English sentence to translate, a YouTube video link, etc. " + OPTIONAL_IF_AUDIO_HELP_TEXT,  blank=True, null=True)
+    source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    text_with_blanks_to_fill = models.TextField(help_text="Wrap words you want to be blank with 2 asterisks (e.g. **blank words**). If there are multiple possibile answers for a single blank then separate them with a single asterisk (e.g. **big*large*tall**). A full example: This is an **example*sample*illustration** of how to specify **blank words** in a **sentence**.")
+    text_with_blanks_to_fill_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+
+    @property
+    def source_text_or_audiomsg(self):
+        return text_or_audiomsg(self.source, self.source_audio)
+
+    @property
+    def text_with_blanks_to_fill_list(self):
+        """
+        Generate a list of strings of the contents of the blanks
+        E.g. if text_with_blanks_to_fill is "this is **an example** of the **words** to be **translated**"
+        this will return the list: ['an example', 'words', 'translated']
+        """
+        return self.text_with_blanks_to_fill.split('**')
+
+    @property
+    def text_with_blanks_to_fill_html(self):
+        """
+        Return the translated statement with blanks replaced with HTML text inputs to be used in the website
+        """
+        html = self.text_with_blanks_to_fill
+        for blank in self.text_with_blanks_to_fill_list:
+            # This string has to be all one line or the template puts each element on a new line in the UI
+            span = f"""<span class="exerciseformat-fillintheblank-fitb-item" dir="auto"><input type="text" dir="auto" size="{len(max(blank.split("."), key=len))}" title="fill in the blank" data-correct="{blank}"></input><span class="exerciseformat-showanswer"><i class="fas fa-info-circle" title="{blank.replace('*', ' OR ')}"></i></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span></span>"""  # noqa: E501
+            html = html.replace(f"**{blank}**", span)
+        return html
+
+    def has_audio(self):
+        return bool(self.source_audio or self.text_with_blanks_to_fill_audio)
+    has_audio.boolean = True  # sets tick/cross in admin dashboard
+
+    def __str__(self):
+        s = ""
+        if self.exercise:
+            s += f"{self.exercise.name}: "
+        if self.source:
+            s += self.source[0:60]
+        else:
+            s += "A 'Fill in the Blank' item"
+        return s
+
+    class Meta:
+        ordering = ['exercise', 'order', 'id']
+
+
+class ExerciseFormatSentenceBuilder(models.Model):
+    """
+    Build a correctly translated sentence with the words given in random order
+    """
+
+    exercise = models.ForeignKey(Exercise,
+                                 limit_choices_to={'exercise_format__name': "Sentence Builder"},
+                                 on_delete=models.CASCADE,
+                                 blank=True,
+                                 null=True)
+    sentence_source = models.TextField(help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, blank=True, null=True)
+    sentence_source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    sentence_translated = models.TextField()
+    sentence_translated_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate with a space, e.g. "car apple tree"', blank=True, null=True)
+    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+
+    @property
+    def sentence_source_text_or_audiomsg(self):
+        return text_or_audiomsg(self.sentence_source, self.sentence_source_audio)
+
+    @property
+    def words(self):
+        """
+        Return the list of words that will be shown as options for building the translated sentence
+        I.e. join sentence_translated and sentence_translated_extra_words into a randomly ordered list
+        """
+        words = self.sentence_translated.split() + self.sentence_translated_extra_words.split()
+        random.shuffle(words)
+        return words
+
+    def has_audio(self):
+        return bool(self.sentence_source_audio or self.sentence_translated_audio)
+    has_audio.boolean = True  # sets tick/cross in admin dashboard
+
+    def __str__(self):
+        s = ""
+        if self.exercise:
+            s += f"{self.exercise.name}: "
+        if self.sentence_source:
+            s += self.sentence_source[0:60]
+        else:
+            s += "A 'Sentence Builder' item"
+        return s
+
+    class Meta:
+        ordering = ['exercise', 'order', 'id']
+
+
+class ExerciseFormatTranslation(models.Model):
+    """
+    A manuscript exercise
+    """
+
+    exercise = models.ForeignKey(Exercise,
+                                 limit_choices_to={'exercise_format__name': "Manuscript"},
+                                 on_delete=models.CASCADE,
+                                 blank=True,
+                                 null=True)
+    manuscript_image = models.ImageField(upload_to='exercises-exerciseformat-manuscript')
+    correct_translation = models.TextField()
+    correct_translation_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+
+    def has_audio(self):
+        return bool(self.correct_translation_audio)
+    has_audio.boolean = True  # sets tick/cross in admin dashboard
+
+    def __str__(self):
+        if self.exercise:
+            return f"{self.exercise.name}: {self.correct_translation[0:40]}"
+        else:
+            return self.correct_translation[0:40]
+
+    class Meta:
+        ordering = ['exercise', 'order', 'id']
+
+
+class ExerciseFormatExternal(models.Model):
+    """
+    An external exercise
+    """
+
+    exercise = models.ForeignKey(Exercise,
+                                 limit_choices_to={'exercise_format__name': "External"},
+                                 on_delete=models.CASCADE,
+                                 blank=True,
+                                 null=True)
+    url = models.URLField()
+    instructions = models.TextField(blank=True, null=True, help_text=OPTIONAL_HELP_TEXT)
+    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+
+    def __str__(self):
+        if self.exercise:
+            return f"{self.exercise.name}: {self.url[0:80]}"
+        else:
+            return self.url[0:80]
+
+    class Meta:
+        ordering = ['exercise', 'order', 'id']
+
+
+class ExerciseFurtherStudyMaterial(models.Model):
+    """
+    A resource (e.g. PDF, URL, etc) for further study in relation to a particular exercise
+    """
+
+    exercise = models.ForeignKey(Exercise, on_delete=models.RESTRICT)
+    name = models.CharField(max_length=255)
+    file = models.FileField(upload_to='exercises-exercisefurtherstudymaterial-file', blank=True, null=True)
+    url = models.URLField(blank=True, null=True)
+    is_published = models.BooleanField(default=True, verbose_name="Published")
+    created_by = models.ForeignKey(User, related_name="exercisefurtherstudymaterial_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The teacher who originally created this material")
+
+    @property
+    def file_name(self):
+        return str(self.file).split('/')[-1:][0]
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name', 'id']
+
+
+class SchoolClassAlertExercise(models.Model):
+    """
+    Many to many relationship between Exercise and SchoolClass,
+    which acts as an alert monitoring system
+    """
+
+    school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField()
+
+    @property
+    def is_active(self):
+        if self.start_date <= date.today() <= self.end_date:
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        return f"Class exercise alert: {self.id}"
+
+    class Meta:
+        ordering = ['start_date', 'end_date', 'school_class', 'exercise', 'id']
+
+
+class UserExerciseAttempt(models.Model):
+    """
+    Many to many relationship between User (students) and Exercise,
+    to record attempts made by the student at the exercise
+    """
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    score = models.FloatField(blank=True, null=True)
+    attempt_duration = models.IntegerField(blank=True, null=True)
+    submit_timestamp = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def score_percentage(self):
+        if self.score:
+            return f"{round(self.score)}%"
+        else:
+            return None
+
+    def __str__(self):
+        return f"[{str(self.submit_timestamp)[0:19]}]: {self.user.username} - {self.exercise.name[0:20]}"
+
+    class Meta:
+        ordering = ['-submit_timestamp', 'user', 'exercise']
