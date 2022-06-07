@@ -300,25 +300,19 @@ main {
     width: 100%;
     padding-top: 5vh;
     position: relative;
-    background-image: url('../images/welcome/banner-bg.jpg');
+    background-image: url('../images/welcome/banner-bg.svg');
     background-repeat: no-repeat;
-    background-size: cover;
     background-position: center;
-    background-color: white;
+    background-color: #1779C5;
     background-attachment: fixed;
 }
 
 #welcome-banner-content {
-    background: #1779C5;
     font-weight: 400;
     letter-spacing: 0.05em;
     font-size: 1.5em;
     color: white;
-}
-
-#welcome-banner-content img {
-    width: 13em;
-    max-width: 90%;
+    text-align: center;
 }
 
 #welcome-banner-content a {

@@ -41,6 +41,8 @@
     }
 
     #welcome-banner-content img {
+        width: 13em;
+        max-width: 90%;
         margin: 1em 0;
     }
 
