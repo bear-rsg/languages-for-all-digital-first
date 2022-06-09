@@ -7,6 +7,7 @@ urlpatterns = [
 
     # General app's urls
     path('', include('general.urls')),
+    path('', include('exercises.urls')),
 
     # Account app's urls + Django's built in auth's urls
     # Share same pattern (/account) for consistency for user

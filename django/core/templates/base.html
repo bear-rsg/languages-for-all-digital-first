@@ -67,7 +67,7 @@
                     </li>
                     <!-- Exercises -->
                     <li class="nav-item">
-                        <a class="nav-link{% if "/exercises/" in request.path %} active{% endif %}" href="/">
+                        <a class="nav-link{% if "/exercises/" in request.path %} active{% endif %}" href="{% url 'exercises:list' %}">
                             <i class="fas fa-check-circle"></i>
                             <span>Exercises</span>
                         </a>
