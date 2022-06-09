@@ -66,8 +66,8 @@ class ThemeAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: Theme
     """
-    list_display = ('name_full', 'is_published')
-    list_display_links = ('name_full',)
+    list_display = ('name', 'is_published')
+    list_display_links = ('name',)
     list_filter = ('is_published',)
     search_fields = ('name',)
     actions = (publish, unpublish)

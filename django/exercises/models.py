@@ -127,41 +127,13 @@ class Theme(models.Model):
     """
 
     name = models.CharField(max_length=255, unique=True)
-    name_full = models.TextField()
-    parent_theme = models.ForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
     is_published = models.BooleanField(default=True, verbose_name="Published")
 
-    @property
-    def level(self):
-        if self.parent_theme:
-            if ":" in str(self.parent_theme):
-                return 3
-            else:
-                return 2
-        else:
-            return 1
-
     def __str__(self):
-        return self.name_full
-
-    def save(self, *args, **kwargs):
-        """
-        To be executed each time an object is created/updated
-        """
-
-        # Set the 'name_full' property
-        if self.level == 1:
-            self.name_full = self.name
-        elif self.level == 2:
-            self.name_full = f"{self.parent_theme}: {self.name}"
-        elif self.level == 3:
-            self.name_full = f"{self.parent_theme} ({self.name})"
-
-        # Save new object
-        super().save(*args, **kwargs)
+        return self.name
 
     class Meta:
-        ordering = ['name_full', 'id']
+        ordering = ['name', 'id']
 
 
 class ExerciseFormat(models.Model):
@@ -222,7 +194,7 @@ class Exercise(models.Model):
             return ExerciseFormatSentenceBuilder.objects.filter(exercise=self)
         elif self.exercise_format.name == "Fill in the Blank":
             return ExerciseFormatFillInTheBlank.objects.filter(exercise=self)
-        elif self.exercise_format.name == "Manuscript Match":
+        elif self.exercise_format.name == "Translation":
             return ExerciseFormatTranslation.objects.filter(exercise=self)
         elif self.exercise_format.name == "External":
             return ExerciseFormatExternal.objects.filter(exercise=self)
@@ -474,15 +446,15 @@ class ExerciseFormatSentenceBuilder(models.Model):
 
 class ExerciseFormatTranslation(models.Model):
     """
-    A manuscript exercise
+    A translation exercise
     """
 
     exercise = models.ForeignKey(Exercise,
-                                 limit_choices_to={'exercise_format__name': "Manuscript"},
+                                 limit_choices_to={'exercise_format__name': "Translation"},
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    manuscript_image = models.ImageField(upload_to='exercises-exerciseformat-manuscript')
+    translation_image = models.ImageField(upload_to='exercises-exerciseformat-translation')
     correct_translation = models.TextField()
     correct_translation_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
