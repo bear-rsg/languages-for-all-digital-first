@@ -55,6 +55,80 @@
         display: none;
     }
 
+    /* ---------- Exercise: List ---------- */
+
+    .exercise-list-head-form-item {
+        width: 100%;
+        display: block;
+    }
+
+    .exercise-list-body-items-item {
+        display: block;
+        width: 90%;
+        padding: 1em;
+    }
+
+    .exercise-list-body-items-item.gridview {
+        border: 1px solid #CCC;
+    }
+
+    #exercise-list-head-form-options-organise label {
+        display: block;
+        margin-top: 1em;
+    }
+
+    #exercise-list-head-form-options-organise span {
+        font-size: 0.93em;
+    }
+
+    /* ---------- Exercise: Detail ---------- */
+
+    #exercise-detail-footer {
+        font-size: 0.9em;
+    }
+
+    .exercise-detail-footer-button {
+        padding: 0.8em 0.7em 0.6em 0.7em;
+        margin: 0.2em;
+    }
+
+    .exercise-detail-footer-button i {
+        display: block;
+    }
+
+    #exercise-detail-footer-score {
+        font-size: 1em;
+    }
+
+    #exercise-detail-footer-completed {
+        display: block;
+        width: 100%;
+    }
+
+    #exercise-detail-footer-completed i {
+        display: inline-block;
+        margin-right: 0.3em;
+    }
+
+    /* Exercise: Detail: Format: ImageMatch */
+
+    .exerciseformat-imagematch {
+        display: block;
+    }
+
+    /* Exercise: Detail: Format: Translation */
+
+    .exerciseformat-translation-image {
+        display: block;
+        padding: 1em 2em;
+        width: 100%;
+    }
+
+    .exerciseformat-translation-userattempt {
+        display: block;
+        margin-top: 3em;
+    }
+
     /* ---------- Popup ---------- */
 
     .popup-content {

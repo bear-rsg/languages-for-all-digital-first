@@ -1,0 +1,93 @@
+{% for sb in exercise.exerciseformatsentencebuilder_set.all %}
+
+    <div class="exerciseformat-sentencebuilder">
+
+        <!-- Question -->
+        <div class="exerciseformat-sentencebuilder-question" dir="auto">
+            {% include "exercises/snippets/force-dir-auto.html" with text=sb.sentence_source_text_or_audiomsg %}
+            {% include "exercises/snippets/audio.html" with audio=sb.sentence_source_audio id=forloop.counter|add:100000 %}
+
+            {{ forloop.counter }}. <span dir="auto">{{ sb.sentence_source_text_or_audiomsg }}</span>
+        </div>
+
+        <!-- Sentence -->
+        <div class="exerciseformat-sentencebuilder-sentence">
+            <div class="exerciseformat-sentencebuilder-sentence-text" dir="auto"></div>
+            {% include "exercises/snippets/audio.html" with audio=sb.sentence_translated_audio id=forloop.counter %}
+        </div>
+
+        <!-- Words -->
+        <div class="exerciseformat-sentencebuilder-words">
+            {% for word in sb.words %}
+                <button value="{{ word }}" dir="auto">{{ word }}</button>
+            {% endfor %}
+        </div>
+
+        <div class="exerciseformat-sentencebuilder-restart"><i class="fas fa-sync-alt"></i> Restart</div>
+
+        <div class="exerciseformat-showanswer">
+            <label><i class="fas fa-info-circle"></i> Show answer</label>
+            <div class="answer">{{ sb.sentence_translated }}</div>
+        </div>
+
+        <!-- Result -->
+        <div class="exerciseformat-sentencebuilder-result">
+        </div>
+
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=sb.id %}
+
+    </div>
+{% empty %}
+    {% include 'exercises/snippets/exercise-content-empty.html' %}
+{% endfor %}
+
+<script>
+$(document).ready(function() {
+    // Click word to add it to sentence
+    $('.exerciseformat-sentencebuilder-words button').on('click', function(){
+        var sentence = $(this).parent().parent().find('.exerciseformat-sentencebuilder-sentence-text');
+        var word = (sentence.html() === '' ? $(this).val() : " " + $(this).val());
+        sentence.append(word);
+        $(this).prop('disabled', true);
+    });
+
+    // Restart a question
+    $('.exerciseformat-sentencebuilder-restart').on('click', function(){
+        // Clear sentence text
+        $(this).parent().find('.exerciseformat-sentencebuilder-sentence-text').html('');
+        // Clear results for this answer
+        $(this).parent().parent().find('.exerciseformat-sentencebuilder-result').html('');
+        // Enable all buttons
+        $(this).parent().find('.exerciseformat-sentencebuilder-words button').prop('disabled', false);
+    });
+
+    // Click button to score attempt
+    $('#exercise-detail-footer-check').on('click', function(){
+        var score = 0;
+        $('.exerciseformat-sentencebuilder').each(function(){
+            var answerAttempt = $(this).find('.exerciseformat-sentencebuilder-sentence-text').text();
+            var answerCorrect = $(this).find('.answer').text();
+            // Correct
+            if (answerAttempt == answerCorrect) {
+                var result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
+                score++;
+            }
+            // Unanswered
+            else if (answerAttempt == "") var result = '<span class="exercise-result-unanswered"><i class="fas fa-question"></i> Unanswered</span>';
+            // Wrong
+            else var result = '<span class="exercise-result-wrong"><i class="fas fa-times"></i> Wrong</span>';
+            // Set individual results
+            $(this).find('.exerciseformat-sentencebuilder-result').html(result);
+        });
+        // Set total results
+        var questionCount = $('.exerciseformat-sentencebuilder').length;
+        var scorePercent = Math.round(parseFloat(score/questionCount) * 100);
+        $('#exercise-detail-footer-score').html("Score: " + score + "/" + questionCount + " (<span id='exercise-detail-footer-score-val'>" + scorePercent + "</span>%)" );
+    });
+
+    // Click to toggle visibility of 'show answer'
+    $('.exerciseformat-showanswer label').on('click', function() {
+        $(this).parent().find('.answer').toggle();
+    });
+});
+</script>

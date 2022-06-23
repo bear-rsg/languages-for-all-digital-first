@@ -1,0 +1,72 @@
+{% for mc in exercise.exerciseformatmultiplechoice_set.all %}
+
+    <div class="exerciseformat-multiplechoice">
+
+        <!-- Question -->
+        <div class="exerciseformat-multiplechoice-question" dir="auto">
+            {% include "exercises/snippets/force-dir-auto.html" with text=mc.question_text_or_audiomsg %}
+            {% include "exercises/snippets/audio.html" with audio=mc.question_audio id=forloop.counter %}
+            <!-- Question text -->
+            {{ forloop.counter }}. {{ mc.question_text_or_audiomsg }}
+        </div>
+
+        <!-- Options -->
+        <div class="exerciseformat-multiplechoice-options">
+            {% for option in mc.options %}
+                <div class="exerciseformat-multiplechoice-options-option{% if option.1 %} hasaudio{% endif %}" dir="auto">
+                    {% include "exercises/snippets/force-dir-auto.html" with text=option.0 %}
+                    {% include "exercises/snippets/audio.html" with audio=option.1 id=option.2 %}
+                    <!-- Value is 1 if correct answer or 0 if not -->
+                    <input type="radio" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{% if mc.answer == forloop.counter %}1{% else %}0{%endif%}"{% if forloop.counter == 1 %} checked="checked"{% endif %}>
+                    <label for="option-{{ option.2 }}">
+                        {{ option.0 }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="exerciseformat-showanswer">
+            <label><i class="fas fa-info-circle"></i> Show answer</label>
+            <div class="answer">{{ mc.answer_text_full }}</div>
+        </div>
+
+        <div class="exerciseformat-multiplechoice-result">
+        </div>
+
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=mc.id %}
+
+    </div>
+{% empty %}
+    {% include 'exercises/snippets/exercise-content-empty.html' %}
+{% endfor %}
+
+<script>
+$(document).ready(function() {
+    // Click button to score attempt
+    $('#exercise-detail-footer-check').on('click', function(){
+        var score = 0;
+        $('.exerciseformat-multiplechoice input:radio:checked').each(function(){
+            var answerAttempt = $(this).val();
+            var answerCorrect = 1;
+            // Correct
+            if (answerAttempt == answerCorrect) {
+                var result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
+                score++;
+            }
+            // Wrong
+            else var result = '<span class="exercise-result-wrong"><i class="fas fa-times"></i> Wrong</span>';
+            // Set individual results
+            $(this).parent().parent().parent().find('.exerciseformat-multiplechoice-result').html(result);
+        });
+        // Set total results
+        var questionCount = $('.exerciseformat-multiplechoice input:radio:checked').length;
+        var scorePercent = Math.round(parseFloat(score/questionCount) * 100);
+        $('#exercise-detail-footer-score').html("Score: " + score + "/" + questionCount + " (<span id='exercise-detail-footer-score-val'>" + scorePercent + "</span>%)" );
+    });
+
+    // Click to toggle visibility of 'show answer'
+    $('.exerciseformat-showanswer label').on('click', function() {
+        $(this).parent().find('.answer').toggle();
+    });
+});
+</script>

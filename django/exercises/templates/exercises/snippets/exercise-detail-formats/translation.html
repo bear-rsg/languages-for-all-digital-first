@@ -1,0 +1,70 @@
+{% for m in exercise.exerciseformattranslation_set.all %}
+
+    <div class="exerciseformat-translation">
+
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=m.id %}
+
+        <div class="exerciseformat-translation-image">
+            <div id="exerciseformat-translation-image-container-{{forloop.counter}}" class="exerciseformat-translation-image-container">
+                <img src="{{ m.translation_image.url }}" id="main-img-{{ forloop.counter }}" class="main-img" alt="Translation image">
+                <div id="zoomed-img-{{ forloop.counter }}" class="zoomed-img" style="background: url('{{ m.translation_image.url }}') no-repeat #F7F7F7;"></div>
+            </div>
+            <a class="exerciseformat-translation-image-fullsize" href="{{ m.translation_image.url }}" target="_blank">View full size <i class="fas fa-expand-arrows-alt"></i></a>
+        </div>
+
+        <!-- User's attempt -->
+        <div class="exerciseformat-translation-userattempt">
+            <!-- Header -->
+            <label for="translation-translate">
+                Translate the translation
+                {% include "exercises/snippets/audio.html" with audio=m.correct_translation_audio id=forloop.counter %}
+            </label>
+            <!-- Input -->
+            <textarea id="translation-translate" dir="auto"></textarea>
+            <!-- Show answer -->
+            <div class="exerciseformat-showanswer">
+                <label><i class="fas fa-info-circle"></i> Show answer</label>
+                <div class="answer" dir="auto">{{ m.correct_translation | linebreaks }}</div>
+            </div>
+        </div>
+
+    </div>
+{% empty %}
+    {% include 'exercises/snippets/exercise-content-empty.html' %}
+{% endfor %}
+
+<script>
+$(document).ready(function() {
+    // Click to toggle visibility of 'show answer'
+    $('.exerciseformat-showanswer label').on('click', function() {
+        $(this).parent().find('.answer').toggle();
+    });
+
+    // Magnifying glass
+    $('.exerciseformat-translation-image-container').on('mousemove', function(e){
+        var this_main_img_id = $(this).find('.main-img').attr('id'),
+           this_zoomed_img_id = $(this).find('.zoomed-img').attr('id'),
+            original = document.getElementById(this_main_img_id),
+            magnified = document.getElementById(this_zoomed_img_id),
+            style = magnified.style,
+            x = e.pageX - this.offsetLeft,
+            y = e.pageY - this.offsetTop,
+            imgWidth = original.width,
+            imgHeight = original.height,
+            xperc = (x / imgWidth) * 100,
+            yperc = (y / imgHeight) * 100;
+        // Add some margin for right edge
+        if (x > 0.01 * imgWidth) xperc += 0.15 * xperc;
+        // Add some margin for bottom edge
+        if (y >= 0.01 * imgHeight) yperc += 0.15 * yperc;
+        // Set the background of the magnified image horizontal
+        style.backgroundPositionX = xperc - 9 + '%';
+        // Set the background of the magnified image vertical
+        style.backgroundPositionY = yperc - 9 + '%';
+        // Move the magnifying glass with the mouse movement.
+        var width_height_half = 125; // whatever value here (e.g. 125) must be double in CSS width & height (e.g. 250px)
+        style.left = x - width_height_half + 'px';
+        style.top = y - width_height_half + 'px';
+    });
+});
+</script>

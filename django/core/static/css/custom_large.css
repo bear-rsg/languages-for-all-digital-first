@@ -64,6 +64,73 @@
         background-color: #F8F8F8;
     }
 
+
+    /* ---------- Exercise: List ---------- */
+
+    .exercise-list-head-form-item {
+        width: 33%;
+        display: inline-block;
+    }
+
+    .exercise-list-body-items-item.gridview {
+        display: inline-block;
+        width: calc(33% - 2em);
+        vertical-align: middle;
+        padding: 1em;
+        border: 1px solid #CCC;
+    }
+    
+    .exercise-list-body-items-item.listview {
+        display: block;
+        width: 100%;
+        padding: 0.7em 1em;
+    }
+
+    /* ---------- Exercise: Detail ---------- */
+
+    .exercise-detail-footer-button {
+        margin: 0 0.5em;
+        padding: 0.8em 1.6em;
+        padding-bottom: 0.7em;
+    }
+
+    .exercise-detail-footer-button i {
+        margin-right: 0.3em;
+    }
+
+    #exercise-detail-footer-score {
+        font-size: 1.3em;
+    }
+
+    #exercise-detail-footer-completed {
+        float: right;
+        display: block;
+    }
+
+    /* Exercise: Detail: Format: ImageMatch */
+
+    .exerciseformat-imagematch {
+        display: inline-block;
+        width: calc(25% - 3.3em);
+    }
+    
+    /* Exercise: Detail: Format: Translation */
+
+    .exerciseformat-translation-image {
+        display: inline-block;
+        padding: 1em 2em;
+        width: calc(50% - 6em);
+        vertical-align: top;
+    }
+
+    .exerciseformat-translation-userattempt {
+        display: inline-block;
+        width: calc(50% - 3em);
+        margin-left: 3em;
+        vertical-align: top;
+    }
+
+
     /* ---------- Popup ---------- */
 
     .popup-content {
