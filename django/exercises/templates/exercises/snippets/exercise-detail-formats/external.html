@@ -1,0 +1,20 @@
+{% for e in exercise.exerciseformatexternal_set.all %}
+
+    <div class="exerciseformat-external">
+
+        <!-- Only show counter if there are multiple -->
+        {% if exercise.exerciseformatexternal_set.all.count > 1 %}
+            <span>{{ forloop.counter }}.</span>
+        {% endif %}
+        <!-- URL -->
+        <a href="{{ e.url }}" target="_blank">{{ e.url }}</a>
+        <!-- Instructions -->
+        {% if e.instructions %}
+            <div class="exerciseformat-external-instructions">{{ e.instructions | linebreaks }}</div>
+        {% endif %}
+
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=e.id %}
+    </div>
+{% empty %}
+    {% include 'exercises/snippets/exercise-content-empty.html' %}
+{% endfor %}

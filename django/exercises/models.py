@@ -164,7 +164,6 @@ class Exercise(models.Model):
     exercise_format = models.ForeignKey(ExerciseFormat, on_delete=models.RESTRICT)
     theme = models.ForeignKey(Theme, on_delete=models.SET_NULL, blank=True, null=True, help_text=OPTIONAL_HELP_TEXT)
     difficulty = models.ForeignKey(Difficulty, on_delete=models.RESTRICT)
-    is_visible_to_registered_users_only = models.BooleanField(default=True, help_text="Tick if this exercise should only be available to users with accounts (e.g. registered students)")
     instructions = models.TextField(blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " If left blank then the default instructions for this exercise format will be used (suitable for most cases)")
     instructions_image = models.ImageField(upload_to='exercises-exercise-instructions', blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " Include an image here to illustrate the instructions for the entire exercise. E.g. if all questions relate to this image.")
     is_published = models.BooleanField(default=True, verbose_name="Published")

@@ -3,6 +3,13 @@
 
 {% block main %}
 
-Content add
+<section class="container">
+    <h2>Add Item to Exercise</h2>
+    <form method="post" class="full-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit"><i class="fas fa-check"></i> Save</button>
+    </form>
+</section>
 
 {% endblock %}

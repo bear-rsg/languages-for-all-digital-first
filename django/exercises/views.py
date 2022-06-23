@@ -51,7 +51,7 @@ class ExerciseCreateView(PermissionRequiredMixin, CreateView):
 
     template_name = 'exercises/exercise-add.html'
     model = models.Exercise
-    fields = ['name', 'language', 'exercise_format', 'theme', 'difficulty', 'font_style', 'is_visible_to_registered_users_only', 'instructions', 'instructions_image']
+    fields = ['name', 'language', 'exercise_format', 'theme', 'difficulty', 'instructions', 'instructions_image']
     permission_required = ('exercises.add_exercise')
     success_url = reverse_lazy('exercises:list')
 
@@ -77,7 +77,7 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
 
     template_name = 'exercises/exercise-edit.html'
     model = models.Exercise
-    fields = ['name', 'language', 'theme', 'difficulty', 'font_style', 'instructions', 'instructions_image', 'is_visible_to_registered_users_only', 'owned_by']
+    fields = ['name', 'language', 'theme', 'difficulty', 'instructions', 'instructions_image', 'owned_by']
     permission_required = ('exercises.change_exercise')
 
     def get_queryset(self):
@@ -116,7 +116,6 @@ def exercise_copy(request, pk):
     # Make copy of exercise
     newExercise = originalExercise
     newExercise.name += ' (copy)'
-    newExercise.is_visible_to_registered_users_only = True
     newExercise.created_by = request.user
     newExercise.owned_by = request.user
     newExercise.pk = None  # clear id so Django will provide a new, unique id automatically
@@ -153,23 +152,6 @@ class ExerciseDetailView(DetailView):
     template_name = 'exercises/exercise-detail.html'
     queryset = models.Exercise.objects.filter(is_published=True)
 
-    def get_object(self, **kwargs):
-        """
-        This method ensures the selected object passes privacy rules and can be shown
-        """
-
-        # Get object, if exists
-        try:
-            object_instance = self.queryset.get(pk=self.kwargs['pk'])
-        except self.model.DoesNotExist:
-            raise Http404()
-
-        # Check the user is authenticated (or isn't authenticated but the exercise doesn't require authentication to view)
-        if self.request.user.is_authenticated or (self.request.user.is_authenticated is False and object_instance.is_visible_to_registered_users_only is False):
-            return object_instance
-        else:
-            raise Http404()
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # If user is logged in, return past scores for current exercise
@@ -191,7 +173,7 @@ class ExerciseListView(ListView):
     def get_queryset(self):
         """
         This method returns a filtered and ordered query set by:
-        1. Enforcing privacy rules (e.g. is_published and is_visible_to_registered_users_only)
+        1. Enforcing privacy rules (e.g. is_published)
         2. Searching
         3. Filtering
         4. Ordering
@@ -199,11 +181,7 @@ class ExerciseListView(ListView):
         """
 
         # 1. Enforcing privacy rules
-        # Published rule (only display published exercises)
         queryset = self.model.objects.filter(is_published=True)
-        # Visible to registered users only rule
-        if self.request.user.is_authenticated is False:
-            queryset = queryset.exclude(is_visible_to_registered_users_only=True)
 
         # 2. Searching
         search = self.request.GET.get('search', '')
@@ -214,8 +192,7 @@ class ExerciseListView(ListView):
                 Q(language__name__contains=search) |
                 Q(exercise_format__name__contains=search) |
                 Q(theme__name__contains=search) |
-                Q(difficulty__name__contains=search) |
-                Q(font_style__name__contains=search)
+                Q(difficulty__name__contains=search)
             )
 
         # 3. Filtering

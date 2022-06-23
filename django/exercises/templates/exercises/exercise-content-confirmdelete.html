@@ -4,6 +4,18 @@
 
 {% block main %}
 
-Content confirm delete
+<section class="container">
+    <h2>Delete Exercise Content</h2>
+    <form action="" method="post" class="full-form">
+        {% csrf_token %}
+        <p>
+            Are you sure you want to delete "{{ object }}"?
+        </p>
+        <p>
+            This is irreversible and you won't be able to get it back.
+        </p>
+        <button type="submit" class="button-danger">Delete</button>
+    </form>
+</section>
 
 {% endblock %}

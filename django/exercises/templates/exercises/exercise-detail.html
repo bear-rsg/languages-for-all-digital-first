@@ -3,6 +3,225 @@
 
 {% block main %}
 
-Detail
+<section id="exercise-detail">
+    <div class="container">
+        <!-- Name -->
+        <div id="exercise-detail-name">
+            {{ exercise.name }}
+        </div>
+        <!-- Info -->
+        <div id="exercise-detail-info">
+            <!-- Language -->
+            <div id="exercise-detail-info-language">
+                <i class="fas fa-globe-americas"></i>
+                <label>Language:</label>
+                <a href="{% url 'exercises:list'%}?language={{ exercise.language.id }}">
+                    {{ exercise.language }}
+                </a>
+            </div>
+            <!-- ExerciseFormat -->
+            <div id="exercise-detail-info-format">
+                <i class="fas fa-dice"></i>
+                <label>Format:</label>
+                <a href="{% url 'exercises:list'%}?format={{ exercise.exercise_format.id }}">
+                    {{ exercise.exercise_format }} {{ exercise.exercise_format.icon | safe }}
+                </a>
+            </div>
+            <!-- Theme -->
+            <div id="exercise-detail-info-group">
+                <i class="fas fa-layer-group"></i>
+                <label>Theme:</label>
+                <a href="{% url 'exercises:list'%}?theme={{ exercise.theme.id }}">
+                    {{ exercise.theme }}
+                </a>
+            </div>
+            <!-- Difficulty -->
+            <div id="exercise-detail-info-difficulty">
+                <i class="fas fa-balance-scale-right"></i>
+                <label>Difficulty:</label>
+                <a href="{% url 'exercises:list'%}?difficulty={{ exercise.difficulty.id }}">
+                    {{ exercise.difficulty }}
+                </a>
+                <i class="fas fa-circle" style="color: {{ exercise.difficulty.colour_hex }};"></i>
+            </div>
+
+        </div>
+
+        <!-- Admin Controls -->
+        {% if perms.exercises.change_exercise %}
+            <div id="exercise-controls">
+                <!-- Copy - button -->
+                <a id="exercise-controls-copy" class="admin-link popup-show">
+                    <i class="fas fa-copy"></i> Copy
+                </a>
+                <!-- Copy - popup -->
+                <div class="popup">
+                    <div class="popup-content">
+                        <div class="popup-hide"><i class="fas fa-times"></i></div>
+                        <div class="popup-content-title">
+                            Are you sure?
+                        </div>
+                        <p>
+                            Are you sure you'd like to create a new exercise, by copying this one?
+                        </p>
+                        <p>
+                            Once you click below to confirm, you'll be taken to the new exercise. You can then edit it as necessary, e.g. change the name, language, difficulty, content, etc.
+                        </p>
+                        <p>
+                            The new exercise will be separate from this one. Changes you make to it won't affect this exercise.
+                        </p>
+                        <a class="popup-submit" href="{% url 'exercises:copy' exercise.id %}">
+                            <i class="fas fa-copy"></i> Copy this exercise
+                        </a>
+                    </div>
+                </div>
+
+                {% if exercise.owned_by == user %}
+                    <!-- Edit -->
+                    <a id="exercise-controls-edit" class="admin-link" href="{% url 'exercises:edit' exercise.id %}">
+                        <i class="fas fa-pen"></i> Edit
+                    </a>
+                {% endif %}
+
+            </div>
+        {% endif %}
+        <!-- Instructions - use exercise specific, if exists, or default to exercise format -->
+        <div id="exercise-detail-instructions">
+            <!-- Text -->
+            {% if exercise.instructions %}
+                {{ exercise.instructions | safe | linebreaks }}
+            {% else %}
+                {{ exercise.exercise_format.instructions | safe | linebreaks }}
+            {% endif %}
+            <!-- Image -->
+            {% if exercise.instructions_image %}
+                <a href="{{ exercise.instructions_image.url }}"><img src="{{ exercise.instructions_image.url }}" alt="exercise instructions image"></a>
+            {% endif %}
+        </div>
+        {% if user.is_staff %}
+            <!-- Show exercise creator & owner info, if user is staff (teacher or admin) -->
+            <div id="exercise-detail-ownership">
+                Created by: <strong>{{ exercise.created_by.name }}</strong> 
+                Owned by: <strong>{{ exercise.owned_by.name }}</strong> 
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section id="exercise-content" class="container">
+
+    {% if perms.exercises.change_exercise and exercise.owned_by == user %}
+        <a id="exercise-content-add" class="admin-link" href="{% url 'exercises:content-add' exercise.id %}">
+            <i class="fas fa-plus"></i> Add item to exercise
+        </a>
+    {% endif %}
+
+    <!-- Exercise format specific content -->
+    <div>
+        {% if exercise.exercise_format.name == "Fill in the Blank" %}
+            {% include 'exercises/snippets/exercise-detail-formats/fill-in-the-blank.html' %}
+        {% elif exercise.exercise_format.name == "Image Match" %}
+            {% include 'exercises/snippets/exercise-detail-formats/image-match.html' %}
+        {% elif exercise.exercise_format.name == "Multiple Choice" %}
+            {% include 'exercises/snippets/exercise-detail-formats/multiple-choice.html' %}
+        {% elif exercise.exercise_format.name == "Sentence Builder" %}
+            {% include 'exercises/snippets/exercise-detail-formats/sentence-builder.html' %}
+        {% elif exercise.exercise_format.name == "External" %}
+            {% include 'exercises/snippets/exercise-detail-formats/external.html' %}
+        {% elif exercise.exercise_format.name == "Translation" %}
+            {% include 'exercises/snippets/exercise-detail-formats/translation.html' %}
+        {% endif %}
+    </div>
+</section>
+
+<section id="exercise-detail-footer">
+    <div class="container">
+
+        <!-- Restart -->
+        <button id="exercise-detail-footer-restart" class="exercise-detail-footer-button" onclick="location.reload(true);">
+            <i class="fas fa-sync-alt"></i> Restart
+        </button>
+
+        <!-- Footer content for auto marking exercise -->
+        {% if exercise.exercise_format.is_marked_automatically_by_system %}
+            {% if pastscores %}
+                <!-- Past scores -->
+                <button id="exercise-detail-footer-pastscores" class="exercise-detail-footer-button popup-show">
+                    <i class="fas fa-history"></i> Past Scores
+                </button>
+                <div class="popup">
+                    <div class="popup-content">
+                        <div class="popup-hide"><i class="fas fa-times"></i></div>
+                        <div class="popup-content-title">
+                            Your Past Scores For This Exercise
+                        </div>
+                        {% for score in pastscores %}
+                            <div class="exercise-detail-footer-pastscores-score">
+                                <label>{{ score.score |floatformat:"0" }}%</label> <span>{{ score.timestamp }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+            <!-- Check answers -->
+            <button id="exercise-detail-footer-check" class="exercise-detail-footer-button">
+                <i class="fas fa-calculator"></i> Check Answers
+            </button>
+            <!-- Score (content filled by JS) -->
+            <div id="exercise-detail-footer-score"></div>
+        {% endif %}
+
+        <!-- If user is authenticated, allow to submit form -->
+        {% if user.is_authenticated %}
+            <!-- Complete button (to show popup form) -->
+            <button id="exercise-detail-footer-completed" class="exercise-detail-footer-button popup-show">
+                <i class="fas fa-check"></i> Completed
+            </button>
+
+            <div id="exercise-attempt-popup" class="popup">
+                <div class="popup-content">
+                    <div class="popup-hide"><i class="fas fa-times"></i></div>
+                    {% if exercise.exercise_format.is_marked_automatically_by_system %}
+                        <div class="popup-content-title">
+                            You scored: <span id="exercise-attempt-popup-score"></span>%
+                        </div>
+                    {% endif %}
+                    <p>
+                        Please confirm you've completed the exercise or close this message to continue working on it
+                    </p>
+                    <!-- Form to mark exercise as completed -->
+                    <form id="exercise-attempt-form" method="post" action="{% url 'exercises:attempt' %}">
+                        {% csrf_token %}
+                        <!-- Hidden values -->
+                        <input id="exercise-attempt-form-exercise" type="hidden" name="exercise" value="{{ exercise.id }}">
+                        <input id="exercise-attempt-form-score" type="hidden" name="score" val="empty">
+                        <button type="submit" class="popup-submit">
+                            <i class="fas fa-check"></i> Completed
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<script>
+$(document).ready(function() {
+    // Click to prompt confirm submission of exercise attempt
+    $('#exercise-detail-footer-completed').on('click', function(){
+        {% if exercise.exercise_format.is_marked_automatically_by_system %}
+            // Score exercise
+            $('#exercise-detail-footer-check').trigger('click');
+            // Add score to popup
+            var score = $('#exercise-detail-footer-score-val').text();
+            $('#exercise-attempt-popup-score').text(score)
+            // Set score val in exercise attempt form
+            if(score == '0') score=0.1 // 0 is ignored by backend, so change to 0.1 (will be rounded to 0)
+            $('#exercise-attempt-form-score').val(score);
+        {% endif %}
+    });
+});
+</script>
 
 {% endblock %}

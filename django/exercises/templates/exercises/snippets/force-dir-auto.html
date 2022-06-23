@@ -1,0 +1,5 @@
+<!-- 
+    In some browsers (Chrome, etc.) the dir="auto" wasn't fully working for rtl content. In some cases the first chars weren't being picked up if, for example, they appeared after the audio icon. 
+    So adding a small sample of the text as the first thing in the element (in a hidden span) helps all browsers know what dir to use (ltr vs rtl) without impacting the UX by having to rearrange content (e.g. moving audio controls to the end).
+-->
+<span class="hidden">{{ text | truncatechars:7 }}</span>

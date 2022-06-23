@@ -1,0 +1,16 @@
+<!-- A select list element (with label) that features in the list head of a page (e.g. exercise list, materials list) for filtering data -->
+<div id="{{ page }}-list-head-form-{{ id }}" class="{{ page }}-list-head-form-item">
+    <label for="{{ page }}-list-head-form-{{ id }}-select">{{ label }}</label>
+    <select id="{{ page }}-list-head-form-{{ id }}-select" name="{{ id }}">
+        <option value="*">(Show all)</option>
+        {% if dataset %}
+            {% for dataobject in dataset %}
+                <option value="{{ dataobject.id }}"{% if dataobject.id == default_value %} selected{% endif %}>
+                    {{ dataobject }}
+                </option>
+            {% endfor %}
+        {% elif optionsHtml %}
+            {{ optionsHtml }}
+        {% endif %}
+    </select>
+</div>

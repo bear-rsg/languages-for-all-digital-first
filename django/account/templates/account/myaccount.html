@@ -31,12 +31,12 @@
                     <label>Score: </label> {% if attempt.score %}{{ attempt.score_percentage }}{% else %}N/A{% endif %}
                 </div>
                 <div class="myaccount-exercisehistory-item-exercise">
-                    <label>Exercise: </label> <a href="{% url 'exercises:exercise-detail' attempt.exercise.id %}">{{ attempt.exercise }}</a>
+                    <label>Exercise: </label> <a href="{% url 'exercises:detail' attempt.exercise.id %}">{{ attempt.exercise }}</a>
                 </div>
             </div>
         {% empty %}
             <div id="myaccount-exercisehistory-empty">
-                You've not completed any <a href="{% url 'exercises:exercise-list' %}">exercises</a> yet. When you complete an exercise, your attempt will be listed here.
+                You've not completed any <a href="{% url 'exercises:list' %}">exercises</a> yet. When you complete an exercise, your attempt will be listed here.
             </div>
         {% endfor %}
     </div>

@@ -332,6 +332,723 @@ main {
     background: #F7F7F7;
 }
 
+/* ---------- Exercise: List ---------- */
+
+#exercise-list-head,
+#exercise-detail {
+    background: #F5F5F5;
+    padding: 1.3em 0 1em 0;
+    border-bottom: 1px solid #EEE;
+    color: #303030;
+}
+
+#exercise-list-head .container {
+    padding: 1em 0 0.5em 0;
+}
+
+.exercise-list-head-form-item label {
+    display: block;
+    font-size: 0.93em;
+    margin: 0 0 0 0.2em;
+}
+
+.exercise-list-head-form-item {
+    width: 33%;
+    display: inline-block;
+    padding: 0.7em;
+}
+
+#exercise-list-head-form-search {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    padding: 0.3em 0.7em;
+    border: 1px solid #AAA;
+    border-right: none;
+    width: calc(100% - 2.4em);
+}
+
+#exercise-list-head-form-search-submit {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: #404040;
+    color: #EEE;
+    padding: calc(0.3em + 1px) 0.7em;
+    border-radius: 0 0.13em 0.13em 0;
+}
+
+#exercise-list-head-form-search-submit:hover {
+    background: #1779C5;
+}
+
+#exercise-list-head-form-options-reset {
+    cursor: pointer;
+    padding: 0.5em 0.7em 0.3em 0.7em;
+    border-radius: 0.3em;
+}
+
+#exercise-list-head-form-options-views i {
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 0.3em;
+    padding: 0.4em;
+    border-radius: 0.3em;
+    font-size: 1.2em;
+}
+
+#exercise-list-head-form-options i.active,
+#exercise-list-head-form-options-organise span.active {
+    background: rgba(0,0,0,.1);
+}
+
+#exercise-list-head-form-options {
+    margin-top: 0.5em;
+    font-size: 0.93em;
+    text-align: left;
+}
+
+#exercise-list-head-form-options div {
+    display: inline-block;
+    margin: 0.5em 3em 0 1em;
+}
+
+#exercise-list-head-form-options span,
+#exercise-list-head-form-options i {
+    cursor: pointer;
+}
+
+#exercise-list-head-form-options-organise span {
+    padding: 0.5em 0.7em 0.3em 0.7em;
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 0.3em;
+}
+#exercise-list-head-form-options-organise span:not(.active):hover,
+#exercise-list-head-form-options-views i:hover,
+#exercise-list-head-form-options-reset:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+#exercise-list-body-items {
+    margin: 1.5em auto 2em;
+}
+
+#exercise-list-body-items-item-add {
+    margin: 4em auto 3.7em auto;
+    
+}
+
+.exercise-list-body-items-item {
+    margin: 1em;
+    font-size: 0.9em;
+    color: #707070;
+}
+
+.exercise-list-body-items-item:hover {
+    box-shadow: 0px 7px 20px 0 rgba(0,0,0,.13);
+}
+
+.exercise-list-body-items-item-name {
+    font-size: 1.5em;
+    font-weight: 400;
+    overflow: hidden;
+}
+
+.exercise-list-body-items-item-name a {
+    color: #1779C5;
+}
+
+.exercise-list-body-items-item-name a:hover {
+    text-decoration: underline;
+}
+
+.gridview .exercise-list-body-items-item-name {
+    height: 3.3em;
+    border-bottom: 1px solid #CCC;
+    margin-bottom: 1em;
+}
+
+.listview .exercise-list-body-items-item-name {
+    height: 2em;
+    text-overflow: ellipsis;
+    margin-bottom: 0em;
+}
+
+.listview .exercise-list-body-items-item-info div {
+    display: inline-block;
+    margin: 0 3em 0 0;
+}
+
+#exercise-list-body-empty {
+    text-align: center;
+    font-size: 1.2em;
+    margin-top: 7em;
+    color: #707070;
+}
+
+#exercise-list-body-empty .reset-form {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* ---------- Exercise: Detail ---------- */
+
+#exercise-detail {
+    padding-bottom: 0.5em;
+}
+
+#exercise-detail-name {
+    text-align: center;
+    padding: 2em 0 1em 0;
+    font-size: 1.5em;
+    color: #404040;
+}
+
+#exercise-controls {
+    text-align: right;
+}
+
+#exercise-controls .admin-link {
+    margin: -1em 0 0.5em 1em;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#exercise-detail-info {
+    text-align: center;
+    margin: 0.5em auto 1em auto;
+}
+
+#exercise-detail-info div {
+    display: inline-block;
+    margin: 0 1em;
+}
+
+#exercise-detail-instructions {
+    text-align: center;
+    padding: 1.3em 1.3em 0.27em 1.3em;
+    background: rgba(0,0,0,.09);
+    color: #505050;
+    margin: 1em auto 3em auto;
+    font-size: 1.1em;
+}
+
+#exercise-detail-instructions img {
+    max-width: 90%;
+    height: initial;
+    display: block;
+    margin: 2em auto;
+}
+
+#exercise-detail-ownership {
+    font-size: 0.8em;
+    margin-top: -3em;
+    margin-bottom: 2em;
+}
+
+#exercise-detail-ownership strong {
+    margin-right: 2em;
+}
+
+.exercise-content-edit {
+    clear: both;
+    float: right;
+    margin: 0.3em;
+}
+
+/* ---------- Exercise: Detail: Content ---------- */
+
+#exercise-content {
+    margin-top: 3em;
+}
+
+#exercise-detail-content-empty {
+    text-align: center;
+    margin: 6em auto 1em auto;
+    color: #707070;
+    font-size: 1.2em;
+}
+
+#exercise-content-add {
+    margin: 2em auto;
+}
+
+.exerciseformat-showanswer {
+    color: #505050;
+    font-size: 0.85em;
+}
+
+.exerciseformat-showanswer label {
+    cursor: pointer;
+}
+
+.exerciseformat-showanswer label:hover {
+    opacity: 0.9;
+}
+
+.exerciseformat-showanswer .answer {
+    display: none;
+    padding: 0.5em;
+    margin-bottom: 1em;
+    background: #505050;
+    color: #EEE;
+    text-align: center;
+}
+
+#exercise-detail-footer {
+    display: block;
+    position: fixed;
+    background: white;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    text-align: left;
+    border-top: 1px solid #DDD;
+    padding: 0.8em;
+}
+
+#exercise-detail-footer {
+    display: inline-block;
+}
+
+.exercise-detail-footer-button {
+    appearance: none;
+    border: none;
+    vertical-align: middle;
+}
+
+#exercise-detail-footer-restart,
+#exercise-detail-footer-pastscores,
+#exercise-detail-footer-check {
+    background: #DDD;
+}
+
+
+#exercise-detail-footer-completed {
+    background: #1779C5;
+    color: white;
+}
+
+#exercise-detail-footer-score {
+    padding-top: 0.13em;
+    margin-left: 0.5em;
+    display: inline-block;
+    vertical-align: middle;
+    color: #1779C5;
+}
+
+.exercise-result-correct,
+.exercise-result-wrong,
+.exercise-result-unanswered {
+    color: white;
+    padding: 0.5em 0.8em;
+    height: 1em;
+    margin: 0.3em;
+}
+
+.exercise-result-correct {
+    background-color: #278301;
+}
+
+.exercise-result-wrong {
+    background-color: #c0392b;
+}
+
+.exercise-result-unanswered {
+    background-color: #B75601;
+}
+
+.exercise-detail-footer-pastscores-score {
+    margin: 1em 0;
+}
+
+.exercise-detail-footer-pastscores-score label {
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.exercise-detail-footer-pastscores-score span {
+    opacity: 0.7;
+}
+
+/* Exercise: Detail: Format: FillInTheBlank */
+
+.exerciseformat-fillintheblank {
+    margin: 6em auto 9em auto;
+}
+
+.exerciseformat-fillintheblank-source {
+    font-size: 1.4em;
+    margin-bottom: 1em;
+    text-align: initial;
+    font-weight: bold;
+}
+
+.exerciseformat-fillintheblank-fitb {
+    margin: 1em auto;
+    display: block;
+    text-align: initial;
+    font-size: 1.3em;
+}
+
+.exerciseformat-fillintheblank-fitb-item,
+.exerciseformat-fillintheblank-fitb-item-result {
+    display: inline-block;
+}
+
+.exerciseformat-fillintheblank-fitb .audio-control {
+    margin-bottom: 0.5em;
+}
+
+.exerciseformat-showanswer i {
+    margin: 0.2em;
+}
+
+/* Exercise: Detail: Format: ImageMatch */
+
+.exerciseformat-imagematch {
+    margin: 1.5em;
+    overflow: hidden;
+    padding-bottom: 1em;
+    vertical-align: top;
+}
+
+.exerciseformat-imagematch-title {
+    display: inline-block;
+    width: calc(100% - 2.4em);
+    height: 2.4em;
+    padding-top: 0.5em;
+    vertical-align: top;
+    font-weight: bold;
+}
+
+.exerciseformat-imagematch img {
+    width: 100%;
+    border: 1px solid #DDD;
+    cursor: zoom-in;
+}
+
+.exerciseformat-imagematch select {
+    width: 100%;
+    margin: 0.5em 0;
+    text-align: center;
+}
+
+.exerciseformat-imagematch select option {
+    text-align: center;
+}
+
+/* Exercise: Detail: Format: MultipleChoice */
+
+.exerciseformat-multiplechoice {
+    margin: 4em auto 10em auto;
+}
+
+.exerciseformat-multiplechoice-question {
+    margin-bottom: 1em;
+    font-size: 1.4em;
+    text-align: initial;
+    font-weight: bold;
+}
+
+.exerciseformat-multiplechoice-question .audio-control {
+    margin: 0 0.3em;
+}
+
+.exerciseformat-multiplechoice-options-option {
+    display: block;
+    width: 100%;
+}
+
+.exerciseformat-multiplechoice-options-option input {
+    display: none;
+}
+
+.exerciseformat-multiplechoice-options-option input[type="radio"]:checked+label {
+    background: #1779C5;
+    color: white;
+}
+
+.exerciseformat-multiplechoice-options-option label {
+    display: inline-block;
+    text-align: initial;
+    width: 100%;
+    padding: 0.8em;
+    font-size: 1.3em;
+    background: #DDD;
+    color: #202020;
+    cursor: pointer;
+}
+.exerciseformat-multiplechoice-options-option label:hover {
+    background: #BBB;
+}
+
+.exerciseformat-multiplechoice-options-option.hasaudio label {
+    width: calc(100% - 2.7em)
+}
+
+.exerciseformat-multiplechoice-options-option .audio-control {
+    display: inline-block;
+    margin: 0 0.3em;
+}
+
+.exerciseformat-multiplechoice .exerciseformat-showanswer {
+    float: right;
+}
+
+.exerciseformat-multiplechoice-result {
+    margin-top: 0.5em;
+}
+
+/* Exercise: Detail: Format: Sentence Builder */
+
+.exerciseformat-sentencebuilder {
+    margin: 8em auto 10em auto;
+    text-align: center;
+}
+
+.exerciseformat-sentencebuilder:last-of-type {
+    margin-bottom: 3em;
+}
+
+.exerciseformat-sentencebuilder-question {
+    font-size: 1.3em;
+    text-align: initial;
+    font-weight: bold;
+}
+
+.exerciseformat-sentencebuilder-sentence {
+    margin: 2em auto;
+}
+
+.exerciseformat-sentencebuilder-sentence-text {
+    padding: 1.3em 1em 0.7em 1em;
+    font-size: 1.2em;
+    min-height: 3.9em;
+    background: #EEE;
+    color: #202020;
+    text-align: initial;
+}
+
+.exerciseformat-sentencebuilder-sentence .audio-control {
+    margin-top: 0.9em;
+}
+
+.exerciseformat-sentencebuilder-words button {
+    appearance: none;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: #DDD;
+    padding: 0.5em 0.8em 0.3em 0.8em;
+    margin: 0.5em;
+}
+
+.exerciseformat-sentencebuilder-words button:not([disabled]):hover {
+    background: #1779C5;
+    color: white;
+}
+
+.exerciseformat-sentencebuilder-words button:disabled {
+    display: none;
+}
+
+.exerciseformat-sentencebuilder-restart {
+    float: right;
+    font-size: 0.85em;
+    color: #505050;
+    margin-bottom: 1em;
+    cursor: pointer;
+}
+
+.exerciseformat-sentencebuilder .exerciseformat-showanswer {
+    clear: both;
+    float: right;
+    text-align: right;
+}
+
+.exerciseformat-sentencebuilder-result {
+    clear: both;
+    display: block;
+    margin-top: 3em;
+}
+
+/* Exercise: Detail: Format: Translation */
+
+.exerciseformat-translation {
+    margin-top: 2em;
+    margin-bottom: 7em;
+}
+
+.exerciseformat-translation-image {
+    padding: 1em 2em;
+}
+
+.exerciseformat-translation-image-container img {
+    width: 100%;
+}
+
+.exerciseformat-translation-image-container {
+    position: relative;
+    cursor: none;
+}
+
+.exerciseformat-translation-image-container .zoomed-img {
+    width: 250px;
+    height: 250px;
+    box-shadow: 0 5px 10px -2px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    position: absolute;
+    border: 5px solid #1779C5;
+    z-index: 99;
+    border-radius: 100%;
+    display: block;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.exerciseformat-translation-image-container:hover .zoomed-img,
+.exerciseformat-translation-image-container:active .zoomed-img {
+    opacity: 1;
+}
+
+.exerciseformat-translation-image-fullsize {
+    text-align: center;
+    display: block;
+    margin-top: 1em;
+    border: 1px solid #1779C5;
+    padding: 0.5em;
+}
+
+.exerciseformat-translation-image-fullsize:hover {
+    background: #1779C5;
+    color: white;
+}
+
+.exerciseformat-translation-image-fullsize i {
+    display: inline-block;
+    margin-left: 0.5em;
+}
+
+.exerciseformat-translation-userattempt label {
+    display: block;
+    font-weight: bold;
+}
+
+.exerciseformat-translation-userattempt textarea {
+    display: block;
+    width: 100%;
+    height: 30em;
+    padding: 1em;
+}
+
+/* Exercise: Detail: Format: External */
+
+.exerciseformat-external {
+    text-align: center;
+    font-size: 1.3em;
+    margin: 4em auto;
+}
+
+.exerciseformat-external-instructions {
+    font-size: 1rem;
+    margin: 0.5em auto;
+}
+
+
+/* ---------- Admin links (e.g. links only admins can see in public website) ---------- */
+
+.admin-link {
+    background: #1779C5;
+    color: white;
+    display: block;
+    padding: 0.5em 1em 0.4em 1em;
+    border-radius: 0.2em;
+    font-size: 0.95rem;
+    width: -moz-fit-content;
+    width: fit-content;
+}
+
+.admin-link:hover {
+    background: #3a8fd1;
+    color: white;
+}
+
+.admin-link i {
+    margin-right: 0.3em;
+}
+
+/* ---------- Account ---------- */
+
+.myaccount-exercisehistory-item {
+    border-top: 1px solid #CCC;
+    padding: 1em 0.7em;
+    padding-bottom: 0;
+    margin: 0.3em auto;
+}
+
+.myaccount-exercisehistory-item:last-of-type {
+    border-bottom: 1px solid #CCC;
+    padding-bottom: 0.3em;
+}
+
+.myaccount-exercisehistory-item div {
+    display: inline-block;
+    margin-right: 3em;
+}
+
+.myaccount-exercisehistory-item div label {
+    font-weight: bold;
+}
+
+.myaccount-exercisehistory-item-date {
+    width: 12em;
+}
+
+.myaccount-exercisehistory-item-time {
+    width: 8em;
+}
+
+.myaccount-exercisehistory-item-score {
+    width: 6em;
+}
+
+#account-login-help {
+    margin-top: 2em;
+}
+
+#id_classes {
+    margin-top: -2em;
+}
+
+/* ---------- Success Pages ---------- */
+
+.successpage {
+    text-align: center;
+    margin-top: 15em;
+}
+
+.successpage i {
+    font-size: 7em;
+    color: #1779C5;
+}
+
+.successpage h2 {
+    padding-top: 0em;
+}
+
+.successpage a {
+    margin-top: 3em;
+    display: inline-block;
+    padding: 0.8em 2em 0.6em 2em;
+    background: #1779C5;
+    color: white;
+    border-radius: 0.4em;
+}
+
 /* ---------- Footer ---------- */
 
 footer {
