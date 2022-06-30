@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% load settings_value %}
+
+{% block main %}
+
+<section id="help-list" class="container">
+
+    <h2>Help</h2>
+
+    {% if object_list %}
+        <input type="text" id="help-list-search" class="quicksearch-input" placeholder="Search help">
+    {% endif %}
+
+    <div id="help-list-items">
+        {% for object in object_list  %}
+            <a href="{{ object.url_detail }}" class="help-list-items-item">
+                <div class="help-list-items-item-text-title">{{ object.list_title }}</div>
+                <div class="help-list-items-item-text-details" data-description="{{ object.description }}">{{ object.list_details | safe }}</div>
+            </a>
+        {% empty %}
+            <div class="list-body-empty">
+                <div class="list-body-empty-title">No help items</div>
+                <div class="list-body-empty-details">
+                    There are no help items to show yet. Please check back soon or <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us</a> if you have a question.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</section>
+
+<script>
+$(document).ready(function() {
+
+    // Function to perform a quick search on a list
+    function quickSearchList(searchTextInput, itemClass){
+        var searchText = searchTextInput.val().toUpperCase();
+        $(itemClass).each(function(){
+            if($(this).text().toUpperCase().indexOf(searchText) != -1) $(this).show();
+            else $(this).hide();
+        });
+    }
+    // Perform above quick search on Help list
+    $("#help-list-search").on('keyup', function(){ quickSearchList($(this), ".help-list-items-item") });
+
+});
+</script>
+
+{% endblock %}
