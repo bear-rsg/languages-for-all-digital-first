@@ -27,7 +27,8 @@ INSTALLED_APPS = [
     # Custom
     'account',
     'exercises',
-    'general'
+    'general',
+    'help'
 ]
 
 MIDDLEWARE = [
@@ -36,8 +37,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware'
 ]
 
 ROOT_URLCONF = 'core.urls'

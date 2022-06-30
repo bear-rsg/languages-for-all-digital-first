@@ -103,6 +103,29 @@ select {
     background: #BBB;
 }
 
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    padding-top: 0;
+    height: 0;
+    margin: 7em auto;
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.pdf-viewer-full {
+    width: 100%;
+    height: calc(100vh - 4em);
+    display: block;
+    margin: 1em auto;
+}
+
 /* ---------- Popup ---------- */
 
 .popup {
@@ -979,6 +1002,91 @@ main {
 
 .admin-link i {
     margin-right: 0.3em;
+}
+
+
+/* ---------- Help ---------- */
+
+#help-list-search {
+    margin: 4em auto;
+    width: 70%;
+    display: block;
+    padding: 0.5em 0.8em 0.4em 0.8em;
+    background: #fff;
+    border: none;
+    border-bottom: 2px solid #CCC;
+    color: #696969;
+    font-size: 1.1em;
+}
+
+#help-list-search:active,
+#help-list-search:focus {
+    border-bottom: 2px solid #1779C5;
+    outline: none;
+}
+
+#help-list-items {
+    margin-top: 1.3em;
+}
+
+.help-list-items-item {
+    display: block;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    background: #EEE;
+    color: #505050;
+    display: block;
+    width: 100%;
+    margin: 0.5em 0;
+    padding: 0.8em 1em 0.8em 1em;
+}
+
+.help-list-items-item:hover {
+    background: #1779C5;
+    color: white;
+}
+
+.help-list-items-item-text-title {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.help-list-items-item-text-details {
+    font-size: 0.95em;
+    padding-top: 0.5em;
+    opacity: 0.8;
+}
+
+.help-list-items-empty {
+    margin-top: 7em;
+    text-align: center;
+}
+
+.help-list-items-empty-title {
+    font-weight: bold;
+    font-size: 1.5em;
+    margin: 1em auto;
+}
+
+.help-list-items-empty-details strong {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#help-detail-link {
+    text-align: center;
+    font-size: 1.6em;
+    display: block;
+    margin: 3em 0;
+}
+
+#help-detail-link a {
+    font-weight: bold;
+}
+
+#help-detail-image {
+    max-width: 100%;
+    margin: 3em auto;
 }
 
 /* ---------- Account ---------- */
