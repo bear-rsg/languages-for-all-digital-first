@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section class="container compact">
+
+    <h2>Import User Data</h2>
+
+    {% block importdatacontent %}
+    {% endblock %}
+
+    <a id="importdata-process-link" href="{% url 'account:importdata-processing' %}">Import Users</a>
+
+    <div id="importdata-process-spinner" class="spinner-container">
+        <div class="spinner"></div>
+        <label>Importing data</label>
+        <span>
+            This process may take several minutes.
+            <br>
+            Do not refresh or close this page.
+            <br>
+            Please wait...
+        </span>
+    </div>
+
+    <script>
+        $('#importdata-process-link').on('click', function(){
+            // Swap this link for the spinner
+            $(this).hide();
+            $('#importdata-process-spinner').show();
+            // Also hide any errors, as can be confusing thinking the same error is persisting
+            $('.importdata-errors').hide();
+        });
+    </script>
+
+</section>
+
+{% endblock %}

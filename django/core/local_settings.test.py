@@ -24,8 +24,6 @@ else:
 
 ALLOWED_HOSTS = ['*']
 
-ADMIN_EMAIL = 'bear-rsg@contacts.bham.ac.uk'
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -35,3 +33,19 @@ DATABASES = {
         },
     }
 }
+
+# Provide the email address for the site admin (e.g. the researcher/research team)
+ADMIN_EMAIL = '...@bham.ac.uk'
+
+# Email settings
+if DEBUG is True:
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+else:
+    EMAIL_USE_TLS = False
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = ''
+    EMAIL_PORT = 25
+    EMAIL_HOST_USER = ADMIN_EMAIL
+    DEFAULT_FROM_EMAIL = ADMIN_EMAIL
+    NOTIFICATION_EMAIL = (ADMIN_EMAIL,)

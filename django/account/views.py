@@ -1,9 +1,20 @@
-from django.views.generic import (TemplateView, CreateView, UpdateView)
+from django.views.generic import (TemplateView, CreateView, UpdateView, RedirectView)
 from django.urls import reverse_lazy
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetView, PasswordResetConfirmView)
+from django.urls import reverse
+from django.db import transaction
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
 from account import (forms, models)
 from exercises.models import UserExerciseAttempt
+import pandas as pd
+import os
+import random
+import string
 
 
 class MyAccountUpdateView(LoginRequiredMixin, UpdateView):
@@ -122,3 +133,101 @@ class PasswordResetChangeSuccessTemplateView(TemplateView):
     """
 
     template_name = 'registration/reset-password-change-success.html'
+
+
+class ImportDataConfirmTemplateView(LoginRequiredMixin, TemplateView):
+    """
+    Class-based view to show the import data confirmation template
+    Requires user to be logged in
+    """
+
+    login_url = '/dashboard/'
+    template_name = 'account/importdata-confirm.html'
+
+
+class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
+    """
+    Class-based view to execute the data import and redirect user to success/failed page
+    Requires user to be logged in
+    """
+
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs):
+        """
+        This method imports new user data from the latest Excel spreadsheet
+
+        Returns a success page or an error page (and emails software developer with error if found)
+        """
+
+        try:
+            # Get users data from latest Excel spreadsheet
+            spreadsheet_obj = models.UsersImportSpreadsheet.objects.order_by('-lastupdated').first()
+            users = pd.read_excel(os.path.join(settings.MEDIA_ROOT, spreadsheet_obj.spreadsheet.name)).to_dict('records')
+            # Add each new user to database and email instructions to them
+            for user in users:
+                # Determines if new
+                if not models.User.objects.filter(email=user['email']).count():
+                    # Generate password (mix of letters and numbers) 10 chars long
+                    characters = string.ascii_letters + string.digits
+                    password_plain = ''.join(random.choice(characters) for i in range(10))
+                    user['password'] = make_password(password_plain)
+                    # Assign Foreign Keys
+                    user['role'] = models.UserRole.objects.get(name=user['role'])
+                    # Create user in db
+                    with transaction.atomic():
+                        models.User(**user).save()
+                    # Email user with instructions
+                    send_mail(' Languages for All - Digital First: New user registration',
+                           f"""Hi {user['first_name']},
+
+Welcome to Languages for All - Digital First! You've been registered with a new {user['role']} account.
+
+Please go to https://lfa-digitalfirst.bham.ac.uk/account/login/ where you can login with the following details:
+
+Username: {user['email']}
+Password: {password_plain}
+
+Please note that you must change this password after logging in for the first time. If you have any issues you can email us for support at {settings.ADMIN_EMAIL}
+
+Thanks,
+Languages for All Team
+""",
+                            settings.DEFAULT_FROM_EMAIL,
+                            (user['email'],),
+                            fail_silently=True)
+
+            print('Completed data import process successfully')
+
+            # If successfully ran, redirect user to success page
+            return reverse('account:importdata-success')
+
+        except Exception as e:
+            print(f'Data import process failed with error: {e}')
+            # Send email alert to software developer
+            send_mail('Languages for All - Digital First: Import Data error',
+                      f"An error occurred when {self.request.user} tried importing user data into the Languages for All - Digital First database.\n\nThe following error was returned:\n\n{e}",
+                      settings.DEFAULT_FROM_EMAIL,
+                      (settings.EMAIL_HOST_USER,),
+                      fail_silently=True)
+            # Redirect user to failed page and show the error message
+            messages.error(self.request, e)
+            return reverse('account:importdata-failed')
+
+
+class ImportDataSuccessTemplateView(LoginRequiredMixin, TemplateView):
+    """
+    Class-based view to show the import data success template
+    Requires user to be logged in
+    """
+
+    template_name = 'account/importdata-success.html'
+
+
+class ImportDataFailedTemplateView(LoginRequiredMixin, TemplateView):
+    """
+    Class-based view to show the import data failed template
+    Requires user to be logged in
+    """
+
+    template_name = 'account/importdata-failed.html'

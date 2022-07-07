@@ -1,0 +1,28 @@
+{% extends "account/importdata.html" %}
+{% load static %}
+
+{% block importdatacontent %}
+
+<h3>Import Failed</h3>
+<p>
+    The data importing process failed to complete.
+</p>
+
+{% if messages %}
+    <div class="importdata-errors">
+        <p>
+            The following error(s) were found:
+        </p>
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+<p>
+    Please try re-running the data import as a first step. If it fails again please email the software developer immediately.
+</p>
+
+{% endblock %}
