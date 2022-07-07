@@ -178,7 +178,7 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
                     with transaction.atomic():
                         models.User(**user).save()
                     # Email user with instructions
-                    send_mail('subjecthere',
+                    send_mail(' Languages for All - Digital First: New user registration',
                            f"""Hi {user['first_name']},
 
 Welcome to Languages for All - Digital First! You've been registered with a new {user['role']} account.
