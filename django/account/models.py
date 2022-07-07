@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, Group
 from django.apps import apps
 from django.db import models
+import os
 
 
 class UserRole(models.Model):
@@ -14,12 +15,36 @@ class UserRole(models.Model):
         return self.name
 
 
+class UsersImportSpreadsheet(models.Model):
+    """
+    An Excel spreadsheet containing new user data to import into the database
+    """
+
+    spreadsheet = models.FileField(upload_to='account/userimportspreadsheets',
+                                   help_text="""Upload an Excel spreadsheet (.xlsx) with data of new users to add to the database.<br>\
+Ensure the structure complies with the latest version of the template spreadsheet or the import may fail.<br>\
+Contact the software developer for support if you require help.<br>\
+Once you've uploaded the file, you can begin <a href="/account/importdata/">the import process</a>""",
+                                   blank=True,
+                                   null=True)
+    lastupdated = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
+
+    @property
+    def spreadsheet_filename(self):
+        return str(os.path.basename(self.spreadsheet.name))
+
+    def __str__(self):
+        return self.spreadsheet_filename
+
+
 class User(AbstractUser):
     """
     Custom user extends the standard Django user model, providing additional properties
     """
 
     role = models.ForeignKey(UserRole, on_delete=models.SET_NULL, blank=True, null=True)
+    is_internal = models.BooleanField(default=True, help_text='Is internal to the University of Birmingham, e.g. an active UoB student or staff member')
+    internal_id_number = models.CharField(max_length=255, help_text='If internal to the University of Birmingham, please provide a unique ID, e.g. student number, staff number', blank=True)
     classes = models.ManyToManyField('exercises.SchoolClass', blank=True)
     default_language = models.ForeignKey('exercises.Language', on_delete=models.SET_NULL, blank=True, null=True)
 

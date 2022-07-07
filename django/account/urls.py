@@ -22,4 +22,9 @@ urlpatterns = [
     # Reset password - change
     path('password/reset/change/<uidb64>/<token>/', views.PasswordResetChangeView.as_view(), name='reset-password-change'),
     path('password/reset/change/success/', views.PasswordResetChangeSuccessTemplateView.as_view(), name='reset-password-change-success'),
+    # Data Import
+    path('importdata/', views.ImportDataConfirmTemplateView.as_view(), name='importdata-confirm'),
+    path('importdata/processing/', views.ImportDataProcessingView.as_view(), name='importdata-processing'),
+    path('importdata/success/', views.ImportDataSuccessTemplateView.as_view(), name='importdata-success'),
+    path('importdata/failed/', views.ImportDataFailedTemplateView.as_view(), name='importdata-failed'),
 ]

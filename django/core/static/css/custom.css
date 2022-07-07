@@ -1005,6 +1005,71 @@ main {
 }
 
 
+/* ---------- Import Data ---------- */
+
+#importdata-process-link {
+    display: block;
+    width: fit-content;
+    padding: 0.8em 1.7em 0.7em 1.7em;
+    background: #1779C5;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin: 7em auto;
+    border-radius: 0.4em;
+}
+
+#importdata-process-link:hover {
+    opacity: 0.9;
+    color: white;
+}
+
+#importdata-process-spinner {
+    display: none;
+    margin: 6em auto 1em auto;
+    width: fit-content;
+    text-align: center;
+}
+
+#importdata-process-spinner .spinner {
+    border: 13px solid #DDD;
+    border-top: 13px solid #1779C5;
+    border-radius: 50%;
+    width: 89px;
+    height: 89px;
+    animation: spinner 2s linear infinite;
+    margin: 2em auto;
+}
+
+@keyframes spinner {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#importdata-process-spinner label {
+    display: block;
+    font-weight: bold;
+}
+
+#importdata-process-spinner span {
+    display: block;
+    font-size: 0.9em;
+    opacity: 0.5;
+}
+
+.importdata-errors ul {
+    list-style: none;
+    padding: 0;
+}
+
+.importdata-errors ul li {
+    font-size: 1.2em;
+    margin: 2em 0;
+    border: 2px solid #1779C5;
+    padding: 1em;
+
+}
+
 /* ---------- Help ---------- */
 
 #help-list-search {
