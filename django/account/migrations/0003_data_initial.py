@@ -7,7 +7,7 @@ from account import models
 """
 This data migration adds default data for the following models:
 
-- Group (teacher_permissions_group)
+- Groups
 - Permissions
 - UserRoles
 
@@ -25,6 +25,9 @@ def insert_groups(apps, schema_editor):
     groups = [
         {
             "name": "teacher_permissions_group"
+        },
+        {
+            "name": "guest_permissions_group"
         }
     ]
 
@@ -117,6 +120,72 @@ def add_group_permissions(apps,schema_editor):
                     ]
                 }
             ]
+        },
+        {
+            "group_name": "guest_permissions_group",
+            "apps": [
+                {
+                    "app_name": "exercises",
+                    "models": [
+                        {
+                            "model_name": "schoolclassalertexercise",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "schoolclass",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "difficulty",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exercise",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exerciseformat",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exerciseformatfillintheblank",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exerciseformatimagematch",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exerciseformattranslation",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exerciseformatmultiplechoice",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exerciseformatsentencebuilder",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "exerciseformatexternal",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "language",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "theme",
+                            "permissions": ['view']
+                        },
+                        {
+                            "model_name": "userexerciseattempt",
+                            "permissions": ['view']
+                        }
+                    ]
+                }
+            ]
         }
     ]
 
@@ -139,7 +208,8 @@ def insert_user_roles(apps, schema_editor):
     roles = [
         { "name": "admin" },
         { "name": "student" },
-        { "name": "teacher" }
+        { "name": "teacher" },
+        { "name": "guest" }
     ]
 
     for role in roles:

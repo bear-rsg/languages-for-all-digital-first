@@ -6,7 +6,7 @@ import os
 
 class UserRole(models.Model):
     """
-    Role for each user, e.g. Student, Teacher, Admin
+    Role for each user, e.g. Student, Teacher, Admin, Guest
     """
 
     name = models.CharField(max_length=100, unique=True)
@@ -94,21 +94,23 @@ class User(AbstractUser):
         # Username to be same as email
         self.username = self.email
         # Set values for admins
-        if self.role == UserRole.objects.get(name='admin'):
+        if self.role.name == 'admin':
             self.is_staff = True
             self.is_superuser = True
-        # Set values for teachers
-        if self.role == UserRole.objects.get(name='teacher'):
+        # Set values for teachers and guests
+        elif self.role.name in ['teacher', 'guest']:
             self.is_staff = True
             self.is_superuser = False
         # Set values for students
-        if self.role == UserRole.objects.get(name='student'):
+        elif self.role.name == 'student':
             self.is_staff = False
             self.is_superuser = False
         # Save object
         super().save(*args, **kwargs)
 
         # Once user is saved, add to necessary permission group
-        # teacher_permissions_group
-        if self.role == UserRole.objects.get(name='teacher'):
+        self.groups.clear()
+        if self.role.name == 'teacher':
             Group.objects.get(name='teacher_permissions_group').user_set.add(self)
+        elif self.role.name == 'guest':
+            Group.objects.get(name='guest_permissions_group').user_set.add(self)

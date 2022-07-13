@@ -17,7 +17,7 @@
                     {% include "exercises/snippets/force-dir-auto.html" with text=option.0 %}
                     {% include "exercises/snippets/audio.html" with audio=option.1 id=option.2 %}
                     <!-- Value is 1 if correct answer or 0 if not -->
-                    <input type="radio" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{% if mc.answer == forloop.counter %}1{% else %}0{%endif%}"{% if forloop.counter == 1 %} checked="checked"{% endif %}>
+                    <input type="radio" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{{ option.3 }}"{% if forloop.counter == 1 %} checked="checked"{% endif %}>
                     <label for="option-{{ option.2 }}">
                         {{ option.0 }}
                     </label>
@@ -27,7 +27,7 @@
 
         <div class="exerciseformat-showanswer">
             <label><i class="fas fa-info-circle"></i> Show answer</label>
-            <div class="answer">{{ mc.answer_text_full }}</div>
+            <div class="answer">{{ mc.answer_text | safe }}</div>
         </div>
 
         <div class="exerciseformat-multiplechoice-result">

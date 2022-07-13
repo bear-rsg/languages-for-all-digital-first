@@ -1,16 +1,15 @@
-from django.views.generic import (TemplateView, CreateView, UpdateView, RedirectView)
+from django.views.generic import (TemplateView, UpdateView, RedirectView)
 from django.urls import reverse_lazy
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetView, PasswordResetConfirmView)
 from django.urls import reverse
-from django.db import transaction
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
 from account import (forms, models)
-from exercises.models import UserExerciseAttempt
+from exercises import models as exercise_models
 import pandas as pd
 import os
 import random
@@ -38,7 +37,7 @@ class MyAccountUpdateView(LoginRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super(MyAccountUpdateView, self).get_context_data(**kwargs)
         # Exercise history
-        context['exercise_attempts'] = UserExerciseAttempt.objects.filter(user=self.get_object())
+        context['exercise_attempts'] = exercise_models.UserExerciseAttempt.objects.filter(user=self.get_object())
         return context
 
 
@@ -49,36 +48,6 @@ class MyAccountUpdateSuccessTemplateView(TemplateView):
     """
 
     template_name = 'account/myaccount-success.html'
-
-
-class UserCreateView(CreateView):
-    """
-    Class-based view to show the account create template
-    """
-
-    template_name = 'account/create.html'
-    form_class = forms.PublicUserCreationForm
-    success_url = reverse_lazy('account:create-success')
-
-    def form_valid(self, form):
-
-        # Save the new user
-        self.object = form.save(commit=False)
-        self.object.save()
-
-        # Add the many to many relationships with classes
-        for c in form.cleaned_data['classes']:
-            self.object.classes.add(c)
-
-        return super().form_valid(form)
-
-
-class UserCreateSuccessTemplateView(TemplateView):
-    """
-    Class-based view to show the account create success template
-    """
-
-    template_name = 'account/create-success.html'
 
 
 class PasswordChangeView(PasswordChangeView):
@@ -164,19 +133,35 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
             # Get users data from latest Excel spreadsheet
             spreadsheet_obj = models.UsersImportSpreadsheet.objects.order_by('-lastupdated').first()
             users = pd.read_excel(os.path.join(settings.MEDIA_ROOT, spreadsheet_obj.spreadsheet.name)).to_dict('records')
-            # Add each new user to database and email instructions to them
+
+            # Process each user
             for user in users:
-                # Determines if new
-                if not models.User.objects.filter(email=user['email']).count():
+
+                # Get/create user through unique identifier (email)
+                user_obj, user_is_new = models.User.objects.get_or_create(email=user['email'])
+
+                # Get/create school class thrugh unique identifiers (year group, language, difficulty)
+                school_class_obj = exercise_models.SchoolClass.objects.get_or_create(
+                    year_group=exercise_models.YearGroup.objects.get(name=user['year_group']),
+                    language=exercise_models.Language.objects.get(name=user['language']),
+                    difficulty=exercise_models.Difficulty.objects.get(name=user['difficulty'])
+                )[0]
+
+                # Add additional user data
+                user_obj.first_name = user['first_name']
+                user_obj.last_name = user['last_name']
+                user_obj.role = models.UserRole.objects.get(name=user['role'])
+                user_obj.is_internal = user['is_internal']
+                user_obj.internal_id_number = user['internal_id_number']
+                user_obj.classes.add(school_class_obj)
+                user_obj.default_language = exercise_models.Language.objects.get(name=user['language'])
+
+                # If this iteration created a new user then process additional steps
+                if user_is_new:
                     # Generate password (mix of letters and numbers) 10 chars long
                     characters = string.ascii_letters + string.digits
                     password_plain = ''.join(random.choice(characters) for i in range(10))
-                    user['password'] = make_password(password_plain)
-                    # Assign Foreign Keys
-                    user['role'] = models.UserRole.objects.get(name=user['role'])
-                    # Create user in db
-                    with transaction.atomic():
-                        models.User(**user).save()
+                    user_obj.password = make_password(password_plain)
                     # Email user with instructions
                     send_mail(' Languages for All - Digital First: New user registration',
                            f"""Hi {user['first_name']},
@@ -196,6 +181,9 @@ Languages for All Team
                             settings.DEFAULT_FROM_EMAIL,
                             (user['email'],),
                             fail_silently=True)
+
+                # Save changes to this user
+                user_obj.save()
 
             print('Completed data import process successfully')
 

@@ -25,6 +25,23 @@ def text_or_audiomsg(text_field, audio_field):
         return ""
 
 
+class YearGroup(models.Model):
+    """
+    A year group that classes are organised into, e.g. 2022/23, 2023/24, etc.
+    """
+
+    name = models.CharField(max_length=255, unique=True)
+    date_start = models.DateField(blank=True, null=True)
+    date_end = models.DateField(blank=True, null=True)
+    is_published = models.BooleanField(default=False, verbose_name="Published")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name', 'id']
+
+
 class Language(models.Model):
     """
     A non-English language being taught, e.g. Portuguese, Italian, French
@@ -42,12 +59,11 @@ class Language(models.Model):
 
 class Difficulty(models.Model):
     """
-    A level of difficulty (e.g. beginners, intermediate, advanced)
+    A level of difficulty (e.g. level 1, level 2, ..., level 7, level 8)
     """
 
     name = models.CharField(max_length=255, unique=True)
     order = models.IntegerField(default=0)
-    colour_hex = models.CharField(max_length=10)
 
     def __str__(self):
         return self.name
@@ -62,6 +78,7 @@ class SchoolClass(models.Model):
     A class of students and teacher(s) within the School
     """
 
+    year_group = models.ForeignKey(YearGroup, on_delete=models.RESTRICT)
     language = models.ForeignKey(Language, on_delete=models.RESTRICT)
     difficulty = models.ForeignKey(Difficulty, on_delete=models.RESTRICT, blank=True, null=True)
     unique_feature = models.CharField(max_length=255, blank=True, null=True,
@@ -71,8 +88,8 @@ class SchoolClass(models.Model):
 
     @property
     def name(self):
-        # Language by default
-        name = f"{self.language}"
+        # Year Group and Language by default
+        name = f"{self.year_group} - {self.language}"
         # Append difficulty (if exists)
         if self.difficulty:
             name += f" ({self.difficulty})"
@@ -81,7 +98,7 @@ class SchoolClass(models.Model):
             name += f" [{self.unique_feature}]"
         # Append teachers' names (if exists)
         if self.teachers_names:
-            name += f" - Taught by: {', '.join(self.teachers_names)}"
+            name += f" - Taught by {', '.join(self.teachers_names)}"
 
         return name
 
@@ -253,15 +270,31 @@ class ExerciseFormatMultipleChoice(models.Model):
                                  null=True)
     question = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
     question_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    option_1 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
-    option_1_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    option_2 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
-    option_2_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    option_3 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
-    option_3_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    option_4 = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT)
-    option_4_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    answer = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)], help_text="Please type the number of the correct option, e.g. for 'Option 3' type '3'")
+
+    option_a = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, verbose_name='Option A')
+    option_a_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='Option A (audio)')
+    option_a_is_correct = models.BooleanField(default=False, verbose_name="Option A is correct")
+
+    option_b = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, verbose_name='Option B')
+    option_b_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='Option B (audio)')
+    option_b_is_correct = models.BooleanField(default=False, verbose_name="Option B is correct")
+
+    option_c = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, verbose_name='Option C')
+    option_c_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='Option C (audio)')
+    option_c_is_correct = models.BooleanField(default=False, verbose_name="Option C is correct")
+
+    option_d = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, verbose_name='Option D')
+    option_d_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='Option D (audio)')
+    option_d_is_correct = models.BooleanField(default=False, verbose_name="Option D is correct")
+
+    option_e = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, verbose_name='Option E')
+    option_e_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='Option E (audio)')
+    option_e_is_correct = models.BooleanField(default=False, verbose_name="Option E is correct")
+
+    option_f = models.TextField(blank=True, null=True, help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, verbose_name='Option F')
+    option_f_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='Option F (audio)')
+    option_f_is_correct = models.BooleanField(default=False, verbose_name="Option F is correct")
+
     order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
 
     @property
@@ -269,56 +302,93 @@ class ExerciseFormatMultipleChoice(models.Model):
         return text_or_audiomsg(self.question, self.question_audio)
 
     @property
-    def option_1_text_or_audiomsg(self):
-        return text_or_audiomsg(self.option_1, self.option_1_audio)
+    def option_a_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_a, self.option_a_audio)
 
     @property
-    def option_2_text_or_audiomsg(self):
-        return text_or_audiomsg(self.option_2, self.option_2_audio)
+    def option_b_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_b, self.option_b_audio)
 
     @property
-    def option_3_text_or_audiomsg(self):
-        return text_or_audiomsg(self.option_3, self.option_3_audio)
+    def option_c_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_c, self.option_c_audio)
 
     @property
-    def option_4_text_or_audiomsg(self):
-        return text_or_audiomsg(self.option_4, self.option_4_audio)
+    def option_d_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_d, self.option_d_audio)
+
+    @property
+    def option_e_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_e, self.option_e_audio)
+
+    @property
+    def option_f_text_or_audiomsg(self):
+        return text_or_audiomsg(self.option_f, self.option_f_audio)
 
     def has_audio(self):
-        return bool(self.question_audio or self.option_1_audio or self.option_2_audio or self.option_3_audio or self.option_4_audio)
+        return bool(self.question_audio or self.option_a_audio or self.option_b_audio or self.option_c_audio or self.option_d_audio or self.option_e_audio or self.option_f_audio)
     has_audio.boolean = True  # sets tick/cross in admin dashboard
 
     @property
     def options(self):
-        return [
-                [f"1. {self.option_1_text_or_audiomsg}", self.option_1_audio, f"{self.id}-1"],
-                [f"2. {self.option_2_text_or_audiomsg}", self.option_2_audio, f"{self.id}-2"],
-                [f"3. {self.option_3_text_or_audiomsg}", self.option_3_audio, f"{self.id}-3"],
-                [f"4. {self.option_4_text_or_audiomsg}", self.option_4_audio, f"{self.id}-4"]
-            ]
+        options_list = []
+
+        # Option A
+        if self.option_a_text_or_audiomsg:
+            options_list.append([
+                f"A. {self.option_a_text_or_audiomsg}",
+                self.option_a_audio,
+                f"{self.id}-1",
+                int(self.option_a_is_correct)])
+        # Option B
+        if self.option_b_text_or_audiomsg:
+            options_list.append([
+                f"B. {self.option_b_text_or_audiomsg}",
+                self.option_b_audio,
+                f"{self.id}-2",
+                int(self.option_b_is_correct)])
+        # Option C
+        if self.option_c_text_or_audiomsg:
+            options_list.append([
+                f"C. {self.option_c_text_or_audiomsg}",
+                self.option_c_audio,
+                f"{self.id}-3",
+                int(self.option_c_is_correct)])
+        # Option D
+        if self.option_d_text_or_audiomsg:
+            options_list.append([
+                f"D. {self.option_d_text_or_audiomsg}",
+                self.option_d_audio,
+                f"{self.id}-4",
+                int(self.option_d_is_correct)])
+        # Option E
+        if self.option_e_text_or_audiomsg:
+            options_list.append([
+                f"E. {self.option_e_text_or_audiomsg}",
+                self.option_e_audio,
+                f"{self.id}-5",
+                int(self.option_e_is_correct)])
+        # Option F
+        if self.option_f_text_or_audiomsg:
+            options_list.append([
+                f"F. {self.option_f_text_or_audiomsg}",
+                self.option_f_audio,
+                f"{self.id}-6",
+                int(self.option_f_is_correct)])
+
+        return options_list
 
     @property
     def answer_text(self):
-        if self.answer == 1:
-            return self.option_1
-        elif self.answer == 2:
-            return self.option_2
-        elif self.answer == 3:
-            return self.option_3
-        elif self.answer == 4:
-            return self.option_4
-        else:
-            return None
-
-    @property
-    def answer_text_full(self):
-        if self.answer_text:
-            return f"{self.answer}. {self.answer_text}"
-        else:
-            return self.answer
+        text = ""
+        for option in self.options:
+            if option[3]:
+                # Print option text (on new line if multiple)
+                text += f"<br>{option[0]}" if len(text) else option[0]
+        return text
 
     def has_audio(self):
-        return bool(self.question_audio or self.option_1_audio or self.option_2_audio or self.option_3_audio or self.option_4_audio)
+        return bool(self.question_audio or self.option_a_audio or self.option_b_audio or self.option_c_audio or self.option_d_audio or self.option_e_audio or self.option_f_audio)
     has_audio.boolean = True  # sets tick/cross in admin dashboard
 
     def __str__(self):
