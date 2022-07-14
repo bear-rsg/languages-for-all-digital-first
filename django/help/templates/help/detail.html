@@ -38,9 +38,8 @@
 
     {% if object.pdf %}
         <!-- PDF -->
-        <object class="pdf-viewer-full" data="{{ object.pdf.url }}" type="application/pdf">
-            <p><a href="{{ object.pdf.url }}">Download the PDF file</a></p>
-        </object>
+        <a class="pdf-viewer-download" href="{{ object.pdf.url }}">Download PDF</a>
+        <iframe src="{{ object.pdf.url }}" class="pdf-viewer-full"></iframe>
     {% endif %}
 </section>
 

@@ -10,9 +10,6 @@ urlpatterns = [
     # My Account
     path('', views.MyAccountUpdateView.as_view(), name='myaccount'),
     path('success/', views.MyAccountUpdateSuccessTemplateView.as_view(), name='myaccount-success'),
-    # Create account
-    path('create/', views.UserCreateView.as_view(), name='create'),
-    path('create/success/', views.UserCreateSuccessTemplateView.as_view(), name='create-success'),
     # Change password
     path('password/change/', views.PasswordChangeView.as_view(), name='change-password'),
     path('password/change/success/', views.PasswordChangeSuccessTemplateView.as_view(), name='change-password-success'),

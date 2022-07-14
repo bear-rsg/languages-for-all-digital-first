@@ -126,6 +126,21 @@ select {
     margin: 1em auto;
 }
 
+.pdf-viewer-download {
+    background: #1779C5;
+    color: white;
+    padding: 0.5em 1em;
+    border-radius: 0.2em;
+    display: block;
+    width: fit-content;
+    margin: 1em auto 2em auto;
+}
+
+.pdf-viewer-download:hover {
+    color: white;
+    background: #0B5186;
+}
+
 /* ---------- Popup ---------- */
 
 .popup {

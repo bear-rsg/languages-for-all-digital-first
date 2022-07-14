@@ -9,6 +9,11 @@ def insert_help_items(apps, schema_editor):
 
     objects = [
         {
+            "name": "Sample pdf help file",
+            "pdf": "help-pdf/sample.pdf",
+            "admin_published": True
+        },
+        {
             "name": "Example video for helping demo the website to users",
             "video": "https://www.youtube.com/watch?v=m80E1K75vDI",
             "admin_published": True

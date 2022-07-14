@@ -8,6 +8,7 @@
     <form method="post" class="full-form">
         {% csrf_token %}
         {{ form.as_p }}
+        <em>You have been assigned the role of <strong>{{ object.role.name }}</strong>. Please contact us if you believe this needs to be changed.</em>
         <button type="submit"><i class="fas fa-check"></i> Save changes</button>
     </form>
     <div class="full-form-footer-links">
@@ -15,6 +16,17 @@
         <a href="{% url 'account:change-password' %}">Change password</a>
     </div>
 </section>
+
+{% if user.classes.all %}
+    <section id="myaccount-classes" class="container">
+        <h2>My Classes</h2>
+        <ul>
+            {% for class in user.classes.all %}
+                <li>{{ class.name }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
 
 <section id="myaccount-exercisehistory" class="container">
     <h2>My Exercise Attempts</h2>

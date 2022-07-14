@@ -65,20 +65,22 @@
                             <span>Welcome</span>
                         </a>
                     </li>
-                    <!-- Exercises -->
-                    <li class="nav-item">
-                        <a class="nav-link{% if "/exercises/" in request.path %} active{% endif %}" href="{% url 'exercises:list' %}">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Exercises</span>
-                        </a>
-                    </li>
-                    <!-- Help -->
-                    <li class="nav-item">
-                        <a class="nav-link{% if "/help/" in request.path %} active{% endif %}" href="{% url 'help:list' %}">
-                            <i class="fas fa-question-circle"></i>
-                            <span>Help</span>
-                        </a>
-                    </li>
+                    {% if user.is_authenticated %}
+                        <!-- Exercises -->
+                        <li class="nav-item">
+                            <a class="nav-link{% if "/exercises/" in request.path %} active{% endif %}" href="{% url 'exercises:list' %}">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Exercises</span>
+                            </a>
+                        </li>
+                        <!-- Help -->
+                        <li class="nav-item">
+                            <a class="nav-link{% if "/help/" in request.path %} active{% endif %}" href="{% url 'help:list' %}">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Help</span>
+                            </a>
+                        </li>
+                    {% endif %}
                     <!-- Login/Account -->
                     <li class="nav-item">
                         <a class="nav-link{% if "/account/" in request.path %} active{% endif %}" href="{% if user.is_authenticated %}{% url 'account:myaccount' %}{% else %}{% url 'login' %}{% endif %}">

@@ -1,6 +1,6 @@
 from django.views.generic import (View, DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView)
 from django.db.models import Q
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMixin)
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
 from django.http import Http404
@@ -145,7 +145,7 @@ def exercise_copy(request, pk):
     return redirect(reverse_lazy('exercises:edit', kwargs={'pk': newExercise.id}))
 
 
-class ExerciseDetailView(DetailView):
+class ExerciseDetailView(LoginRequiredMixin, DetailView):
     """
     Class-based view for exercise detail template
     """
@@ -162,7 +162,7 @@ class ExerciseDetailView(DetailView):
         return context
 
 
-class ExerciseListView(ListView):
+class ExerciseListView(LoginRequiredMixin, ListView):
     """
     Class-based view for exercise list template
     """

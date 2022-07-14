@@ -1,4 +1,5 @@
 from django.views.generic import (DetailView, ListView)
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from . import models
 
@@ -26,7 +27,7 @@ def help_queryset(self):
     return queryset
 
 
-class HelpDetailView(DetailView):
+class HelpDetailView(LoginRequiredMixin, DetailView):
     """
     Class-based view for help detail template
     """
@@ -37,7 +38,7 @@ class HelpDetailView(DetailView):
         return help_queryset(self)
 
 
-class HelpListView(ListView):
+class HelpListView(LoginRequiredMixin, ListView):
     """
     Class-based view for help list template
     """

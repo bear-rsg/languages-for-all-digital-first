@@ -40,6 +40,17 @@ def fk_link(object, fk_field):
         return "-"  # If FK value is null
 
 
+class YearGroupAdminView(admin.ModelAdmin):
+    """
+    Customise the admin interface: YearGroup
+    """
+    list_display = ('name', 'date_start', 'date_end', 'is_published')
+    list_display_links = ('name',)
+    list_filter = ('is_published',)
+    search_fields = ('name',)
+    actions = (publish, unpublish)
+
+
 class LanguageAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: Language
@@ -55,10 +66,10 @@ class SchoolClassAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: SchoolClass
     """
-    list_display = ('name',  'language', 'difficulty', 'teachers_names', 'students_count', 'is_active', 'is_published')
+    list_display = ('name', 'year_group', 'language', 'difficulty', 'teachers_names', 'students_count', 'is_active', 'is_published')
     list_display_links = ('name',)
-    list_filter = ('is_published', 'is_active', 'difficulty', 'language')
-    search_fields = ('name', 'language__name', 'difficulty__name')
+    list_filter = ('is_published', 'is_active', 'year_group', 'difficulty', 'language')
+    search_fields = ('name', 'year_group__name', 'language__name', 'difficulty__name')
     actions = (publish, unpublish)
 
 
@@ -77,9 +88,9 @@ class DifficultyAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: Difficulty
     """
-    list_display = ('name', 'order', 'colour_hex')
+    list_display = ('name', 'order')
     list_display_links = ('name',)
-    search_fields = ('name', 'order', 'colour_hex')
+    search_fields = ('name', 'order')
 
 
 class ExerciseAdminView(admin.ModelAdmin):
@@ -168,6 +179,7 @@ class UserExerciseAttemptAdminView(admin.ModelAdmin):
 
 # Register admin views
 
+admin.site.register(models.YearGroup, YearGroupAdminView)
 admin.site.register(models.Language, LanguageAdminView)
 admin.site.register(models.SchoolClass, SchoolClassAdminView)
 admin.site.register(models.Theme, ThemeAdminView)

@@ -5,12 +5,51 @@ from django.db import transaction
 
 """
 This data migration adds default data for the following models:
+- Year group
 - Language
 - Difficulty
 - Exercise format
 - Theme
 - School class
 """
+
+
+def insert_year_groups(apps, schema_editor):
+    """
+    Inserts YearGroup objects.
+    """
+
+    year_groups = [
+        {
+            "name": "2022/23",
+            "date_start": "2022-09-01",
+            "date_end": "2023-08-31",
+            "is_published": True
+        },
+        {
+            "name": "2023/24",
+            "date_start": "2023-09-01",
+            "date_end": "2024-08-31"
+        },
+        {
+            "name": "2024/25",
+            "date_start": "2024-09-01",
+            "date_end": "2025-08-31"
+        },
+        {
+            "name": "2025/26",
+            "date_start": "2025-09-01",
+            "date_end": "2026-08-31"
+        },
+        {
+            "name": "2026/27",
+            "date_start": "2026-09-01",
+            "date_end": "2027-08-31"
+        },
+    ]
+
+    for year_group in year_groups:
+        models.YearGroup(**year_group).save()
 
 
 def insert_languages(apps, schema_editor):
@@ -36,9 +75,14 @@ def insert_difficulties(apps, schema_editor):
     """
 
     difficulties = [
-        {"name": "Beginners", "order": 1, "colour_hex": "#2ecc71"},
-        {"name": "Intermediate", "order": 2, "colour_hex": "#f39c12"},
-        {"name": "Advanced", "order": 3, "colour_hex": "#c23616"}
+        {"name": "Level 1", "order": 1},
+        {"name": "Level 2", "order": 2},
+        {"name": "Level 3", "order": 3},
+        {"name": "Level 4", "order": 4},
+        {"name": "Level 5", "order": 5},
+        {"name": "Level 6", "order": 6},
+        {"name": "Level 7", "order": 7},
+        {"name": "Level 8", "order": 8},
     ]
 
     for difficulty in difficulties:
@@ -60,7 +104,7 @@ def insert_exercise_formats(apps, schema_editor):
         {
             "name": "Multiple Choice",
             "icon": '<i class="fas fa-list-ul"></i>',
-            "instructions": "Choose the correct answer of 4 possible options",
+            "instructions": "Choose the correct answer of the available possible options",
             "is_marked_automatically_by_system": True
         },
         {
@@ -112,11 +156,18 @@ def insert_school_class(apps, schema_editor):
     """
     Inserts SchoolClass objects
     """
+    initial_year_group = models.YearGroup.objects.get(name='2022/23')
 
     school_classes = [
         {
+            "year_group": initial_year_group,
             "language": models.Language.objects.get(name='Portuguese'),
-            "difficulty": models.Difficulty.objects.get(name="Beginners")
+            "difficulty": models.Difficulty.objects.get(name="Level 1")
+        },
+        {
+            "year_group": initial_year_group,
+            "language": models.Language.objects.get(name='Portuguese'),
+            "difficulty": models.Difficulty.objects.get(name="Level 3")
         },
     ]
 
@@ -131,6 +182,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(insert_year_groups),
         migrations.RunPython(insert_languages),
         migrations.RunPython(insert_difficulties),
         migrations.RunPython(insert_exercise_formats),
