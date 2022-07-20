@@ -6,10 +6,10 @@ import random
 
 OPTIONAL_HELP_TEXT = "(Optional)"
 OPTIONAL_IF_AUDIO_HELP_TEXT = "Optional if supplying audio instead, otherwise required"
-ORDER_HELP_TEXT = OPTIONAL_HELP_TEXT + " Specify the order you'd like this item to appear on the exercise page. Leave blank to order automatically."
 AUDIO_HELP_TEXT = OPTIONAL_HELP_TEXT + " <a href='https://online-voice-recorder.com/' target='_blank'>Record your audio clip</a> and then upload the file here"
 AUDIO_UPLOAD_PATH = "exercises-exercise-audio"
-
+CORRECT_ANSWER_FEEDBACK_HELP_TEXT = OPTIONAL_HELP_TEXT + " Provide feedback about the correct answer (if relevant) to help aid student learning"
+EXERCISE_ITEM_ORDER_HELP_TEXT = OPTIONAL_HELP_TEXT + " Specify the order you'd like this item to appear on the exercise page. Leave blank to order automatically."
 
 def text_or_audiomsg(text_field, audio_field):
     """
@@ -20,7 +20,7 @@ def text_or_audiomsg(text_field, audio_field):
     if text_field:
         return text_field
     elif audio_field:
-        return "Please play the audio clip"
+        return "(Please play the audio clip)"
     else:
         return ""
 
@@ -183,6 +183,7 @@ class Exercise(models.Model):
     difficulty = models.ForeignKey(Difficulty, on_delete=models.RESTRICT)
     instructions = models.TextField(blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " If left blank then the default instructions for this exercise format will be used (suitable for most cases)")
     instructions_image = models.ImageField(upload_to='exercises-exercise-instructions', blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " Include an image here to illustrate the instructions for the entire exercise. E.g. if all questions relate to this image.")
+    is_a_formal_assessment = models.BooleanField(default=False, help_text="Marking this as a formal assessment (i.e. a test that counts to the student's grade) will put restrictions on this exercise, like preventing students from being able to check answers and only allowing a single attempt")
     is_published = models.BooleanField(default=True, verbose_name="Published")
     owned_by = models.ForeignKey(User, related_name="exercise_owned_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The only teacher who can manage this exercise")
     created_by = models.ForeignKey(User, related_name="exercise_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The teacher who originally created this exercise")
@@ -241,6 +242,7 @@ class ExerciseFormatImageMatch(models.Model):
     image = models.ImageField(upload_to='exercises-exerciseformat-imagematch')
     label = models.CharField(max_length=255)
     label_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     # no order field as these load in random order
 
     def has_audio(self):
@@ -295,7 +297,8 @@ class ExerciseFormatMultipleChoice(models.Model):
     option_f_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='Option F (audio)')
     option_f_is_correct = models.BooleanField(default=False, verbose_name="Option F is correct")
 
-    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+    correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     @property
     def question_text_or_audiomsg(self):
@@ -419,7 +422,8 @@ class ExerciseFormatFillInTheBlank(models.Model):
     source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     text_with_blanks_to_fill = models.TextField(help_text="Wrap words you want to be blank with 2 asterisks (e.g. **blank words**). If there are multiple possibile answers for a single blank then separate them with a single asterisk (e.g. **big*large*tall**). A full example: This is an **example*sample*illustration** of how to specify **blank words** in a **sentence**.")
     text_with_blanks_to_fill_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+    correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     @property
     def source_text_or_audiomsg(self):
@@ -440,9 +444,10 @@ class ExerciseFormatFillInTheBlank(models.Model):
         Return the translated statement with blanks replaced with HTML text inputs to be used in the website
         """
         html = self.text_with_blanks_to_fill
-        for blank in self.text_with_blanks_to_fill_list:
+        for i, blank in enumerate(self.text_with_blanks_to_fill_list):
+            showanswer_html = f"""<span class="exerciseformat-showanswer"><i class="fas fa-info-circle" title="{blank.replace('*', ' OR ')}"></i></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span>""" if not self.exercise.is_a_formal_assessment else ""
             # This string has to be all one line or the template puts each element on a new line in the UI
-            span = f"""<span class="exerciseformat-fillintheblank-fitb-item" dir="auto"><input type="text" dir="auto" size="{len(max(blank.split("."), key=len))}" title="fill in the blank" data-correct="{blank}"></input><span class="exerciseformat-showanswer"><i class="fas fa-info-circle" title="{blank.replace('*', ' OR ')}"></i></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span></span>"""  # noqa: E501
+            span = f"""<span id="exerciseformat-fillintheblank-fitb-item-{i}" class="exerciseformat-fillintheblank-fitb-item" dir="auto"><input type="text" dir="auto" size="{len(max(blank.split("."), key=len))}" title="fill in the blank" data-correct="{blank}"></input>{showanswer_html}</span>"""  # noqa: E501
             html = html.replace(f"**{blank}**", span)
         return html
 
@@ -479,7 +484,8 @@ class ExerciseFormatSentenceBuilder(models.Model):
     sentence_translated = models.TextField()
     sentence_translated_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate with a space, e.g. "car apple tree"', blank=True, null=True)
-    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+    correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     @property
     def sentence_source_text_or_audiomsg(self):
@@ -526,7 +532,8 @@ class ExerciseFormatTranslation(models.Model):
     translation_image = models.ImageField(upload_to='exercises-exerciseformat-translation')
     correct_translation = models.TextField()
     correct_translation_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+    correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     def has_audio(self):
         return bool(self.correct_translation_audio)
@@ -554,7 +561,7 @@ class ExerciseFormatExternal(models.Model):
                                  null=True)
     url = models.URLField()
     instructions = models.TextField(blank=True, null=True, help_text=OPTIONAL_HELP_TEXT)
-    order = models.IntegerField(blank=True, null=True, help_text=ORDER_HELP_TEXT)
+    order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     def __str__(self):
         if self.exercise:

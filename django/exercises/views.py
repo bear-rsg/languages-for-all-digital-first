@@ -1,3 +1,4 @@
+from multiprocessing import get_context
 from django.views.generic import (View, DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView)
 from django.db.models import Q
 from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMixin)
@@ -40,6 +41,12 @@ class UserExerciseAttemptSuccessTemplateView(TemplateView):
     """
     template_name = 'exercises/exercise-attempt-success.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Get the last attempt of this user (i.e. the one that has just been completed)
+        context['last_attempt'] = models.UserExerciseAttempt.objects.filter(user=self.request.user).order_by('-submit_timestamp').first()
+        return context
+
 
 # Exercise
 
@@ -51,7 +58,7 @@ class ExerciseCreateView(PermissionRequiredMixin, CreateView):
 
     template_name = 'exercises/exercise-add.html'
     model = models.Exercise
-    fields = ['name', 'language', 'exercise_format', 'theme', 'difficulty', 'instructions', 'instructions_image']
+    fields = ['name', 'language', 'exercise_format', 'theme', 'difficulty', 'instructions', 'instructions_image', 'is_a_formal_assessment']
     permission_required = ('exercises.add_exercise')
     success_url = reverse_lazy('exercises:list')
 
@@ -77,7 +84,7 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
 
     template_name = 'exercises/exercise-edit.html'
     model = models.Exercise
-    fields = ['name', 'language', 'theme', 'difficulty', 'instructions', 'instructions_image', 'owned_by']
+    fields = ['name', 'language', 'theme', 'difficulty', 'instructions', 'instructions_image', 'is_a_formal_assessment', 'owned_by']
     permission_required = ('exercises.change_exercise')
 
     def get_queryset(self):
