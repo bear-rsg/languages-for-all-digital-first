@@ -1,6 +1,6 @@
 {% for im in exercise.exerciseformatimagematch_set.all %}
 
-    <div class="exerciseformat-imagematch">
+    <div class="exerciseformat-imagematch" id="exerciseformat-imagematch-{{ forloop.counter }}">
 
         <div class="exerciseformat-imagematch-title">Image {{ forloop.counter }}</div>
 
@@ -20,10 +20,17 @@
             <img src="{{ im.image.url }}" alt="Match the image to the label">
         </a>
 
-        <div class="exerciseformat-showanswer">
-            <label><i class="fas fa-info-circle"></i> Show answer</label>
-            <div class="answer">{{ im.label }}</div>
-        </div>
+        {% if not exercise.is_a_formal_assessment %}
+            <div class="exerciseformat-showanswer">
+                <label><i class="fas fa-info-circle"></i> Show answer</label>
+                <div class="answer">
+                    <div class="answer-text">Answer: {{ im.label }}</div>
+                    {% if im.correct_answer_feedback %}
+                        <div class="answer-feedback">{{ im.correct_answer_feedback | safe }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
 
         <div class="exerciseformat-imagematch-result">
         </div>
@@ -34,36 +41,3 @@
 {% empty %}
     {% include 'exercises/snippets/exercise-content-empty.html' %}
 {% endfor %}
-
-<script>
-$(document).ready(function() {
-    // Click button to score attempt
-    $('#exercise-detail-footer-check').on('click', function(){
-        var score = 0;
-        $('.exerciseformat-imagematch').each(function(){
-            var answerAttempt = $(this).find("select").val();
-            var answerCorrect = 1;
-            // Correct
-            if (answerAttempt == answerCorrect) {
-                var result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
-                score++;
-            }
-            // Unanswered
-            else if (answerAttempt == "") var result = '<span class="exercise-result-unanswered"><i class="fas fa-question"></i> Unanswered</span>';
-            // Wrong
-            else var result = '<span class="exercise-result-wrong"><i class="fas fa-times"></i> Wrong</span>';
-            // Set individual results
-            $(this).find('.exerciseformat-imagematch-result').html(result);
-        });
-        // Set total results
-        var questionCount = $('.exerciseformat-imagematch').length;
-        var scorePercent = Math.round(parseFloat(score/questionCount) * 100);
-        $('#exercise-detail-footer-score').html("Score: " + score + "/" + questionCount + " (<span id='exercise-detail-footer-score-val'>" + scorePercent + "</span>%)" );
-    });
-
-    // Click to toggle visibility of 'show answer'
-    $('.exerciseformat-showanswer label').on('click', function() {
-        $(this).parent().find('.answer').toggle();
-    });
-});
-</script>

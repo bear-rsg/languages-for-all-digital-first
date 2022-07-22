@@ -590,6 +590,12 @@ main {
     margin-right: 2em;
 }
 
+#exercise-detail-formalassessment {
+    font-weight: bold;
+    margin-bottom: 1.5em;
+    color: #1779C5;
+}
+
 .exercise-content-edit {
     clear: both;
     float: right;
@@ -615,7 +621,7 @@ main {
 
 .exerciseformat-showanswer {
     color: #505050;
-    font-size: 0.85em;
+    font-size: 0.95em;
 }
 
 .exerciseformat-showanswer label {
@@ -632,7 +638,11 @@ main {
     margin-bottom: 1em;
     background: #505050;
     color: #EEE;
-    text-align: center;
+    text-align: left;
+}
+
+.exerciseformat-showanswer .answer-feedback {
+    margin-top: 1.3em;
 }
 
 #exercise-detail-footer {
@@ -834,7 +844,8 @@ main {
 }
 
 .exerciseformat-multiplechoice .exerciseformat-showanswer {
-    float: right;
+    float: left;
+    margin-top: 1em;
 }
 
 .exerciseformat-multiplechoice-result {
@@ -894,9 +905,11 @@ main {
     display: none;
 }
 
+.exerciseformat-sentencebuilder-checkanswer,
 .exerciseformat-sentencebuilder-restart {
-    float: right;
-    font-size: 0.85em;
+    float: left;
+    clear: both;
+    font-size: 0.95em;
     color: #505050;
     margin-bottom: 1em;
     cursor: pointer;
@@ -904,8 +917,8 @@ main {
 
 .exerciseformat-sentencebuilder .exerciseformat-showanswer {
     clear: both;
-    float: right;
-    text-align: right;
+    float: left;
+    text-align: left;
 }
 
 .exerciseformat-sentencebuilder-result {

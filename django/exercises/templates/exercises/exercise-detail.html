@@ -104,6 +104,11 @@
                 Owned by: <strong>{{ exercise.owned_by.name }}</strong> 
             </div>
         {% endif %}
+        {% if exercise.is_a_formal_assessment %}
+            <div id="exercise-detail-formalassessment">
+                This is a formal assessment, meaning that {% if user.role.name == 'student' %}you{% else %}students{% endif %} cannot receive any help or check answers and can only attempt this exercise once.
+            </div>
+        {% endif %}
     </div>
 </section>
 
@@ -162,44 +167,44 @@
                     </div>
                 </div>
             {% endif %}
-            <!-- Check answers -->
-            <button id="exercise-detail-footer-check" class="exercise-detail-footer-button">
-                <i class="fas fa-calculator"></i> Check Answers
-            </button>
-            <!-- Score (content filled by JS) -->
-            <div id="exercise-detail-footer-score"></div>
+            {% if not exercise.is_a_formal_assessment %}
+                <!-- Score (content filled by JS) -->
+                <div id="exercise-detail-footer-score"></div>
+            {% endif %}
         {% endif %}
 
         <!-- If user is authenticated, allow to submit form -->
         {% if user.is_authenticated %}
-            <!-- Complete button (to show popup form) -->
-            <button id="exercise-detail-footer-completed" class="exercise-detail-footer-button popup-show">
-                <i class="fas fa-check"></i> Completed
-            </button>
+            {% if not exercise.is_a_formal_assessment or not pastscores %}
+                <!-- Complete button (to show popup form) -->
+                <button id="exercise-detail-footer-completed" class="exercise-detail-footer-button popup-show">
+                    <i class="fas fa-check"></i> Completed
+                </button>
 
-            <div id="exercise-attempt-popup" class="popup">
-                <div class="popup-content">
-                    <div class="popup-hide"><i class="fas fa-times"></i></div>
-                    {% if exercise.exercise_format.is_marked_automatically_by_system %}
-                        <div class="popup-content-title">
-                            You scored: <span id="exercise-attempt-popup-score"></span>%
-                        </div>
-                    {% endif %}
-                    <p>
-                        Please confirm you've completed the exercise or close this message to continue working on it
-                    </p>
-                    <!-- Form to mark exercise as completed -->
-                    <form id="exercise-attempt-form" method="post" action="{% url 'exercises:attempt' %}">
-                        {% csrf_token %}
-                        <!-- Hidden values -->
-                        <input id="exercise-attempt-form-exercise" type="hidden" name="exercise" value="{{ exercise.id }}">
-                        <input id="exercise-attempt-form-score" type="hidden" name="score" val="empty">
-                        <button type="submit" class="popup-submit">
-                            <i class="fas fa-check"></i> Completed
-                        </button>
-                    </form>
+                <div id="exercise-attempt-popup" class="popup">
+                    <div class="popup-content">
+                        <div class="popup-hide"><i class="fas fa-times"></i></div>
+                        {% if not exercise.is_a_formal_assessment and exercise.exercise_format.is_marked_automatically_by_system %}
+                            <div class="popup-content-title">
+                                You scored: <span id="exercise-attempt-popup-score"></span>%
+                            </div>
+                        {% endif %}
+                        <p>
+                            Please confirm you've completed the exercise or close this message to continue working on it
+                        </p>
+                        <!-- Form to mark exercise as completed -->
+                        <form id="exercise-attempt-form" method="post" action="{% url 'exercises:attempt' %}">
+                            {% csrf_token %}
+                            <!-- Hidden values -->
+                            <input id="exercise-attempt-form-exercise" type="hidden" name="exercise" value="{{ exercise.id }}">
+                            <input id="exercise-attempt-form-score" type="hidden" name="score" val="empty">
+                            <button type="submit" class="popup-submit">
+                                <i class="fas fa-check"></i> Completed
+                            </button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         {% endif %}
 
     </div>
@@ -207,19 +212,103 @@
 
 <script>
 $(document).ready(function() {
+
+    var totalScorePercent = 0;
+
+    // Score (aka grade/mark) each answer, but only show feedback for answerId
+    function scoreAnswers(answerClass, answerId){
+        // Reset score to 0 each time
+        var score = 0;
+        // Ensure answerClass starts with . for use in $() below
+        var answerClass = (answerClass[0] == '.' ? answerClass : '.' + answerClass);
+
+        // Loop through each item (e.g. question/answer)
+        $(answerClass).each(function(){
+
+            // Define exercise format specific values
+            // Get format from class name, e.g. multiplechoice in .exerciseformat-multiplechoice
+            switch (answerClass.split('-')[1]) {
+                case 'multiplechoice':
+                    var answerAttempt = $(this).find('input:radio:checked').val();
+                    var answerCorrect = 1;
+                    var answerIsCorrect = answerAttempt == answerCorrect;
+                    break;
+
+                case 'imagematch':
+                    var answerAttempt = $(this).find("select").val();
+                    var answerCorrect = 1;
+                    var answerIsCorrect = answerAttempt == answerCorrect;
+                    break;
+
+                case 'fillintheblank':
+                    var answerAttempt = $(this).find('input').val();
+                    var answerCorrect = $(this).find('input').attr('data-correct').split("*");  // Make list of answers
+                    var answerIsCorrect = answerCorrect.indexOf(answerAttempt) > -1;
+                    break;
+
+                case 'sentencebuilder':
+                    var answerAttempt = $(this).find('.exerciseformat-sentencebuilder-sentence-text').text();
+                    var answerCorrect = $(this).find('.answer').attr('data-answer');
+                    var answerIsCorrect = answerAttempt == answerCorrect;
+                    break;
+            }
+
+            // Calculate score for this answer
+            if (answerIsCorrect) score++;
+
+            // Display Correct/Wrong/Unanswered result for this answer only
+            if (answerId == $(this).attr('id')) {
+                var result = '';
+                // Correct
+                if (answerIsCorrect) result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
+                // Wrong
+                else if (answerAttempt !== '') result = '<span class="exercise-result-wrong"><i class="fas fa-times"></i> Wrong</span>';
+                // Set individual results
+                $(this).find(answerClass + '-result').html(result);
+            }
+        });
+        // Set total results
+        var questionCount = $(answerClass).length;
+        totalScorePercent = Math.round(parseFloat(score/questionCount) * 100);
+        $('#exercise-detail-footer-score').html("Score: " + score + "/" + questionCount + " (<span id='exercise-detail-footer-score-val'>" + totalScorePercent + "</span>%)" );
+    }
+
+
+    // Score answers: most exercise formats
+    $('.exerciseformat-multiplechoice, .exerciseformat-fillintheblank-fitb-item, .exerciseformat-imagematch').on('change', function(){
+        answerClass = $(this).attr('class').split(" ")[0];
+        answerId = $(this).attr('id');
+        scoreAnswers(answerClass, answerId);
+    });
+
+
+    // Score answers: Sentence Builder
+    $('.exerciseformat-sentencebuilder-checkanswer').on('click', function(){
+        answerClass = '.exerciseformat-sentencebuilder';
+        answerId = $(this).closest(answerClass).attr('id');
+        scoreAnswers(answerClass, answerId);
+    });
+
+
+    // Click to toggle visibility of 'show answer'
+    $('.exerciseformat-showanswer label').on('click', function() {
+        $(this).parent().find('.answer').toggle();
+    });
+
+
     // Click to prompt confirm submission of exercise attempt
     $('#exercise-detail-footer-completed').on('click', function(){
         {% if exercise.exercise_format.is_marked_automatically_by_system %}
             // Score exercise
             $('#exercise-detail-footer-check').trigger('click');
             // Add score to popup
-            var score = $('#exercise-detail-footer-score-val').text();
-            $('#exercise-attempt-popup-score').text(score)
+            $('#exercise-attempt-popup-score').text(totalScorePercent);
             // Set score val in exercise attempt form
-            if(score == '0') score=0.1 // 0 is ignored by backend, so change to 0.1 (will be rounded to 0)
-            $('#exercise-attempt-form-score').val(score);
+            if(totalScorePercent == '0') totalScorePercent=0.1 // 0 is ignored by backend, so change to 0.1 (will be rounded to 0)
+            $('#exercise-attempt-form-score').val(totalScorePercent);
         {% endif %}
     });
+
 });
 </script>
 

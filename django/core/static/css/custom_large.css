@@ -75,7 +75,7 @@
     .exercise-list-body-items-item.gridview {
         display: inline-block;
         width: calc(33% - 2em);
-        vertical-align: middle;
+        vertical-align: top;
         padding: 1em;
         border: 1px solid #CCC;
     }

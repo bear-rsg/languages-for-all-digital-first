@@ -1,15 +1,15 @@
-{% for m in exercise.exerciseformattranslation_set.all %}
+{% for t in exercise.exerciseformattranslation_set.all %}
 
     <div class="exerciseformat-translation">
 
-        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=m.id %}
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=t.id %}
 
         <div class="exerciseformat-translation-image">
             <div id="exerciseformat-translation-image-container-{{forloop.counter}}" class="exerciseformat-translation-image-container">
-                <img src="{{ m.translation_image.url }}" id="main-img-{{ forloop.counter }}" class="main-img" alt="Translation image">
-                <div id="zoomed-img-{{ forloop.counter }}" class="zoomed-img" style="background: url('{{ m.translation_image.url }}') no-repeat #F7F7F7;"></div>
+                <img src="{{ t.translation_image.url }}" id="main-img-{{ forloop.counter }}" class="main-img" alt="Translation image">
+                <div id="zoomed-img-{{ forloop.counter }}" class="zoomed-img" style="background: url('{{ t.translation_image.url }}') no-repeat #F7F7F7;"></div>
             </div>
-            <a class="exerciseformat-translation-image-fullsize" href="{{ m.translation_image.url }}" target="_blank">View full size <i class="fas fa-expand-arrows-alt"></i></a>
+            <a class="exerciseformat-translation-image-fullsize" href="{{ t.translation_image.url }}" target="_blank">View full size <i class="fas fa-expand-arrows-alt"></i></a>
         </div>
 
         <!-- User's attempt -->
@@ -17,15 +17,22 @@
             <!-- Header -->
             <label for="translation-translate">
                 Translate the translation
-                {% include "exercises/snippets/audio.html" with audio=m.correct_translation_audio id=forloop.counter %}
+                {% include "exercises/snippets/audio.html" with audio=t.correct_translation_audio id=forloop.counter %}
             </label>
             <!-- Input -->
             <textarea id="translation-translate" dir="auto"></textarea>
-            <!-- Show answer -->
-            <div class="exerciseformat-showanswer">
-                <label><i class="fas fa-info-circle"></i> Show answer</label>
-                <div class="answer" dir="auto">{{ m.correct_translation | linebreaks }}</div>
-            </div>
+            {% if not exercise.is_a_formal_assessment %}
+                <!-- Show answer -->
+                <div class="exerciseformat-showanswer">
+                    <label><i class="fas fa-info-circle"></i> Show answer</label>
+                    <div class="answer" dir="auto">
+                        <div class="answer-text">Answer:<br>{{ t.correct_translation | linebreaks }}</div>
+                        {% if t.correct_answer_feedback %}
+                            <div class="answer-feedback">{{ t.correct_answer_feedback | safe }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
     </div>
@@ -35,11 +42,6 @@
 
 <script>
 $(document).ready(function() {
-    // Click to toggle visibility of 'show answer'
-    $('.exerciseformat-showanswer label').on('click', function() {
-        $(this).parent().find('.answer').toggle();
-    });
-
     // Magnifying glass
     $('.exerciseformat-translation-image-container').on('mousemove', function(e){
         var this_main_img_id = $(this).find('.main-img').attr('id'),

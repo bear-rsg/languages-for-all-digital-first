@@ -1,6 +1,6 @@
 {% for mc in exercise.exerciseformatmultiplechoice_set.all %}
 
-    <div class="exerciseformat-multiplechoice">
+    <div id="exerciseformat-multiplechoice-{{ forloop.counter }}" class="exerciseformat-multiplechoice">
 
         <!-- Question -->
         <div class="exerciseformat-multiplechoice-question" dir="auto">
@@ -17,7 +17,7 @@
                     {% include "exercises/snippets/force-dir-auto.html" with text=option.0 %}
                     {% include "exercises/snippets/audio.html" with audio=option.1 id=option.2 %}
                     <!-- Value is 1 if correct answer or 0 if not -->
-                    <input type="radio" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{{ option.3 }}"{% if forloop.counter == 1 %} checked="checked"{% endif %}>
+                    <input type="radio" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{{ option.3 }}">
                     <label for="option-{{ option.2 }}">
                         {{ option.0 }}
                     </label>
@@ -25,10 +25,17 @@
             {% endfor %}
         </div>
 
-        <div class="exerciseformat-showanswer">
-            <label><i class="fas fa-info-circle"></i> Show answer</label>
-            <div class="answer">{{ mc.answer_text | safe }}</div>
-        </div>
+        {% if not exercise.is_a_formal_assessment %}
+            <div class="exerciseformat-showanswer">
+                <label><i class="fas fa-info-circle"></i> Show answer</label>
+                <div class="answer">
+                    <div class="answer-text">Answer:<br>{{ mc.answer_text | safe }}</div>
+                    {% if mc.correct_answer_feedback %}
+                        <div class="answer-feedback">{{ mc.correct_answer_feedback | safe }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
 
         <div class="exerciseformat-multiplechoice-result">
         </div>
@@ -39,34 +46,3 @@
 {% empty %}
     {% include 'exercises/snippets/exercise-content-empty.html' %}
 {% endfor %}
-
-<script>
-$(document).ready(function() {
-    // Click button to score attempt
-    $('#exercise-detail-footer-check').on('click', function(){
-        var score = 0;
-        $('.exerciseformat-multiplechoice input:radio:checked').each(function(){
-            var answerAttempt = $(this).val();
-            var answerCorrect = 1;
-            // Correct
-            if (answerAttempt == answerCorrect) {
-                var result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
-                score++;
-            }
-            // Wrong
-            else var result = '<span class="exercise-result-wrong"><i class="fas fa-times"></i> Wrong</span>';
-            // Set individual results
-            $(this).parent().parent().parent().find('.exerciseformat-multiplechoice-result').html(result);
-        });
-        // Set total results
-        var questionCount = $('.exerciseformat-multiplechoice input:radio:checked').length;
-        var scorePercent = Math.round(parseFloat(score/questionCount) * 100);
-        $('#exercise-detail-footer-score').html("Score: " + score + "/" + questionCount + " (<span id='exercise-detail-footer-score-val'>" + scorePercent + "</span>%)" );
-    });
-
-    // Click to toggle visibility of 'show answer'
-    $('.exerciseformat-showanswer label').on('click', function() {
-        $(this).parent().find('.answer').toggle();
-    });
-});
-</script>

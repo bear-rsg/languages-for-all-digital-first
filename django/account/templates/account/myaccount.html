@@ -4,7 +4,7 @@
 {% block main %}
 
 <section id="myaccount-details" class="container">
-    <h2>My Details</h2>
+    <h2>My Account Details</h2>
     <form method="post" class="full-form">
         {% csrf_token %}
         {{ form.as_p }}
@@ -34,10 +34,10 @@
         {% for attempt in exercise_attempts %}
             <div class="myaccount-exercisehistory-item">
                 <div class="myaccount-exercisehistory-item-date">
-                    <label>Date: </label> {{ attempt.timestamp | date:"D d M Y" }}
+                    <label>Date: </label> {{ attempt.submit_timestamp | date:"D d M Y" }}
                 </div>
                 <div class="myaccount-exercisehistory-item-time">
-                    <label>Time: </label> {{ attempt.timestamp | time:"H:i:s" }}
+                    <label>Time: </label> {{ attempt.submit_timestamp | time:"H:i:s" }}
                 </div>
                 <div class="myaccount-exercisehistory-item-score">
                     <label>Score: </label> {% if attempt.score %}{{ attempt.score_percentage }}{% else %}N/A{% endif %}

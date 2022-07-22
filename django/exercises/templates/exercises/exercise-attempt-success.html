@@ -7,6 +7,13 @@
 
     <i class="far fa-check-circle"></i>
     <h2>Exercise Completed</h2>
+
+    {% if last_attempt.score %}
+        <p>
+            You scored {{ last_attempt.score_percentage }}
+        </p>
+    {% endif %}
+
     <p>
         <a href="{% url 'exercises:list' %}">Continue</a>
     </p>
