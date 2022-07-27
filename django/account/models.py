@@ -93,6 +93,15 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         # Username to be same as email
         self.username = self.email
+        # Set as admin if user hasn't been given a role (e.g. created using 'createsuperuser')
+
+        # Set default role of student if one isn't provided at account creation
+        if not self.role:
+            self.role = UserRole.objects.get(name='student')
+            # If user is created using 'createsuperuser' upgrade them to admin
+            if self.is_superuser:
+                self.role = UserRole.objects.get(name='admin')
+
         # Set values for admins
         if self.role.name == 'admin':
             self.is_staff = True
