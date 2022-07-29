@@ -8,6 +8,7 @@ django/media/
 django/static/
 node_modules/
 private_testdata*
+outputdata/
 
 
 ###################### Django Templated gitignore paths  ######################

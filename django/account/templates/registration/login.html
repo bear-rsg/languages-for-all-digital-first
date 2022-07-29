@@ -27,7 +27,7 @@
             <a href="{% url 'account:reset-password-request' %}">Forgot your password?</a>
         </p>
         <p>
-            If you don't have an account or have forgotten your email address, please <a href="{% settings_value 'ADMIN_EMAIL' %}">contact us</a>.
+            If you don't have an account or have forgotten your email address, please <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us</a>.
         </p>
         
     </div>
