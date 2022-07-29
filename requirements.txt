@@ -12,3 +12,4 @@ django-embed-video~=1.4.0
 django-light~=0.1.0
 pandas~=1.4.3
 openpyxl~=3.0.10
+XlsxWriter~=3.0.3

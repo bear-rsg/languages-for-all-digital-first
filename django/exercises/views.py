@@ -3,12 +3,15 @@ from django.views.generic import (View, DetailView, ListView, CreateView, Update
 from django.db.models import Q
 from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMixin)
 from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, Http404
 from django.shortcuts import redirect
-from django.http import Http404
 from django.urls import reverse_lazy
 from account.models import User
 from . import models
 from . import forms
+from .exportdata.studentscores import exportstudentscores
+import os
 
 
 # UserExerciseAttempt
@@ -46,6 +49,44 @@ class UserExerciseAttemptSuccessTemplateView(TemplateView):
         # Get the last attempt of this user (i.e. the one that has just been completed)
         context['last_attempt'] = models.UserExerciseAttempt.objects.filter(user=self.request.user).order_by('-submit_timestamp').first()
         return context
+
+
+# Export Data: Student Scores
+
+
+class ExportDataStudentScoresOptionsTemplateView(LoginRequiredMixin, TemplateView):
+    """
+    Class-based view for export data: student scores options template
+    """
+    template_name = 'exercises/exportdata-studentscores-options.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Return all classes if user is an admin
+        if self.request.user.role.name == 'admin':
+            context['classes'] = models.SchoolClass.objects.all()
+        elif self.request.user.role.name == 'teacher':
+            context['classes'] = models.SchoolClass.objects.filter(user__id=self.request.user.id)
+
+        return context
+
+
+@login_required
+def exportdata_studentscores(request):
+    """
+    Creates an Excel spreadsheet containing student scores and return it to the user to download
+    """
+
+    # Only allow admins and teachers to export scores
+    if request.user.role.name in ['admin', 'teacher']:
+        file_path = exportstudentscores.create_workbook(request)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = f'inline; filename={os.path.basename(file_path)}'
+                return response
+    raise Http404
 
 
 # Exercise

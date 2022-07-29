@@ -254,7 +254,7 @@ form.full-form button[type=submit] {
     -webkit-appearance: none;
     border: none;
     padding: 0.7em;
-    margin: 1em auto;
+    margin: 2.7em auto 1.3em auto;
     background: #1779C5;
     color: white;
     width: 100%;
