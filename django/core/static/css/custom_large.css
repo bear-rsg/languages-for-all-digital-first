@@ -1,4 +1,19 @@
 @media (min-width: 992px) {
+    /* ---------- Data Table ---------- */
+
+    .data-table tr:nth-child(even) {
+        background: #EEE;
+    }
+
+    .data-table td,
+    .data-table th {
+        padding: 0.5em;
+    }
+
+    .data-table label {
+        display: none;
+    }
+
     /* ---------- Navigation ---------- */
 
     nav h1 img {

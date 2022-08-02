@@ -32,6 +32,10 @@ class UserExerciseAttemptView(View):
         score = self.request.POST.get('score', '')
         if score != '':
             attempt['score'] = score
+        # Add attempt_duration to attempt dict if it's provided
+        attempt_duration = self.request.POST.get('attempt_duration', '')
+        if attempt_duration != '':
+            attempt['attempt_duration'] = attempt_duration
         # Save object
         models.UserExerciseAttempt(**attempt).save()
         # Success redirect url

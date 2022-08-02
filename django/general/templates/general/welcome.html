@@ -10,6 +10,9 @@
             A brief tagline here, about a sentence long, like this dummy text is, but not much longer
         </p>
         <a href="{% url 'exercises:list' %}"><i class="fas fa-check-circle"></i> Exercises</a>
+        {% if exercises_todo_count %}
+            <a href="{% url 'exercises:list' %}?myexercises=todo"><i class="fas fa-clipboard-check"></i> To Do ({{ exercises_todo_count }})</a>
+        {% endif %}
     </div>
     <div id="welcome-banner-proceed">
         <i class="fas fa-angle-down"></i>

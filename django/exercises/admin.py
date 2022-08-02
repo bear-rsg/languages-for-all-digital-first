@@ -62,6 +62,11 @@ class LanguageAdminView(admin.ModelAdmin):
     actions = (publish, unpublish)
 
 
+class SchoolClassUserInline(admin.TabularInline):
+    model = models.SchoolClass.user_set.through
+    extra = 1
+
+
 class SchoolClassAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: SchoolClass
@@ -70,6 +75,8 @@ class SchoolClassAdminView(admin.ModelAdmin):
     list_display_links = ('name',)
     list_filter = ('is_published', 'is_active', 'year_group', 'difficulty', 'language')
     search_fields = ('name', 'year_group__name', 'language__name', 'difficulty__name')
+    fields = ('year_group', 'language', 'difficulty', 'is_active', 'is_published')
+    inlines = [SchoolClassUserInline]
     actions = (publish, unpublish)
 
 
@@ -96,15 +103,27 @@ class DifficultyAdminView(admin.ModelAdmin):
 class ExerciseAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: Exercise
+    
+    This blocks the model from appearing in sidebar and being able to add, edit, and delete.
+    It's required in order for other ModelAdmins to include it in autocomplete_fields for searching.
     """
 
     search_fields = ('name',)
 
     def get_model_perms(self, request):
         """
-        Hide SL tables from admin side bar, but still CRUD via inline shortcuts on main models
+        Hide from sidebar
         """
         return {}
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class ExerciseFurtherStudyMaterialAdminView(admin.ModelAdmin):
@@ -189,3 +208,12 @@ admin.site.register(models.Exercise, ExerciseAdminView)
 admin.site.register(models.ExerciseFurtherStudyMaterial, ExerciseFurtherStudyMaterialAdminView)
 admin.site.register(models.SchoolClassAlertExercise, SchoolClassAlertExerciseAdminView)
 admin.site.register(models.UserExerciseAttempt, UserExerciseAttemptAdminView)
+
+
+
+# admin.site.register(models.Language, LanguageAdminView)
+# admin.site.register(models.SchoolClass, SchoolClassAdminView)
+# admin.site.register(models.Theme, ThemeAdminView)
+# admin.site.register(models.Material, MaterialAdminView)
+# admin.site.register(models.ClassAlertExercise, ClassAlertExerciseAdminView)
+# admin.site.register(models.UserExerciseAttempt, UserExerciseAttemptAdminView)

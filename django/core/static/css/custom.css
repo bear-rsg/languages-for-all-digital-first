@@ -202,6 +202,12 @@ select {
     color: #1779C5;
 }
 
+/* ---------- Data Table ---------- */
+
+.data-table {
+    width: 100%;
+}
+
 /* ---------- Forms ---------- */
 
 form.full-form p {
@@ -1183,39 +1189,6 @@ main {
 }
 
 /* ---------- Account ---------- */
-
-.myaccount-exercisehistory-item {
-    border-top: 1px solid #CCC;
-    padding: 1em 0.7em;
-    padding-bottom: 0;
-    margin: 0.3em auto;
-}
-
-.myaccount-exercisehistory-item:last-of-type {
-    border-bottom: 1px solid #CCC;
-    padding-bottom: 0.3em;
-}
-
-.myaccount-exercisehistory-item div {
-    display: inline-block;
-    margin-right: 3em;
-}
-
-.myaccount-exercisehistory-item div label {
-    font-weight: bold;
-}
-
-.myaccount-exercisehistory-item-date {
-    width: 12em;
-}
-
-.myaccount-exercisehistory-item-time {
-    width: 8em;
-}
-
-.myaccount-exercisehistory-item-score {
-    width: 6em;
-}
 
 #account-login-help {
     margin-top: 2em;

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load divide %}
 
 {% block main %}
 
@@ -28,30 +29,28 @@
     </section>
 {% endif %}
 
-<section id="myaccount-exercisehistory" class="container">
-    <h2>My Exercise Attempts</h2>
-    <div>
-        {% for attempt in exercise_attempts %}
-            <div class="myaccount-exercisehistory-item">
-                <div class="myaccount-exercisehistory-item-date">
-                    <label>Date: </label> {{ attempt.submit_timestamp | date:"D d M Y" }}
-                </div>
-                <div class="myaccount-exercisehistory-item-time">
-                    <label>Time: </label> {{ attempt.submit_timestamp | time:"H:i:s" }}
-                </div>
-                <div class="myaccount-exercisehistory-item-score">
-                    <label>Score: </label> {% if attempt.score %}{{ attempt.score_percentage }}{% else %}N/A{% endif %}
-                </div>
-                <div class="myaccount-exercisehistory-item-exercise">
-                    <label>Exercise: </label> <a href="{% url 'exercises:detail' attempt.exercise.id %}">{{ attempt.exercise }}</a>
-                </div>
-            </div>
-        {% empty %}
-            <div id="myaccount-exercisehistory-empty">
-                You've not completed any <a href="{% url 'exercises:list' %}">exercises</a> yet. When you complete an exercise, your attempt will be listed here.
-            </div>
-        {% endfor %}
-    </div>
-</section>
+{% if exercise_attempts %}
+    <section id="myaccount-exercisehistory" class="container">
+        <h2>My Exercise Attempts</h2>
+        <table class="data-table">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Duration (secs)</th>
+                <th>Score</th>
+                <th>Exercise</th>
+            </tr>
+            {% for attempt in exercise_attempts %}
+                <tr>
+                    <td><label>Date:</label> {{ attempt.submit_timestamp | date:"D d M Y" }}</td>
+                    <td><label>Time:</label> {{ attempt.submit_timestamp | time:"H:i" }}</td>
+                    <td><label>Duration (secs):</label> {% if attempt.attempt_duration %}{{ attempt.attempt_duration | divide:1000 }} secs{% else %}N/A{% endif %}</td>
+                    <td><label>Score:</label> {% if attempt.score %}{{ attempt.score_percentage }}{% else %}N/A{% endif %}</td>
+                    <td><label>Exercise:</label> <a href="{% url 'exercises:detail' attempt.exercise.id %}">{{ attempt.exercise }}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+{% endif %}
 
 {% endblock %}
