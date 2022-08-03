@@ -27,7 +27,7 @@ class UserAdmin(admin.ModelAdmin):
     search_fields = ['username', 'first_name', 'last_name', 'email',]
     list_filter = ['role', 'is_active', 'is_internal']
     filter_horizontal = ('classes',)
-    readonly_fields = ['date_joined', 'last_login', 'is_superuser']
+    readonly_fields = ['date_joined', 'last_login', 'is_staff', 'is_superuser']
     fields = ('username', 'first_name', 'last_name', 'role', 'is_internal', 'internal_id_number', 'is_staff', 'is_superuser', 'classes', 'is_active', 'date_joined', 'last_login')
 
     def has_add_permission(self, request, obj=None):
