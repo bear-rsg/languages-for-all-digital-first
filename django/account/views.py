@@ -168,7 +168,7 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
 
 Welcome to Languages for All - Digital First! You've been registered with a new {user['role']} account.
 
-Please go to https://lfa-digitalfirst.bham.ac.uk/account/login/ where you can login with the following details:
+Please go to {self.request.build_absolute_uri('/account/login/')} where you can login with the following details:
 
 Username: {user['email']}
 Password: {password_plain}
