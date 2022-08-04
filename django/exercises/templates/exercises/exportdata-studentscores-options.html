@@ -9,7 +9,10 @@
     <h2>Export Data: Student Scores</h2>
 
     <p>
-        To download students' scores data as an Excel spreadsheet, please choose from the available options below and click download. If you have any issues please <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us for support</a>.
+        To download students' scores data as an Excel spreadsheet, please choose from the available options below and click download. If you don't specify options then all students' score data will be downloaded.
+    </p>
+    <p>
+        If you have any issues please <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us for support</a>.
     </p>
 
     <form class="full-form" action="{% url 'exercises:export-studentscores' %}">

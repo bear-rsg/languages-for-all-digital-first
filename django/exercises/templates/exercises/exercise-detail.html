@@ -198,6 +198,7 @@
                             <!-- Hidden values -->
                             <input id="exercise-attempt-form-exercise" type="hidden" name="exercise" value="{{ exercise.id }}">
                             <input id="exercise-attempt-form-score" type="hidden" name="score" val="empty">
+                            <input id="exercise-attempt-form-attemptduration" type="hidden" name="attempt_duration" val="empty">
                             <button type="submit" class="popup-submit">
                                 <i class="fas fa-check"></i> Completed
                             </button>
@@ -307,6 +308,13 @@ $(document).ready(function() {
             if(totalScorePercent == '0') totalScorePercent=0.1 // 0 is ignored by backend, so change to 0.1 (will be rounded to 0)
             $('#exercise-attempt-form-score').val(totalScorePercent);
         {% endif %}
+    });
+
+    // Calculate how long it takes the user to attempt the exercise
+    var pageInitializationTime = new Date();
+    $('#exercise-attempt-form').on('submit', function(){
+        var attemptDuration = new Date() - pageInitializationTime;
+        $('#exercise-attempt-form-attemptduration').val(attemptDuration);
     });
 
 });

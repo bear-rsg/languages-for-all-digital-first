@@ -56,6 +56,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'settings_value': 'core.templatetags.settings_value',
+                'divide': 'core.templatetags.divide',
             }
         },
     },

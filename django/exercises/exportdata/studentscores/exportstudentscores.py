@@ -66,11 +66,11 @@ def create_workbook(request):
     workbook = xlsxwriter.Workbook(file_path)
 
     # Build queryset
-    queryset_studentscores = models.UserExerciseAttempt.objects.all()
+    # Only return student scores (i.e. not attempts by teachers and admins)
+    queryset_studentscores = models.UserExerciseAttempt.objects.filter(user__role__name='student')
     # Filter by classes, if param is provided
     filter_classes = request.GET.getlist('filter_classes', '')
     if filter_classes:
-        print(filter_classes)
         queryset_studentscores = queryset_studentscores.filter(user__classes__in=filter_classes)
 
     # Create worksheet
@@ -80,10 +80,10 @@ def create_workbook(request):
         "Student Email",
         "Student ID",
         "Score",
-        "Attempt Duration",
+        "Attempt Duration (milliseconds)",
         "Submit Timestamp"
     ]
-    print(request.build_absolute_uri())
+
     data_print = []
     for studentscore in queryset_studentscores:
         data_print.append([

@@ -14,6 +14,9 @@
     {% if site_url %}
         <a href="{{ site_url }}">{% translate 'View site' %}</a> /
     {% endif %}
+    {% if user.is_active and user.is_superuser %}
+        <a href="{% url 'account:importdata-confirm' %}">{% translate 'Import Users' %}</a> /
+    {% endif %}
     {% if user.is_active and user.is_staff %}
         <a href="{% url 'exercises:export-studentscores-options' %}">{% translate 'Export Student Scores' %}</a> /
     {% endif %}

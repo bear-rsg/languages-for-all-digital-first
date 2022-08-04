@@ -141,20 +141,27 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
                 user_obj, user_is_new = models.User.objects.get_or_create(email=user['email'])
 
                 # Get/create school class thrugh unique identifiers (year group, language, difficulty)
-                school_class_obj = exercise_models.SchoolClass.objects.get_or_create(
-                    year_group=exercise_models.YearGroup.objects.get(name=user['year_group']),
-                    language=exercise_models.Language.objects.get(name=user['language']),
-                    difficulty=exercise_models.Difficulty.objects.get(name=user['difficulty'])
-                )[0]
+                if str(user['year_group']) != 'nan' and str(user['language']) != 'nan' and str(user['difficulty']) != 'nan':
+                    school_class_obj = exercise_models.SchoolClass.objects.get_or_create(
+                        year_group=exercise_models.YearGroup.objects.get(name=user['year_group']),
+                        language=exercise_models.Language.objects.get(name=user['language']),
+                        difficulty=exercise_models.Difficulty.objects.get(name=user['difficulty'])
+                    )[0]
+                    # Add the related class
+                    user_obj.classes.add(school_class_obj)
+
+                # Set default language (if provided, else None)
+                if str(user['language']) != 'nan':
+                    user_obj.default_language = exercise_models.Language.objects.get(name=user['language'])
+                else:
+                    user_obj.default_language = None
 
                 # Add additional user data
                 user_obj.first_name = user['first_name']
                 user_obj.last_name = user['last_name']
                 user_obj.role = models.UserRole.objects.get(name=user['role'])
                 user_obj.is_internal = user['is_internal']
-                user_obj.internal_id_number = user['internal_id_number']
-                user_obj.classes.add(school_class_obj)
-                user_obj.default_language = exercise_models.Language.objects.get(name=user['language'])
+                user_obj.internal_id_number = str(user['internal_id_number']) if str(user['internal_id_number']) != 'nan' else ''
 
                 # If this iteration created a new user then process additional steps
                 if user_is_new:
@@ -168,7 +175,7 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
 
 Welcome to Languages for All - Digital First! You've been registered with a new {user['role']} account.
 
-Please go to https://lfa-digitalfirst.bham.ac.uk/account/login/ where you can login with the following details:
+Please go to {self.request.build_absolute_uri('/account/login/')} where you can login with the following details:
 
 Username: {user['email']}
 Password: {password_plain}
