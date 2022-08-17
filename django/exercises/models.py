@@ -528,7 +528,8 @@ class ExerciseFormatTranslation(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    translation_image = models.ImageField(upload_to='exercises-exerciseformat-translation')
+    translation_source_text = models.TextField(blank=True, null=True, help_text='Optional if provided source image instead, otherwise required')
+    translation_source_image = models.ImageField(upload_to='exercises-exerciseformat-translation', blank=True, null=True, help_text='Optional if provided source text instead, otherwise required')
     correct_translation = models.TextField()
     correct_translation_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)

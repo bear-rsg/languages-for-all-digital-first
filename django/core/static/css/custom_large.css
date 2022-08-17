@@ -131,9 +131,10 @@
     
     /* Exercise: Detail: Format: Translation */
 
-    .exerciseformat-translation-image {
+    .exerciseformat-translation-source-image,
+    .exerciseformat-translation-source-text,
+    .exerciseformat-translation-source-none {
         display: inline-block;
-        padding: 1em 2em;
         width: calc(50% - 6em);
         vertical-align: top;
     }

@@ -939,20 +939,24 @@ main {
     margin-bottom: 7em;
 }
 
-.exerciseformat-translation-image {
+.exerciseformat-translation-source-image {
     padding: 1em 2em;
 }
 
-.exerciseformat-translation-image-container img {
+.exerciseformat-translation-source-none {
+    color: red;
+}
+
+.exerciseformat-translation-source-image-container img {
     width: 100%;
 }
 
-.exerciseformat-translation-image-container {
+.exerciseformat-translation-source-image-container {
     position: relative;
     cursor: none;
 }
 
-.exerciseformat-translation-image-container .zoomed-img {
+.exerciseformat-translation-source-image-container .zoomed-img {
     width: 250px;
     height: 250px;
     box-shadow: 0 5px 10px -2px rgba(0, 0, 0, 0.3);
@@ -966,12 +970,12 @@ main {
     transition: opacity 0.2s;
 }
 
-.exerciseformat-translation-image-container:hover .zoomed-img,
-.exerciseformat-translation-image-container:active .zoomed-img {
+.exerciseformat-translation-source-image-container:hover .zoomed-img,
+.exerciseformat-translation-source-image-container:active .zoomed-img {
     opacity: 1;
 }
 
-.exerciseformat-translation-image-fullsize {
+.exerciseformat-translation-source-image-fullsize {
     text-align: center;
     display: block;
     margin-top: 1em;
@@ -979,12 +983,12 @@ main {
     padding: 0.5em;
 }
 
-.exerciseformat-translation-image-fullsize:hover {
+.exerciseformat-translation-source-image-fullsize:hover {
     background: #1779C5;
     color: white;
 }
 
-.exerciseformat-translation-image-fullsize i {
+.exerciseformat-translation-source-image-fullsize i {
     display: inline-block;
     margin-left: 0.5em;
 }
