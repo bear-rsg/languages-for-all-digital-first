@@ -674,8 +674,7 @@ main {
 }
 
 #exercise-detail-footer-restart,
-#exercise-detail-footer-pastscores,
-#exercise-detail-footer-check {
+#exercise-detail-footer-pastscores {
     background: #DDD;
 }
 
@@ -694,7 +693,7 @@ main {
 }
 
 .exercise-result-correct,
-.exercise-result-wrong,
+.exercise-result-incorrect,
 .exercise-result-unanswered {
     color: white;
     padding: 0.5em 0.8em;
@@ -706,7 +705,7 @@ main {
     background-color: #278301;
 }
 
-.exercise-result-wrong {
+.exercise-result-incorrect {
     background-color: #c0392b;
 }
 

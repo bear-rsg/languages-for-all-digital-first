@@ -479,10 +479,9 @@ class ExerciseFormatSentenceBuilder(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    sentence_source = models.TextField(help_text=OPTIONAL_IF_AUDIO_HELP_TEXT, blank=True, null=True)
+    sentence_source = models.TextField(help_text=f"Provide an original source sentence in one language, which will be translated below. {OPTIONAL_IF_AUDIO_HELP_TEXT}", blank=True, null=True)
     sentence_source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    sentence_translated = models.TextField()
-    sentence_translated_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
+    sentence_translated = models.TextField(help_text='Provide a translated sentence of the above source sentence. This translated sentence will be jumbled and the student will have to rebuild it.')
     sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate with a space, e.g. "car apple tree"', blank=True, null=True)
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
@@ -502,7 +501,7 @@ class ExerciseFormatSentenceBuilder(models.Model):
         return words
 
     def has_audio(self):
-        return bool(self.sentence_source_audio or self.sentence_translated_audio)
+        return bool(self.sentence_source_audio)
     has_audio.boolean = True  # sets tick/cross in admin dashboard
 
     def __str__(self):
@@ -571,29 +570,6 @@ class ExerciseFormatExternal(models.Model):
 
     class Meta:
         ordering = ['exercise', 'order', 'id']
-
-
-class ExerciseFurtherStudyMaterial(models.Model):
-    """
-    A resource (e.g. PDF, URL, etc) for further study in relation to a particular exercise
-    """
-
-    exercise = models.ForeignKey(Exercise, on_delete=models.RESTRICT)
-    name = models.CharField(max_length=255)
-    file = models.FileField(upload_to='exercises-exercisefurtherstudymaterial-file', blank=True, null=True)
-    url = models.URLField(blank=True, null=True)
-    is_published = models.BooleanField(default=True, verbose_name="Published")
-    created_by = models.ForeignKey(User, related_name="exercisefurtherstudymaterial_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The teacher who originally created this material")
-
-    @property
-    def file_name(self):
-        return str(self.file).split('/')[-1:][0]
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        ordering = ['name', 'id']
 
 
 class SchoolClassAlertExercise(models.Model):

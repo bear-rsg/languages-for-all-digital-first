@@ -161,7 +161,8 @@
                         </div>
                         {% for score in pastscores %}
                             <div class="exercise-detail-footer-pastscores-score">
-                                <label>{{ score.score |floatformat:"0" }}%</label> <span>{{ score.timestamp }}</span>
+                                
+                                <span>{{ score.submit_timestamp }}</span> ----- <label>{{ score.score | floatformat:"0" }}%</label>
                             </div>
                         {% endfor %}
                     </div>
@@ -190,7 +191,7 @@
                             </div>
                         {% endif %}
                         <p>
-                            Please confirm you've completed the exercise or close this message to continue working on it
+                            Click below to submit your attempt or close to continue working on the exercise.
                         </p>
                         <!-- Form to mark exercise as completed -->
                         <form id="exercise-attempt-form" method="post" action="{% url 'exercises:attempt' %}">
@@ -200,7 +201,7 @@
                             <input id="exercise-attempt-form-score" type="hidden" name="score" val="empty">
                             <input id="exercise-attempt-form-attemptduration" type="hidden" name="attempt_duration" val="empty">
                             <button type="submit" class="popup-submit">
-                                <i class="fas fa-check"></i> Completed
+                                <i class="fas fa-check"></i> Submit
                             </button>
                         </form>
                     </div>
@@ -257,13 +258,13 @@ $(document).ready(function() {
             // Calculate score for this answer
             if (answerIsCorrect) score++;
 
-            // Display Correct/Wrong/Unanswered result for this answer only
+            // Display Correct/Incorrect/Unanswered result for this answer only
             if (answerId == $(this).attr('id')) {
                 var result = '';
                 // Correct
                 if (answerIsCorrect) result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
-                // Wrong
-                else if (answerAttempt !== '') result = '<span class="exercise-result-wrong"><i class="fas fa-times"></i> Wrong</span>';
+                // Incorrect
+                else if (answerAttempt !== '') result = '<span class="exercise-result-incorrect"><i class="fas fa-times"></i> Incorrect</span>';
                 // Set individual results
                 $(this).find(answerClass + '-result').html(result);
             }
@@ -300,8 +301,6 @@ $(document).ready(function() {
     // Click to prompt confirm submission of exercise attempt
     $('#exercise-detail-footer-completed').on('click', function(){
         {% if exercise.exercise_format.is_marked_automatically_by_system %}
-            // Score exercise
-            $('#exercise-detail-footer-check').trigger('click');
             // Add score to popup
             $('#exercise-attempt-popup-score').text(totalScorePercent);
             // Set score val in exercise attempt form

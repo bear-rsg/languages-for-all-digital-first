@@ -139,21 +139,6 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(on_delete=django.db.models.deletion.RESTRICT, to='exercises.yeargroup'),
         ),
         migrations.CreateModel(
-            name='ExerciseFurtherStudyMaterial',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('file', models.FileField(blank=True, null=True, upload_to='exercises-exercisefurtherstudymaterial-file')),
-                ('url', models.URLField(blank=True, null=True)),
-                ('is_published', models.BooleanField(default=True, verbose_name='Published')),
-                ('created_by', models.ForeignKey(blank=True, help_text='The teacher who originally created this material', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='exercisefurtherstudymaterial_created_by', to=settings.AUTH_USER_MODEL)),
-                ('exercise', models.ForeignKey(on_delete=django.db.models.deletion.RESTRICT, to='exercises.exercise')),
-            ],
-            options={
-                'ordering': ['name', 'id'],
-            },
-        ),
-        migrations.CreateModel(
             name='ExerciseFormatTranslation',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
