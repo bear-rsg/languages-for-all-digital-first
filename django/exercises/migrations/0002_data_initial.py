@@ -62,7 +62,7 @@ def insert_languages(apps, schema_editor):
         "French",
         "Spanish",
         "Italian",
-        "Japenese",
+        "Japanese",
     ]
 
     for language in languages:
@@ -110,7 +110,7 @@ def insert_exercise_formats(apps, schema_editor):
         {
             "name": "Fill in the Blank",
             "icon": '<i class="fas fa-edit"></i>',
-            "instructions": "Fill in the blank words in the sentence. Hover over an (i) icon to reveal the answer.",
+            "instructions": "Fill in the blank words in the sentence. Answers arecase sensitive. Hover over an (i) icon to reveal the answer.",
             "is_marked_automatically_by_system": True
         },
         {

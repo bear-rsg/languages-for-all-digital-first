@@ -126,43 +126,6 @@ class ExerciseAdminView(admin.ModelAdmin):
         return False
 
 
-class ExerciseFurtherStudyMaterialAdminView(admin.ModelAdmin):
-    """
-    Customise the admin interface: ExerciseFurtherStudyMaterial
-    """
-    list_display = ('exercise', 'name', 'file', 'url', 'is_published')
-    list_display_links = ('name',)
-    list_filter = ('is_published',)
-    exclude = ('created_by',)
-    search_fields = ('name', 'file', 'url')
-    actions = (publish, unpublish)
-
-    def get_queryset(self, request):
-        # Superuser (aka admin) can see all
-        if request.user.is_superuser:
-            return models.ExerciseFurtherStudyMaterial.objects.all()
-        # Non superuser (aka teachers) can only see if they own the parent exercise it
-        else:
-            try:
-                return models.ExerciseFurtherStudyMaterial.objects.filter(exercise__owned_by=request.user.id)
-            except None:
-                return models.ExerciseFurtherStudyMaterial.objects.none()
-
-    def get_form(self, request, obj=None, **kwargs):
-        # Customise the Add form only (not the Change form)
-        if not obj:
-            kwargs.update({
-                'exclude': ('created_by',),
-            })
-        return super().get_form(request, obj, **kwargs)
-
-    def save_model(self, request, obj, form, change):
-        # If creating an object (i.e. not updating an existing object)
-        if obj.created_by is None:
-            obj.created_by = request.user
-        super().save_model(request, obj, form, change)
-
-
 class SchoolClassAlertExerciseAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: SchoolClassAlertExercise
@@ -205,15 +168,5 @@ admin.site.register(models.Theme, ThemeAdminView)
 admin.site.register(models.Difficulty, DifficultyAdminView)
 admin.site.register(models.Exercise, ExerciseAdminView)
 
-admin.site.register(models.ExerciseFurtherStudyMaterial, ExerciseFurtherStudyMaterialAdminView)
 admin.site.register(models.SchoolClassAlertExercise, SchoolClassAlertExerciseAdminView)
 admin.site.register(models.UserExerciseAttempt, UserExerciseAttemptAdminView)
-
-
-
-# admin.site.register(models.Language, LanguageAdminView)
-# admin.site.register(models.SchoolClass, SchoolClassAdminView)
-# admin.site.register(models.Theme, ThemeAdminView)
-# admin.site.register(models.Material, MaterialAdminView)
-# admin.site.register(models.ClassAlertExercise, ClassAlertExerciseAdminView)
-# admin.site.register(models.UserExerciseAttempt, UserExerciseAttemptAdminView)

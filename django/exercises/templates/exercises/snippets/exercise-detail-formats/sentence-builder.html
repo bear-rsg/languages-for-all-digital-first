@@ -13,7 +13,6 @@
         <!-- Sentence -->
         <div class="exerciseformat-sentencebuilder-sentence">
             <div class="exerciseformat-sentencebuilder-sentence-text" dir="auto"></div>
-            {% include "exercises/snippets/audio.html" with audio=sb.sentence_translated_audio id=forloop.counter %}
         </div>
 
         <!-- Words -->
@@ -77,28 +76,5 @@ $(document).ready(function() {
         $(this).parent().find('.exerciseformat-sentencebuilder-words button').prop('disabled', false);
     });
 
-    // Click button to score attempt
-    $('#exercise-detail-footer-check').on('click', function(){
-        var score = 0;
-        $('.exerciseformat-sentencebuilder').each(function(){
-            var answerAttempt = $(this).find('.exerciseformat-sentencebuilder-sentence-text').text();
-            var answerCorrect = $(this).find('.answer').text();
-            // Correct
-            if (answerAttempt == answerCorrect) {
-                var result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
-                score++;
-            }
-            // Unanswered
-            else if (answerAttempt == "") var result = '<span class="exercise-result-unanswered"><i class="fas fa-question"></i> Unanswered</span>';
-            // Wrong
-            else var result = '<span class="exercise-result-wrong"><i class="fas fa-times"></i> Wrong</span>';
-            // Set individual results
-            $(this).find('.exerciseformat-sentencebuilder-result').html(result);
-        });
-        // Set total results
-        var questionCount = $('.exerciseformat-sentencebuilder').length;
-        var scorePercent = Math.round(parseFloat(score/questionCount) * 100);
-        $('#exercise-detail-footer-score').html("Score: " + score + "/" + questionCount + " (<span id='exercise-detail-footer-score-val'>" + scorePercent + "</span>%)" );
-    });
 });
 </script>

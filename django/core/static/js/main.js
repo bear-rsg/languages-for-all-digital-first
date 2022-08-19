@@ -6,7 +6,7 @@ $(document).ready(function() {
         $(this).next('.popup').show();
     });
     // Hide
-    $('.popup-hide, .popup').on('click', function(e) {
+    $('.popup-hide').on('click', function(e) {
         e.stopPropagation();
         $(this).closest('.popup').hide();
     });
