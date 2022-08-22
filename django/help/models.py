@@ -17,6 +17,8 @@ class HelpItem(models.Model):
     video = EmbedVideoField(blank=True, null=True, help_text='Provide a URL of a video hosted on YouTube or Vimeo, e.g. https://www.youtube.com/watch?v=BHACKCNDMW8')
     pdf = models.FileField(upload_to='help-pdf', blank=True, null=True)
     visible_only_to_user_groups = models.ManyToManyField(UserRole, blank=True, related_name='helpitems')
+    created_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Created")
+    lastupdated_datetime = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
 
     # Admin
     admin_published = models.BooleanField(default=False, verbose_name='published')

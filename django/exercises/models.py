@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from account.models import User, UserRole
 from datetime import date
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -187,6 +188,8 @@ class Exercise(models.Model):
     is_published = models.BooleanField(default=True, verbose_name="Published")
     owned_by = models.ForeignKey(User, related_name="exercise_owned_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The only teacher who can manage this exercise")
     created_by = models.ForeignKey(User, related_name="exercise_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The teacher who originally created this exercise")
+    created_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Created")
+    lastupdated_datetime = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
 
     @property
     def image_match_label_options(self):
@@ -224,6 +227,9 @@ class Exercise(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('exercise:detail', args=[str(self.id)])
 
     class Meta:
         ordering = ['name', 'id']
