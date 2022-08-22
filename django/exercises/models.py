@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from account.models import User, UserRole
 from datetime import date
-from django.core.validators import MaxValueValidator, MinValueValidator
 import random
 
 OPTIONAL_HELP_TEXT = "(Optional)"
@@ -11,6 +10,7 @@ AUDIO_HELP_TEXT = OPTIONAL_HELP_TEXT + " <a href='https://online-voice-recorder.
 AUDIO_UPLOAD_PATH = "exercises-exercise-audio"
 CORRECT_ANSWER_FEEDBACK_HELP_TEXT = OPTIONAL_HELP_TEXT + " Provide feedback about the correct answer (if relevant) to help aid student learning"
 EXERCISE_ITEM_ORDER_HELP_TEXT = OPTIONAL_HELP_TEXT + " Specify the order you'd like this item to appear on the exercise page. Leave blank to order automatically."
+
 
 def text_or_audiomsg(text_field, audio_field):
     """
@@ -426,7 +426,7 @@ class ExerciseFormatFillInTheBlank(models.Model):
                                  null=True)
     source = models.TextField(help_text="E.g. an English sentence to translate, a YouTube video link, etc. " + OPTIONAL_IF_AUDIO_HELP_TEXT,  blank=True, null=True)
     source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    text_with_blanks_to_fill = models.TextField(help_text="Wrap words you want to be blank with 2 asterisks (e.g. **blank words**). If there are multiple possibile answers for a single blank then separate them with a single asterisk (e.g. **big*large*tall**). A full example: This is an **example*sample*illustration** of how to specify **blank words** in a **sentence**.")
+    text_with_blanks_to_fill = models.TextField(help_text="Wrap words you want to be blank with 2 asterisks (e.g. **blank words**). If there are multiple possibile answers for a single blank then separate them with a single asterisk (e.g. **big*large*tall**). A full example: This is an **example*sample*illustration** of how to specify **blank words** in a **sentence**.")  # NOQA
     text_with_blanks_to_fill_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)

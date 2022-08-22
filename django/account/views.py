@@ -4,7 +4,6 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetView, PasswordResetConfirmView)
 from django.urls import reverse
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.conf import settings
@@ -171,7 +170,7 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
                     user_obj.password = make_password(password_plain)
                     # Email user with instructions
                     send_mail(' Languages for All - Digital First: New user registration',
-                           f"""Hi {user['first_name']},
+                              f"""Hi {user['first_name']},
 
 Welcome to Languages for All - Digital First! You've been registered with a new {user['role']} account.
 
@@ -185,9 +184,9 @@ Please note that you must change this password after logging in for the first ti
 Thanks,
 Languages for All Team
 """,
-                            settings.DEFAULT_FROM_EMAIL,
-                            (user['email'],),
-                            fail_silently=True)
+                              settings.DEFAULT_FROM_EMAIL,
+                              (user['email'],),
+                              fail_silently=True)
 
                 # Save changes to this user
                 user_obj.save()

@@ -5,7 +5,6 @@ import time
 from exercises import models
 
 
-
 def write_data_to_worksheet(workbook, worksheet, datamatrix, column_titles=None):
     """
     Writes provided datamatrix to the provided xlsxwriter worksheet
@@ -26,8 +25,8 @@ def write_data_to_worksheet(workbook, worksheet, datamatrix, column_titles=None)
         if row == 0 and column_titles:
             for col, title in enumerate(column_titles):
                 # Print column titles
-                    worksheet.write(row, col, title, column_titles_style)
-                    column_max_widths.append(len(str(title)))  # add initial values to column_max_widths list
+                worksheet.write(row, col, title, column_titles_style)
+                column_max_widths.append(len(str(title)))  # add initial values to column_max_widths list
             column_titles_adjustment = 1
 
         # Datamatrix
