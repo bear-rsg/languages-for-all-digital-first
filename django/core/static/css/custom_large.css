@@ -51,11 +51,11 @@
     #welcome-banner-content img {
         width: 20em;
         max-width: 90%;
-        margin-bottom: 1.3em;
+        margin-bottom: 1em;
     }
 
     #welcome-banner-content p {
-        margin-bottom: 5em;
+        margin-bottom: 4em;
     }
 
     #welcome-banner-content a {
