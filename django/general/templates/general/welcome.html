@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load settings_value %}
 
 {% block main %}
 
@@ -7,7 +8,7 @@
     <div id="welcome-banner-content">
         <img src="{% static 'images/logos/lfadf.png' %}" alt="Languages for All Digital First logo">
         <p>
-            A brief tagline here, about a sentence long, like this dummy text is, but not much longer
+            A new era of language learning
         </p>
         <a href="{% url 'exercises:list' %}"><i class="fas fa-check-circle"></i> Exercises</a>
         {% if exercises_todo_count %}
@@ -22,18 +23,22 @@
 <section id="welcome-content" class="container">
     <h2>Welcome</h2>
     <p>
-        Welcome paragraph text
+        This website has been specially created to support your Digital First language learning experience with Languages for All.
     </p>
     <p>
-        Languages available include:
+        You will find a range of different exercises including image matching, sentence building, multiple choice quizzes, fill in the blanks and more.
     </p>
-    <ul>
-        <li>Portuguese</li>
-        <li>French</li>
-        <li>etc.</li>
-    </ul>
     <p>
-        More info
+        Most exercises provide instant feedback so you will be able to keep track of your scores and see the progress you make. In some cases, you will also see a brief explanation to help you figure out or signpost important grammatical points.
+    </p>
+    <p>
+        Your teacher will direct which exercises you need to complete each week, so keep an eye on the learning materials published on Canvas for further instruction.
+    </p>
+    <p>
+        For more information about Languages for All and our new Digital First framework, please visit our website: <a href="https://www.birmingham.ac.uk/lfa">https://www.birmingham.ac.uk/lfa</a>
+    </p>
+    <p>
+        If you have any issues or questions related to the website, please visit the help section in the top right-hand corner of this website. If not resolved, please email <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">{% settings_value 'ADMIN_EMAIL' %}</a>
     </p>
 
 </section>
