@@ -58,12 +58,18 @@
 
 <script>
 $(document).ready(function() {
+
     // Click word to add it to sentence
     $('.exerciseformat-sentencebuilder-words button').on('click', function(){
         var sentence = $(this).parent().parent().find('.exerciseformat-sentencebuilder-sentence-text');
         var word = (sentence.html() === '' ? $(this).val() : " " + $(this).val());
         sentence.append(word);
         $(this).prop('disabled', true);
+
+        // If this is the last word being clicked, automatically check answer to this question
+        if ($(this).parent().find('button:visible').length < 1 ){
+            $(this).parent().parent().find('.exerciseformat-sentencebuilder-checkanswer').trigger('click');
+        }
     });
 
     // Restart a question

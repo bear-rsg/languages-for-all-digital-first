@@ -19,8 +19,7 @@
         <!-- Fill in the blanks -->
         <div class="exerciseformat-fillintheblank-fitb" dir="auto">
             {% include "exercises/snippets/force-dir-auto.html" with text=fitb.text_with_blanks_to_fill_html %}
-            
-            {% include "exercises/snippets/audio.html" with audio=fitb.text_with_blanks_to_fill_audio id=forloop.counter %}
+
             {{ fitb.text_with_blanks_to_fill_html | safe | linebreaks }}
         </div>
 

@@ -424,11 +424,9 @@ class ExerciseFormatFillInTheBlank(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    source = models.TextField(help_text="E.g. an English sentence to translate, a YouTube video link, etc. " + OPTIONAL_IF_AUDIO_HELP_TEXT,  blank=True, null=True)
+    source = models.TextField(help_text="A sentence for the user to translate, either in English or the language being taught. " + OPTIONAL_IF_AUDIO_HELP_TEXT,  blank=True, null=True)
     source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     text_with_blanks_to_fill = models.TextField(help_text="Wrap words you want to be blank with 2 asterisks (e.g. **blank words**). If there are multiple possibile answers for a single blank then separate them with a single asterisk (e.g. **big*large*tall**). A full example: This is an **example*sample*illustration** of how to specify **blank words** in a **sentence**.")  # NOQA
-    text_with_blanks_to_fill_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     @property
@@ -451,14 +449,14 @@ class ExerciseFormatFillInTheBlank(models.Model):
         """
         html = self.text_with_blanks_to_fill
         for i, blank in enumerate(self.text_with_blanks_to_fill_list):
-            showanswer_html = f"""<span class="exerciseformat-showanswer"><i class="fas fa-info-circle" title="{blank.replace('*', ' OR ')}"></i></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span>""" if not self.exercise.is_a_formal_assessment else ""
+            showanswer_html = f"""<span class="exerciseformat-showanswer"><label><i class="fas fa-info-circle"></i></label><span class="answer">{blank.replace('*', ' | ')}</span></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span>""" if not self.exercise.is_a_formal_assessment else ""
             # This string has to be all one line or the template puts each element on a new line in the UI
             span = f"""<span id="exerciseformat-fillintheblank-fitb-item-{i}" class="exerciseformat-fillintheblank-fitb-item" dir="auto"><input type="text" dir="auto" size="{len(max(blank.split("."), key=len))}" title="fill in the blank" data-correct="{blank}"></input>{showanswer_html}</span>"""  # noqa: E501
             html = html.replace(f"**{blank}**", span)
         return html
 
     def has_audio(self):
-        return bool(self.source_audio or self.text_with_blanks_to_fill_audio)
+        return bool(self.source_audio)
     has_audio.boolean = True  # sets tick/cross in admin dashboard
 
     def __str__(self):
@@ -485,10 +483,10 @@ class ExerciseFormatSentenceBuilder(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    sentence_source = models.TextField(help_text=f"Provide an original source sentence in one language, which will be translated below. {OPTIONAL_IF_AUDIO_HELP_TEXT}", blank=True, null=True)
-    sentence_source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    sentence_translated = models.TextField(help_text='Provide a translated sentence of the above source sentence. This translated sentence will be jumbled and the student will have to rebuild it.')
-    sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate with a space, e.g. "car apple tree"', blank=True, null=True)
+    sentence_source = models.TextField(help_text=f"Provide an original source text in one language, which will be translated below. {OPTIONAL_IF_AUDIO_HELP_TEXT}", blank=True, null=True, verbose_name='source text')
+    sentence_source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='source audio')
+    sentence_translated = models.TextField(help_text='Provide a translated/transcribed sentence of the above source text/audio. The words in this target text will be jumbled and the student will have to rebuild it in the correct order.', verbose_name='target text')
+    sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate words with a space, e.g. "car apple tree"', blank=True, null=True, verbose_name='target text extra words')
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 

@@ -638,6 +638,7 @@ main {
 .exerciseformat-showanswer {
     color: #505050;
     font-size: 0.95em;
+    display: none;
 }
 
 .exerciseformat-showanswer label {
@@ -755,6 +756,7 @@ main {
     display: block;
     text-align: initial;
     font-size: 1.3em;
+    line-height: 2em;
 }
 
 .exerciseformat-fillintheblank-fitb-item,

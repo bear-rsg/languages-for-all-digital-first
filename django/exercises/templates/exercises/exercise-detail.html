@@ -265,6 +265,8 @@ $(document).ready(function() {
                 if (answerIsCorrect) result = '<span class="exercise-result-correct"><i class="fas fa-check"></i> Correct</span>';
                 // Incorrect
                 else if (answerAttempt !== '') result = '<span class="exercise-result-incorrect"><i class="fas fa-times"></i> Incorrect</span>';
+                // Show the 'show answer' box
+                $(this).find('.exerciseformat-showanswer').show();
                 // Set individual results
                 $(this).find(answerClass + '-result').html(result);
             }
