@@ -35,7 +35,7 @@ class UserAdmin(DjangoUserAdmin):
                     'is_active',
                     'date_joined',
                     'last_login']
-    search_fields = ['username', 'first_name', 'last_name', 'email',]
+    search_fields = ['username', 'first_name', 'last_name', 'email']
     list_filter = ['role', 'is_active', 'is_internal']
     filter_horizontal = ('classes',)
     readonly_fields = ['date_joined', 'last_login', 'is_staff', 'is_superuser']

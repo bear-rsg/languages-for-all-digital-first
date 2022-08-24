@@ -5,5 +5,6 @@ app_name = 'general'
 
 urlpatterns = [
     path('', views.WelcomeTemplateView.as_view(), name='welcome'),
-    path('cookies/', views.CookiesTemplateView.as_view(), name='cookies')
+    path('cookies/', views.CookiesTemplateView.as_view(), name='cookies'),
+    path('robots.txt', views.RobotsTemplateView.as_view(), name='robots')
 ]

@@ -1,8 +1,5 @@
 from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
-from django import forms
-from .models import User, UserRole
-from captcha.fields import ReCaptchaField, ReCaptchaV3
-from exercises.models import SchoolClass
+from .models import User
 
 
 class DashboardUserChangeForm(UserChangeForm):
@@ -48,7 +45,7 @@ class PublicPasswordChangeForm(PasswordChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""  # removes : from label, e.g. Email: becomes Email
-        self.fields['new_password1'].help_text = "Your password:<br>- can't be too similar to your other personal information.<br>- must contain at least 8 characters.<br>- can't be a commonly used password.<br>- cant be entirely numeric."
+        self.fields['new_password1'].help_text = "Your password:<br>- can't be too similar to your other personal information.<br>- must contain at least 8 characters.<br>- can't be a commonly used password.<br>- cant be entirely numeric."  # NOQA
 
     class Meta:
         model = User

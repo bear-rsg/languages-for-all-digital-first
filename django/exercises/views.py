@@ -1,4 +1,3 @@
-from multiprocessing import get_context
 from django.views.generic import (View, DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView)
 from django.db.models import Q
 from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMixin)
@@ -178,7 +177,7 @@ def exercise_copy(request, pk):
     if originalParentExercise.exercise_format.name == 'Multiple Choice':
         originalFormatObjects = models.ExerciseFormatMultipleChoice.objects.filter(exercise=originalParentExercise)
     elif originalParentExercise.exercise_format.name == 'Fill in the Blank':
-        originalFormatObjects = models.ExerciseFormatFillInTheBlankForm.objects.filter(exercise=originalParentExercise)
+        originalFormatObjects = models.ExerciseFormatFillInTheBlank.objects.filter(exercise=originalParentExercise)
     elif originalParentExercise.exercise_format.name == 'Image Match':
         originalFormatObjects = models.ExerciseFormatImageMatch.objects.filter(exercise=originalParentExercise)
     elif originalParentExercise.exercise_format.name == 'Sentence Builder':

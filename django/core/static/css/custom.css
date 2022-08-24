@@ -305,10 +305,9 @@ nav {
 }
 
 .nav-link {
-    font-weight: 400;
+    font-weight: 300;
     font-size: 1.2em;
     color: #FFF;
-    opacity: 0.8;
     text-align: center;
 }
 
@@ -322,9 +321,7 @@ nav {
 }
 
 .nav-link.active {
-    font-weight: 400;
-    color: #FFF;
-    opacity: 1;
+    font-weight: 600;
 }
 
 nav a:hover {
@@ -357,6 +354,19 @@ main {
     font-size: 1.5em;
     color: white;
     text-align: center;
+}
+
+#welcome-banner-content p {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: white;
+    text-align: center;
+    width: fit-content;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0.1em 0.4em;
+    background-color: #1779C5;
 }
 
 #welcome-banner-content a {
@@ -628,6 +638,7 @@ main {
 .exerciseformat-showanswer {
     color: #505050;
     font-size: 0.95em;
+    display: none;
 }
 
 .exerciseformat-showanswer label {
@@ -745,6 +756,7 @@ main {
     display: block;
     text-align: initial;
     font-size: 1.3em;
+    line-height: 2em;
 }
 
 .exerciseformat-fillintheblank-fitb-item,

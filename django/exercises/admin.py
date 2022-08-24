@@ -103,7 +103,7 @@ class DifficultyAdminView(admin.ModelAdmin):
 class ExerciseAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: Exercise
-    
+
     This blocks the model from appearing in sidebar and being able to add, edit, and delete.
     It's required in order for other ModelAdmins to include it in autocomplete_fields for searching.
     """
