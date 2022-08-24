@@ -449,7 +449,10 @@ class ExerciseFormatFillInTheBlank(models.Model):
         """
         html = self.text_with_blanks_to_fill
         for i, blank in enumerate(self.text_with_blanks_to_fill_list):
-            showanswer_html = f"""<span class="exerciseformat-showanswer"><label><i class="fas fa-info-circle"></i></label><span class="answer">{blank.replace('*', ' | ')}</span></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span>""" if not self.exercise.is_a_formal_assessment else ""
+            if not self.exercise.is_a_formal_assessment:
+                showanswer_html = f"""<span class="exerciseformat-showanswer"><label><i class="fas fa-info-circle"></i></label><span class="answer">{blank.replace('*', ' | ')}</span></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span>"""
+            else:
+                showanswer_html = ""
             # This string has to be all one line or the template puts each element on a new line in the UI
             span = f"""<span id="exerciseformat-fillintheblank-fitb-item-{i}" class="exerciseformat-fillintheblank-fitb-item" dir="auto"><input type="text" dir="auto" size="{len(max(blank.split("."), key=len))}" title="fill in the blank" data-correct="{blank}"></input>{showanswer_html}</span>"""  # noqa: E501
             html = html.replace(f"**{blank}**", span)
