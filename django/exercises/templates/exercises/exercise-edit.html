@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section class="container">
+    <h2>Edit Exercise</h2>
+    <form method="post" class="full-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit"><i class="fas fa-check"></i> Save</button>
+    </form>
+    <div class="full-form-footer-links">
+        <a href="{% url 'exercises:delete' exercise.id %}">Delete this exercise</a>
+    </div>
+</section>
+
+{% endblock %}

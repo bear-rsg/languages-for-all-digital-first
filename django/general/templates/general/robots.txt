@@ -1,0 +1,4 @@
+Sitemap: https://digitalfirst-lfa.bham.ac.uk/sitemap.xml
+User-agent: *
+Crawl-delay: 5
+Disallow:

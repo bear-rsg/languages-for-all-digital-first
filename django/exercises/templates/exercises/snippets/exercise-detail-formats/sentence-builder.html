@@ -1,0 +1,86 @@
+{% for sb in exercise.exerciseformatsentencebuilder_set.all %}
+
+    <div id="exerciseformat-sentencebuilder-{{ forloop.counter }}" class="exerciseformat-sentencebuilder">
+
+        <!-- Question -->
+        <div class="exerciseformat-sentencebuilder-question" dir="auto">
+            {% include "exercises/snippets/force-dir-auto.html" with text=sb.sentence_source_text_or_audiomsg %}
+            {% include "exercises/snippets/audio.html" with audio=sb.sentence_source_audio id=forloop.counter|add:100000 %}
+
+            {{ forloop.counter }}. <span dir="auto">{{ sb.sentence_source_text_or_audiomsg }}</span>
+        </div>
+
+        <!-- Sentence -->
+        <div class="exerciseformat-sentencebuilder-sentence">
+            <div class="exerciseformat-sentencebuilder-sentence-text" dir="auto"></div>
+        </div>
+
+        <!-- Words -->
+        <div class="exerciseformat-sentencebuilder-words">
+            {% for word in sb.words %}
+                <button value="{{ word }}" dir="auto">{{ word }}</button>
+            {% endfor %}
+        </div>
+
+        <!-- Check Answer -->
+        {% if not exercise.is_a_formal_assessment %}
+            <div class="exerciseformat-sentencebuilder-checkanswer">
+                <i class="fas fa-check"></i> Check Answer
+            </div>
+        {% endif %}
+
+        <!-- Restart -->
+        <div class="exerciseformat-sentencebuilder-restart"><i class="fas fa-sync-alt"></i> Restart</div>
+
+        <!-- Show Answer -->
+        {% if not exercise.is_a_formal_assessment %}
+            <div class="exerciseformat-showanswer">
+                <label><i class="fas fa-info-circle"></i> Show answer</label>
+                <div class="answer" data-answer="{{ sb.sentence_translated }}">
+                    <div class="answer-text">Answer: {{ sb.sentence_translated }}</div>
+                    {% if sb.correct_answer_feedback %}
+                        <div class="answer-feedback">{{ sb.correct_answer_feedback | safe }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Result -->
+        <div class="exerciseformat-sentencebuilder-result">
+        </div>
+
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=sb.id %}
+
+    </div>
+{% empty %}
+    {% include 'exercises/snippets/exercise-content-empty.html' %}
+{% endfor %}
+
+<script>
+$(document).ready(function() {
+
+    // Click word to add it to sentence
+    $('.exerciseformat-sentencebuilder-words button').on('click', function(){
+        var sentence = $(this).parent().parent().find('.exerciseformat-sentencebuilder-sentence-text');
+        var word = (sentence.html() === '' ? $(this).val() : " " + $(this).val());
+        sentence.append(word);
+        $(this).prop('disabled', true);
+
+        // If this is the last word being clicked, automatically check answer to this question
+        if ($(this).parent().find('button:visible').length < 1 ){
+            $(this).parent().parent().find('.exerciseformat-sentencebuilder-checkanswer').trigger('click');
+        }
+    });
+
+    // Restart a question
+    $('.exerciseformat-sentencebuilder-restart').on('click', function(){
+        // Clear sentence text
+        $(this).parent().find('.exerciseformat-sentencebuilder-sentence-text').html('');
+        // Clear results for this answer
+        $(this).parent().parent().find('.exerciseformat-sentencebuilder-result').html('');
+        // Enable all buttons
+        $(this).parent().find('.exerciseformat-sentencebuilder-words button').prop('disabled', false);
+    });
+
+});
+</script>

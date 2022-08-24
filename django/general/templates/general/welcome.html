@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load static %}
+{% load settings_value %}
+
+{% block main %}
+
+<section id="welcome-banner">
+    <div id="welcome-banner-content">
+        <img src="{% static 'images/logos/lfadf.png' %}" alt="Languages for All Digital First logo">
+        <p>
+            A new era of language learning
+        </p>
+        <a href="{% url 'exercises:list' %}"><i class="fas fa-check-circle"></i> Exercises</a>
+        {% if exercises_todo_count %}
+            <a href="{% url 'exercises:list' %}?myexercises=todo"><i class="fas fa-clipboard-check"></i> To Do ({{ exercises_todo_count }})</a>
+        {% endif %}
+    </div>
+    <div id="welcome-banner-proceed">
+        <i class="fas fa-angle-down"></i>
+    </div>
+</section>
+
+<section id="welcome-content" class="container">
+    <h2>Welcome</h2>
+    <p>
+        This website has been specially created to support your Digital First language learning experience with Languages for All.
+    </p>
+    <p>
+        You will find a range of different exercises including image matching, sentence building, multiple choice quizzes, fill in the blanks and more.
+    </p>
+    <p>
+        Most exercises provide instant feedback so you will be able to keep track of your scores and see the progress you make. In some cases, you will also see a brief explanation to help you figure out or signpost important grammatical points.
+    </p>
+    <p>
+        Your teacher will direct which exercises you need to complete each week, so keep an eye on the learning materials published on Canvas for further instruction.
+    </p>
+    <p>
+        For more information about Languages for All and our new Digital First framework, please visit our website: <a href="https://www.birmingham.ac.uk/lfa">https://www.birmingham.ac.uk/lfa</a>
+    </p>
+    <p>
+        If you have any issues or questions related to the website, please visit the help section in the top right-hand corner of this website. If not resolved, please email <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">{% settings_value 'ADMIN_EMAIL' %}</a>
+    </p>
+
+</section>
+
+
+<script>
+    $(document).ready(function() {
+        // Scroll down when clicking on the proceed button in the welcome banner
+        $('#welcome-banner-proceed').on('click', function(){
+            $('html,body').animate({ scrollTop: $('#welcome-content').offset().top - 50 }, 800); 
+        });
+
+    });
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section id="exercise-list-head">
+    <div class="container">
+
+        <form method="GET" action="" id="exercise-list-head-form">
+            
+            <!-- Filters: -->
+            <!-- Language -->
+            {% include "exercises/snippets/list-head-select.html" with page='exercise' dataset=languages label='<i class="fas fa-globe-americas"></i> Language' id='language' default_value=language_id %}
+            <!-- Exercise Format -->
+            {% include "exercises/snippets/list-head-select.html" with page='exercise' dataset=formats label='<i class="fas fa-dice"></i> Format' id='format' %}
+            <!-- Theme -->
+            {% include "exercises/snippets/list-head-select.html" with page='exercise' dataset=themes label='<i class="fas fa-layer-group"></i> Theme' id='theme' %}
+            <!-- Difficulty -->
+            {% include "exercises/snippets/list-head-select.html" with page='exercise' dataset=difficulties label='<i class="fas fa-balance-scale-right"></i> Difficulty' id='difficulty' %}
+            <!-- My Exercises -->
+            {% include "exercises/snippets/list-head-select.html" with page='exercise' label='<i class="fas fa-clipboard-check"></i> My Exercises' id='myexercises' optionsHtml='<option value="todo">To Do</option><option value="completed">Completed</option>' %}
+
+            <!-- Search -->
+            {% include "exercises/snippets/list-head-search.html" with page='exercise' %}
+
+            <!-- Options -->
+            <div id="exercise-list-head-form-options">
+                <div id="exercise-list-head-form-options-reset" class="reset-form">
+                    <i class="fas fa-redo"></i> Reset
+                </div>
+                <div id="exercise-list-head-form-options-views">
+                    <label>View: </label>
+                    <i id="exercise-list-head-form-options-views-grid" class="fas fa-th"></i>
+                    <i id="exercise-list-head-form-options-views-list" class="fas fa-bars"></i></span>
+                </div>
+                <div id="exercise-list-head-form-options-organise">
+                    <!-- Clicking a span will set the hidden field's value and execute the form submit -->
+                    <label>Organise by: </label>
+                    <input type="hidden" id="exercise-list-head-form-options-organise-hidden" name="organise" value="name">
+                    <span data-value="name"{% if organise == 'name' %} class="active"{% endif %}>Exercise</span>
+                    <span data-value="exercise_format"{% if organise == 'exercise_format' %} class="active"{% endif %}>Format</span>
+                    <span data-value="theme"{% if organise == 'theme' %} class="active"{% endif %}>Theme</span>
+                    <span data-value="difficulty"{% if organise == 'difficulty' %} class="active"{% endif %}>Difficulty</span>
+                </div>
+            </div>
+
+        </form>
+
+    </div>
+</section>
+
+<section id="exercise-list-body">
+
+    <div id="exercise-list-body-items" class="container">
+
+        {% if perms.exercises.add_exercise %}
+            <a id="exercise-list-body-items-item-add" class="admin-link" href="{% url 'exercises:add' %}">
+                <i class="fas fa-plus"></i> Add Exercise
+            </a>
+        {% endif %}
+
+        {% for exercise in exercise_list %}
+            <!-- Only show exercises with content, unless admin or exercise owner -->
+            {% if user.is_superuser or exercise.owned_by == user or exercise.items_count %}
+                <!-- Organise: Exercise Format -->
+                {% if organise == 'exercise_format' %}
+                    {% ifchanged exercise.exercise_format %}
+                        <h3>{{ exercise.exercise_format }} {{ exercise.exercise_format.icon | safe }}</h3>
+                    {% endifchanged %}
+                <!-- Organise: Theme -->
+                {% elif organise == 'theme' %}
+                    {% ifchanged exercise.theme %}
+                        <h3>{{ exercise.theme }}</h3>
+                    {% endifchanged %}
+                <!-- Organise: Difficulty -->
+                {% elif organise == 'difficulty' %}
+                    {% ifchanged exercise.difficulty %}
+                        <h3>{{ exercise.difficulty }}</h3>
+                    {% endifchanged %}
+                {% endif %}
+                <!-- Item -->
+                <div class="exercise-list-body-items-item">
+                    <!-- Name -->
+                    <div class="exercise-list-body-items-item-name">
+                        <a href="{% url 'exercises:detail' exercise.id %}">
+                            {{ exercise.name }}
+                        </a>
+                    </div>
+                    <!-- Info -->
+                    <div class="exercise-list-body-items-item-info">
+                        <!-- Language -->
+                        <div class="exercise-list-body-items-item-info-language">
+                            <i class="fas fa-globe-americas"></i>
+                            <label>Language:</label>
+                            <a href="{% url 'exercises:list'%}?language={{ exercise.language.id }}">
+                                {{ exercise.language }}
+                            </a>
+                        </div>
+                        <!-- Format -->
+                        <div class="exercise-list-body-items-item-info-format">
+                            <i class="fas fa-dice"></i>
+                            <label>Format:</label>
+                            <a href="{% url 'exercises:list'%}?format={{ exercise.exercise_format.id }}">
+                                {{ exercise.exercise_format }} {{ exercise.exercise_format.icon | safe }}
+                            </a>
+                        </div>
+                        <!-- Theme -->
+                        {% if exercise.theme %}
+                            <div class="exercise-list-body-items-item-info-group">
+                                <i class="fas fa-layer-group"></i>
+                                <label>Theme:</label>
+                                <a href="{% url 'exercises:list'%}?theme={{ exercise.theme.id }}">
+                                    {{ exercise.theme }}
+                                </a>
+                            </div>
+                        {% endif %}
+                        <!-- Difficulty -->
+                        <div class="exercise-list-body-items-item-info-difficulty">
+                            <i class="fas fa-balance-scale-right"></i>
+                            <label>Difficulty:</label>
+                            <a href="{% url 'exercises:list'%}?difficulty={{ exercise.difficulty.id }}">
+                                {{ exercise.difficulty }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% empty %}
+            <div id="exercise-list-body-empty">
+                No exercises to show. Try expanding your search criteria or <span class="reset-form">show all exercises.</span>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<script>
+$(document).ready(function() {
+
+    function getCookie(name) {
+        var c_list = document.cookie.split("; "), i = 0, c, c_name, c_value;
+        for (i = 0; i < c_list.length; i++) {
+            c = c_list[i].split('=');
+            c_name = c[0];
+            c_value = c[1];
+            if (c_name === name) return c_value;
+        }
+        return null;
+    }
+
+    // Set the input values from URL parameters
+    function setValueFromUrl(inputId, urlParameter) {
+        var value = new URL(window.location.href).searchParams.get(urlParameter);
+        if(value) document.getElementById(inputId).value = value;
+    }
+    // Apply above function to all form fields:
+    // Language
+    setValueFromUrl("exercise-list-head-form-language-select", "language");
+    // Format
+    setValueFromUrl("exercise-list-head-form-format-select", "format");
+    // Theme
+    setValueFromUrl("exercise-list-head-form-theme-select", "theme");
+    // Difficulty
+    setValueFromUrl("exercise-list-head-form-difficulty-select", "difficulty");
+    // My Exercises
+    setValueFromUrl("exercise-list-head-form-myexercises-select", "myexercises");
+    // Search
+    setValueFromUrl("exercise-list-head-form-search", "search");
+    // Organise
+    setValueFromUrl("exercise-list-head-form-options-organise-hidden", "organise");
+
+    // Auto-submit form on change of select value
+    $('.exercise-list-head-form-item select').on('change', function() {
+        $('#exercise-list-head-form').submit();
+    });
+
+    // Auto-submit form on click of organise by
+    $('#exercise-list-head-form-options-organise span').on('click', function(){
+        var organiseValue = $(this).attr('data-value');
+        // alert(organiseValue)
+        $('#exercise-list-head-form-options-organise input').val(organiseValue)
+        $('#exercise-list-head-form').submit();
+    });
+
+    // Reset form (aka go to current URL but strip parameters)
+    $('.reset-form').on('click', function(){ window.location.replace(window.location.href.split('?')[0]); });
+
+    // Switch views: grid vs list
+    var cookieViewKey = 'LFAExerciseListOptionsView';
+    $('#exercise-list-head-form-options-views i').on('click', function(){
+        var view = $(this).attr('id').slice(-4); // either 'grid' or 'list'
+        
+        // Set the cookie
+        document.cookie = cookieViewKey + "=" + view + "; expires=Mon, 31 Dec 2050 23:59:59 GMT; path=/; Secure;";
+        
+        // Set the view of the list items
+        // listview
+        if (view == 'list') $('.exercise-list-body-items-item').addClass('listview').removeClass('gridview');
+        // gridview
+        else $('.exercise-list-body-items-item').addClass('gridview').removeClass('listview');
+
+        // Toggle active state of view button
+        $('#exercise-list-head-form-options-views i').removeClass('active');
+        $('#exercise-list-head-form-options-views-' + view).addClass('active');
+    });
+    // Trigger on page load - either from cookie if exists, or default to grid view if no cookie
+    if (getCookie(cookieViewKey) !== null) $('#exercise-list-head-form-options-views-' + getCookie(cookieViewKey)).trigger('click');
+    else $('#exercise-list-head-form-options-views-grid').trigger('click');
+    
+});
+</script>
+
+{% endblock %}

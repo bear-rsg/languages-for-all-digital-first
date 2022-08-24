@@ -1,0 +1,48 @@
+{% for mc in exercise.exerciseformatmultiplechoice_set.all %}
+
+    <div id="exerciseformat-multiplechoice-{{ forloop.counter }}" class="exerciseformat-multiplechoice">
+
+        <!-- Question -->
+        <div class="exerciseformat-multiplechoice-question" dir="auto">
+            {% include "exercises/snippets/force-dir-auto.html" with text=mc.question_text_or_audiomsg %}
+            {% include "exercises/snippets/audio.html" with audio=mc.question_audio id=forloop.counter %}
+            <!-- Question text -->
+            {{ forloop.counter }}. {{ mc.question_text_or_audiomsg }}
+        </div>
+
+        <!-- Options -->
+        <div class="exerciseformat-multiplechoice-options">
+            {% for option in mc.options %}
+                <div class="exerciseformat-multiplechoice-options-option{% if option.1 %} hasaudio{% endif %}" dir="auto">
+                    {% include "exercises/snippets/force-dir-auto.html" with text=option.0 %}
+                    {% include "exercises/snippets/audio.html" with audio=option.1 id=option.2 %}
+                    <!-- Value is 1 if correct answer or 0 if not -->
+                    <input type="radio" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{{ option.3 }}">
+                    <label for="option-{{ option.2 }}">
+                        {{ option.0 }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if not exercise.is_a_formal_assessment %}
+            <div class="exerciseformat-showanswer">
+                <label><i class="fas fa-info-circle"></i> Show answer</label>
+                <div class="answer">
+                    <div class="answer-text">Answer:<br>{{ mc.answer_text | safe }}</div>
+                    {% if mc.correct_answer_feedback %}
+                        <div class="answer-feedback">{{ mc.correct_answer_feedback | safe }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="exerciseformat-multiplechoice-result">
+        </div>
+
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=mc.id %}
+
+    </div>
+{% empty %}
+    {% include 'exercises/snippets/exercise-content-empty.html' %}
+{% endfor %}

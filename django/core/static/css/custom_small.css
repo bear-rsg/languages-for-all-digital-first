@@ -1,0 +1,178 @@
+@media (max-width: 991px) {
+    /* ---------- Data Table ---------- */
+
+    .data-table tr {
+        display: block;
+        border-bottom: 1px solid #CCC;
+        margin: 1em 0;
+        padding: 1em 0;
+    }
+
+    .data-table tr:first-child,
+    .data-table tr:last-child {
+        border-bottom: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .data-table th {
+        display: none;
+    }
+
+    .data-table td {
+        display: block;
+        padding: 0.5em;
+    }
+
+    .data-table label {
+        font-weight: bold;
+    }
+
+    /* ---------- Navigation ---------- */
+
+    nav h1 img {
+        height: 1.8em;
+    }
+
+    .nav-item {
+        margin: 0.5em 0;
+    }
+
+    .navbar-toggler {
+        color: #FFF;
+        font-size: 1.7em;
+        padding-right: 0.35em;
+    }
+
+    .navbar-toggler:focus {
+        outline: none;
+        opacity: 0.8;
+    }
+
+    /* ---------- Main ---------- */
+
+    main {
+        margin-top: 3.39em;
+        min-height: calc(100vh - 3.39em);
+    }
+
+    /* ---------- Welcome ---------- */
+
+    #welcome-banner {
+        height: 75vh;
+    }
+
+    #welcome-banner-content {
+        width: 90%;
+        margin-left: 5%;
+        margin-top: 1vh;
+        padding: 0.7em;
+    }
+
+    #welcome-banner-content img {
+        width: 13em;
+        max-width: 90%;
+        margin: 1em 0;
+    }
+
+    #welcome-banner-content a {
+        margin: 2em auto 1em;
+        font-size: 1rem;
+    }
+
+    #welcome-banner-proceed {
+        display: none;
+    }
+
+    /* ---------- Exercise: List ---------- */
+
+    .exercise-list-head-form-item {
+        width: 100%;
+        display: block;
+    }
+
+    .exercise-list-body-items-item {
+        display: block;
+        width: 90%;
+        padding: 1em;
+    }
+
+    .exercise-list-body-items-item.gridview {
+        border: 1px solid #CCC;
+    }
+
+    #exercise-list-head-form-options-organise label {
+        display: block;
+        margin-top: 1em;
+    }
+
+    #exercise-list-head-form-options-organise span {
+        font-size: 0.93em;
+    }
+
+    /* ---------- Exercise: Detail ---------- */
+
+    #exercise-detail-footer {
+        font-size: 0.9em;
+    }
+
+    .exercise-detail-footer-button {
+        padding: 0.8em 0.7em 0.6em 0.7em;
+        margin: 0.2em;
+    }
+
+    .exercise-detail-footer-button i {
+        display: block;
+    }
+
+    #exercise-detail-footer-score {
+        font-size: 1em;
+    }
+
+    #exercise-detail-footer-completed {
+        display: block;
+        width: 100%;
+    }
+
+    #exercise-detail-footer-completed i {
+        display: inline-block;
+        margin-right: 0.3em;
+    }
+
+    /* Exercise: Detail: Format: ImageMatch */
+
+    .exerciseformat-imagematch {
+        display: block;
+    }
+
+    /* Exercise: Detail: Format: Translation */
+
+    .exerciseformat-translation-source-image,
+    .exerciseformat-translation-source-text,
+    .exerciseformat-translation-source-none {
+        display: block;
+        width: 100%;
+    }
+
+    .exerciseformat-translation-userattempt {
+        display: block;
+        margin-top: 3em;
+    }
+
+    /* ---------- Popup ---------- */
+
+    .popup-content {
+        width: 90%;
+        max-height: 90vh;
+        left: 5%;
+    }
+
+    /* ---------- Footer ---------- */
+
+    #footer-content img {
+        width: 17em;
+        max-width: 100%;
+        margin: 0 auto 2em auto;
+        display: block;
+    }
+}

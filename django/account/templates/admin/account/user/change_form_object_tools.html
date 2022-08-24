@@ -1,0 +1,10 @@
+{% load i18n admin_urls %}
+{% block object-tools-items %}
+<li>
+    <a href="../password/" class="passwordlink">{% translate "Change This User's Password" %}</a>
+</li>
+<li>
+    {% url opts|admin_urlname:'history' original.pk|admin_urlquote as history_url %}
+    <a href="{% add_preserved_filters history_url %}" class="historylink">{% translate "History" %}</a>
+</li>
+{% endblock %}

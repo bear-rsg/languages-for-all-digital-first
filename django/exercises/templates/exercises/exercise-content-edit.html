@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section class="container">
+    <h2>Edit Exercise Item</h2>
+    <form method="post" class="full-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit"><i class="fas fa-check"></i> Save</button>
+        {% if perms.exercises.delete_exercise %}
+            <div class="full-form-footer-links">
+                <a href="{% url 'exercises:content-delete' object.exercise.id object.id %}">Delete</a>
+            </div>
+        {% endif %}
+    </form>
+    
+</section>
+
+{% endblock %}

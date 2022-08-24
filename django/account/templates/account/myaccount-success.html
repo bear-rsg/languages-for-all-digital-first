@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+
+<section class="container successpage">
+
+    <i class="far fa-check-circle"></i>
+    <h2>Account updated</h2>
+    <p>
+        Your account details have been updated successfully
+    </p>
+    <p>
+        <a href="{% url 'account:myaccount' %}">My Account</a>
+    </p>
+
+</section>
+
+{% endblock %}

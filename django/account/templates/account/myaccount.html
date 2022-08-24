@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% load divide %}
+
+{% block main %}
+
+<section id="myaccount-details" class="container">
+    <h2>My Account Details</h2>
+    <form method="post" class="full-form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <em>You have been assigned the role of <strong>{{ object.role.name }}</strong>. Please contact us if you believe this needs to be changed.</em>
+        <button type="submit"><i class="fas fa-check"></i> Save changes</button>
+    </form>
+    <div class="full-form-footer-links">
+        <a href="{% url 'logout' %}">Logout</a>
+        <a href="{% url 'account:change-password' %}">Change password</a>
+    </div>
+</section>
+
+{% if user.classes.all %}
+    <section id="myaccount-classes" class="container">
+        <h2>My Classes</h2>
+        <ul>
+            {% for class in user.classes.all %}
+                <li>{{ class.name }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
+
+{% if exercise_attempts %}
+    <section id="myaccount-exercisehistory" class="container">
+        <h2>My Exercise Attempts</h2>
+        <table class="data-table">
+            <tr>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Duration (secs)</th>
+                <th>Score</th>
+                <th>Exercise</th>
+            </tr>
+            {% for attempt in exercise_attempts %}
+                <tr>
+                    <td><label>Date:</label> {{ attempt.submit_timestamp | date:"D d M Y" }}</td>
+                    <td><label>Time:</label> {{ attempt.submit_timestamp | time:"H:i" }}</td>
+                    <td><label>Duration (secs):</label> {% if attempt.attempt_duration %}{{ attempt.attempt_duration | divide:1000 }} secs{% else %}N/A{% endif %}</td>
+                    <td><label>Score:</label> {% if attempt.score %}{{ attempt.score_percentage }}{% else %}N/A{% endif %}</td>
+                    <td><label>Exercise:</label> <a href="{% url 'exercises:detail' attempt.exercise.id %}">{{ attempt.exercise }}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+{% endif %}
+
+{% endblock %}

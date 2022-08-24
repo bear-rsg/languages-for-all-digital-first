@@ -1,0 +1,10 @@
+{% extends "account/importdata.html" %}
+{% load static %}
+
+{% block importdatacontent %}
+
+<p>
+    Click the button below to start the user data import. This will take the latest Excel spreadsheet file <a href="{% url 'admin:account_usersimportspreadsheet_changelist' %}" target="_blank">in this list</a> and import the users of this spreadsheet directly into this database.
+</p>
+
+{% endblock %}

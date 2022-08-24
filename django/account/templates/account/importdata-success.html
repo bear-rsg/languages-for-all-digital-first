@@ -1,0 +1,17 @@
+{% extends "account/importdata.html" %}
+{% load static %}
+
+{% block importdatacontent %}
+
+<h3>Success!</h3>
+<p>
+    The new user data importing process has completed successfully.
+</p>
+<p>
+    Please remember to <a href="{% url 'admin:account_user_changelist' %}">check the new user data in the database</a> to ensure that it's imported as you expected.
+</p>
+<p>
+    Click the button below if you need to import the data again.
+</p>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% for fitb in exercise.exerciseformatfillintheblank_set.all %}
+
+    <div class="exerciseformat-fillintheblank">
+
+        <!-- Source -->
+        <div class="exerciseformat-fillintheblank-source" dir="auto">
+
+            {% include "exercises/snippets/force-dir-auto.html" with text=fitb.source_text_or_audiomsg %}
+            
+            {% include "exercises/snippets/audio.html" with audio=fitb.source_audio id=forloop.counter|add:100000 %}
+            
+            <!-- Only show counter if there are multiple -->
+            {% if exercise.exerciseformatfillintheblank_set.all.count > 1 %}
+                {{ forloop.counter }}.
+            {% endif %}
+            {{ fitb.source_text_or_audiomsg }}
+        </div>
+
+        <!-- Fill in the blanks -->
+        <div class="exerciseformat-fillintheblank-fitb" dir="auto">
+            {% include "exercises/snippets/force-dir-auto.html" with text=fitb.text_with_blanks_to_fill_html %}
+
+            {{ fitb.text_with_blanks_to_fill_html | safe | linebreaks }}
+        </div>
+
+        <!-- Result -->
+        <div class="exerciseformat-fillintheblank-result">
+        </div>
+
+        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=fitb.id %}
+
+    </div>
+{% empty %}
+    {% include 'exercises/snippets/exercise-content-empty.html' %}
+{% endfor %}
