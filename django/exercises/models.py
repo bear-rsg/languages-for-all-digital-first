@@ -247,13 +247,8 @@ class ExerciseFormatImageMatch(models.Model):
                                  null=True)
     image = models.ImageField(upload_to='exercises-exerciseformat-imagematch')
     label = models.CharField(max_length=255)
-    label_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     # no order field as these load in random order
-
-    def has_audio(self):
-        return bool(self.label_audio)
-    has_audio.boolean = True  # sets tick/cross in admin dashboard
 
     def __str__(self):
         if self.exercise:
@@ -538,13 +533,8 @@ class ExerciseFormatTranslation(models.Model):
     translation_source_text = models.TextField(blank=True, null=True, help_text='Optional if provided source image instead, otherwise required')
     translation_source_image = models.ImageField(upload_to='exercises-exerciseformat-translation', blank=True, null=True, help_text='Optional if provided source text instead, otherwise required')
     correct_translation = models.TextField()
-    correct_translation_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
-
-    def has_audio(self):
-        return bool(self.correct_translation_audio)
-    has_audio.boolean = True  # sets tick/cross in admin dashboard
 
     def __str__(self):
         if self.exercise:

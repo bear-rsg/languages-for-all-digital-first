@@ -225,6 +225,10 @@ form.full-form input[type=number] {
     width: 100%;
 }
 
+form.full-form input[type=checkbox] {
+    display: block;
+}
+
 form.full-form textarea {
     height: 4em;
 }
