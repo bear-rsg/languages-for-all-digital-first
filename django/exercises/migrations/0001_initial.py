@@ -209,7 +209,6 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('image', models.ImageField(upload_to='exercises-exerciseformat-imagematch')),
                 ('label', models.CharField(max_length=255)),
-                ('label_audio', models.FileField(blank=True, help_text="(Optional) <a href='https://online-voice-recorder.com/' target='_blank'>Record your audio clip</a> and then upload the file here", null=True, upload_to='exercises-exercise-audio')),
                 ('correct_answer_feedback', models.TextField(blank=True, help_text='(Optional) Provide feedback about the correct answer (if relevant) to help aid student learning', null=True)),
                 ('exercise', models.ForeignKey(blank=True, limit_choices_to={'exercise_format__name': 'Image Match'}, null=True, on_delete=django.db.models.deletion.CASCADE, to='exercises.exercise')),
             ],
