@@ -4,8 +4,6 @@
 
         <div class="exerciseformat-imagematch-title">Image {{ forloop.counter }}</div>
 
-        {% include "exercises/snippets/audio.html" with audio=im.label_audio id=forloop.counter %}
-
         <select dir="rtl">
             <option value="">-- Please select --</option>
             {% for label in exercise.image_match_label_options %}
