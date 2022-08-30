@@ -445,7 +445,7 @@ class ExerciseFormatFillInTheBlank(models.Model):
         html = self.text_with_blanks_to_fill
         for i, blank in enumerate(self.text_with_blanks_to_fill_list):
             if not self.exercise.is_a_formal_assessment:
-                showanswer_html = f"""<span class="exerciseformat-showanswer"><label><i class="fas fa-info-circle"></i></label><span class="answer">{blank.replace('*', ' | ')}</span></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span>"""
+                showanswer_html = f"""<span class="exerciseformat-showanswer"><label><i class="fas fa-eye"></i></label><span class="answer">{blank.replace('*', ' | ')}</span></span><span class="exerciseformat-fillintheblank-fitb-item-result"></span>"""
             else:
                 showanswer_html = ""
             # This string has to be all one line or the template puts each element on a new line in the UI
