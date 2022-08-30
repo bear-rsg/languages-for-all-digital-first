@@ -419,9 +419,9 @@ class ExerciseFormatFillInTheBlank(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    source = models.TextField(help_text="A sentence for the user to translate, either in English or the language being taught. " + OPTIONAL_IF_AUDIO_HELP_TEXT,  blank=True, null=True)
+    source = models.TextField(help_text="A sentence for the user to translate, either in English or the language being taught. " + OPTIONAL_IF_AUDIO_HELP_TEXT,  blank=True, null=True, verbose_name="source text")
     source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True)
-    text_with_blanks_to_fill = models.TextField(help_text="Wrap words you want to be blank with 2 asterisks (e.g. **blank words**). If there are multiple possibile answers for a single blank then separate them with a single asterisk (e.g. **big*large*tall**). A full example: This is an **example*sample*illustration** of how to specify **blank words** in a **sentence**.")  # NOQA
+    text_with_blanks_to_fill = models.TextField(verbose_name='target text with blanks', help_text="Wrap words you want to be blank with 2 asterisks (e.g. **blank words**). If there are multiple possibile answers for a single blank then separate them with a single asterisk (e.g. **big*large*tall**). A full example: This is an **example*sample*illustration** of how to specify **blank words** in a **sentence**.")  # NOQA
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     @property
@@ -484,7 +484,7 @@ class ExerciseFormatSentenceBuilder(models.Model):
     sentence_source = models.TextField(help_text=f"Provide an original source text in one language, which will be translated below. {OPTIONAL_IF_AUDIO_HELP_TEXT}", blank=True, null=True, verbose_name='source text')
     sentence_source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='source audio')
     sentence_translated = models.TextField(help_text='Provide a translated/transcribed sentence of the above source text/audio. The words in this target text will be jumbled and the student will have to rebuild it in the correct order.', verbose_name='target text')
-    sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate words with a space, e.g. "car apple tree"', blank=True, null=True, verbose_name='target text extra words')
+    sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate words with a space, e.g. "car apple tree"', blank=True, null=True, verbose_name='extra words for target text')
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
@@ -530,9 +530,9 @@ class ExerciseFormatTranslation(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    translation_source_text = models.TextField(blank=True, null=True, help_text='Optional if provided source image instead, otherwise required')
-    translation_source_image = models.ImageField(upload_to='exercises-exerciseformat-translation', blank=True, null=True, help_text='Optional if provided source text instead, otherwise required')
-    correct_translation = models.TextField()
+    translation_source_text = models.TextField(blank=True, null=True, help_text='Optional if provided source image instead, otherwise required', verbose_name='source text')
+    translation_source_image = models.ImageField(upload_to='exercises-exerciseformat-translation', blank=True, null=True, help_text='Optional if provided source text instead, otherwise required', verbose_name='image of source text')
+    correct_translation = models.TextField(verbose_name='target text')
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 

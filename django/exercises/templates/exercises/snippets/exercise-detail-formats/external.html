@@ -1,11 +1,8 @@
 {% for e in exercise.exerciseformatexternal_set.all %}
 
     <div class="exerciseformat-external">
-
-        <!-- Only show counter if there are multiple -->
-        {% if exercise.exerciseformatexternal_set.all.count > 1 %}
-            <span>{{ forloop.counter }}.</span>
-        {% endif %}
+        <!-- Identifying number (counts from 1) -->
+        <span>{{ forloop.counter }}.</span>
         <!-- URL -->
         <a href="{{ e.url }}" target="_blank">{{ e.url }}</a>
         <!-- Instructions -->
