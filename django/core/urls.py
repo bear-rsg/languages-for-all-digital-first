@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.contrib.sitemaps.views import sitemap
 from . import sitemaps
 
 sitemaps = {
@@ -10,8 +11,8 @@ sitemaps = {
     'help:list': sitemaps.HelpItemListSitemap,
     'help:detail': sitemaps.HelpItemDetailSitemap,
 
-    'exercise:list': sitemaps.ExerciseListSitemap,
-    'exercise:detail': sitemaps.ExerciseDetailSitemap
+    'exercises:list': sitemaps.ExerciseListSitemap,
+    'exercises:detail': sitemaps.ExerciseDetailSitemap
 }
 
 urlpatterns = [
@@ -30,4 +31,6 @@ urlpatterns = [
     # Django admin
     path('dashboard/', admin.site.urls),
 
+    # Sitemap
+    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
