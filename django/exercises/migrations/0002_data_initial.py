@@ -98,37 +98,37 @@ def insert_exercise_formats(apps, schema_editor):
         {
             "name": "Image Match",
             "icon": '<i class="fas fa-images"></i>',
-            "instructions": "Choose the correct label for each image",
+            "instructions": "Choose the correct label for each image.",
             "is_marked_automatically_by_system": True
         },
         {
             "name": "Multiple Choice",
             "icon": '<i class="fas fa-list-ul"></i>',
-            "instructions": "Choose the correct answer of the available possible options",
+            "instructions": "Choose the correct answer of the available possible options.",
             "is_marked_automatically_by_system": True
         },
         {
             "name": "Fill in the Blank",
             "icon": '<i class="fas fa-edit"></i>',
-            "instructions": "Fill in the blank words in the sentence. Answers are case sensitive",
+            "instructions": "Fill in the blank words in the sentence. Answers are sensitive to case and diacritics (e.g. accents on letters).",
             "is_marked_automatically_by_system": True
         },
         {
             "name": "Sentence Builder",
             "icon": '<i class="fas fa-tools"></i>',
-            "instructions": "Build the correctly translated sentence from the available words",
+            "instructions": "Build the correct sentence from the available words.",
             "is_marked_automatically_by_system": True
         },
         {
             "name": "Translation",
             "icon": '<i class="fas fa-scroll"></i>',
-            "instructions": "Translate the source material and self-mark against the provided correct translation",
+            "instructions": "Translate the source material and self-mark against the correct translation provided.",
             "is_marked_automatically_by_system": False
         },
         {
             "name": "External",
             "icon": '<i class="fas fa-external-link-square-alt"></i>',
-            "instructions": "Click on the link to complete the external exercise",
+            "instructions": "Click on the link to complete the external exercise.",
             "is_marked_automatically_by_system": False
         }
     ]
@@ -143,8 +143,8 @@ def insert_themes(apps, schema_editor):
     """
 
     themes = [
-        "Test theme 1",
-        "Test theme 2"
+        "Grammar",
+        "Vocabulary"
     ]
 
     for theme in themes:

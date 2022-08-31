@@ -666,6 +666,10 @@ main {
     margin-top: 1.3em;
 }
 
+.exerciseformat-showanswer-selfmark {
+    display: block;  /* Self-marking exercise formats must always display 'show answer' */
+}
+
 #exercise-detail-footer {
     display: block;
     position: fixed;
