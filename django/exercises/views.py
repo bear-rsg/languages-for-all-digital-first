@@ -235,15 +235,15 @@ class ExerciseListView(LoginRequiredMixin, ListView):
         queryset = self.model.objects.filter(is_published=True)
 
         # 2. Searching
-        search = self.request.GET.get('search', '')
+        search = self.request.GET.get('search', '').strip()
         if search != '':
             queryset = queryset.filter(
                 Q(id__contains=search) |
-                Q(name__contains=search) |
-                Q(language__name__contains=search) |
-                Q(exercise_format__name__contains=search) |
-                Q(theme__name__contains=search) |
-                Q(difficulty__name__contains=search)
+                Q(name__icontains=search) |
+                Q(language__name__icontains=search) |
+                Q(exercise_format__name__icontains=search) |
+                Q(theme__name__icontains=search) |
+                Q(difficulty__name__icontains=search)
             )
 
         # 3. Filtering
