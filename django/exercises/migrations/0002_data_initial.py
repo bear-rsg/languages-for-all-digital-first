@@ -31,21 +31,6 @@ def insert_year_groups(apps, schema_editor):
             "date_start": "2023-09-01",
             "date_end": "2024-08-31"
         },
-        {
-            "name": "2024/25",
-            "date_start": "2024-09-01",
-            "date_end": "2025-08-31"
-        },
-        {
-            "name": "2025/26",
-            "date_start": "2025-09-01",
-            "date_end": "2026-08-31"
-        },
-        {
-            "name": "2026/27",
-            "date_start": "2026-09-01",
-            "date_end": "2027-08-31"
-        },
     ]
 
     for year_group in year_groups:

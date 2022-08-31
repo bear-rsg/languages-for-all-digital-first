@@ -79,6 +79,15 @@ class SchoolClassAdminView(admin.ModelAdmin):
     inlines = [SchoolClassUserInline]
     actions = (publish, unpublish)
 
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class ThemeAdminView(admin.ModelAdmin):
     """
@@ -98,6 +107,15 @@ class DifficultyAdminView(admin.ModelAdmin):
     list_display = ('name', 'order')
     list_display_links = ('name',)
     search_fields = ('name', 'order')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 class ExerciseAdminView(admin.ModelAdmin):
@@ -146,7 +164,7 @@ class UserExerciseAttemptAdminView(admin.ModelAdmin):
     """
     list_display = ('__str__', 'user', 'exercise', 'score_percentage', 'attempt_duration', 'submit_timestamp')
     list_display_links = ('__str__',)
-    search_fields = ('__str__',)
+    search_fields = ('attempt_duration', 'exercise__name', 'score', 'submit_timestamp', 'user__first_name', 'user__last_name', 'user__email')
     autocomplete_fields = ('exercise',)
 
     def has_add_permission(self, request, obj=None):
