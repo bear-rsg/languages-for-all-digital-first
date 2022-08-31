@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load settings_value %}
 {% load divide %}
 
 {% block main %}
@@ -9,7 +10,7 @@
     <form method="post" class="full-form">
         {% csrf_token %}
         {{ form.as_p }}
-        <em>You have been assigned the role of <strong>{{ object.role.name }}</strong>. Please contact us if you believe this needs to be changed.</em>
+        <em>You have been assigned the role of <strong>{{ object.role.name }}</strong>. Please <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us</a> if you believe this needs to be changed.</em>
         <button type="submit"><i class="fas fa-check"></i> Save changes</button>
     </form>
     <div class="full-form-footer-links">

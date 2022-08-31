@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.models import Group
 from account import forms
 from .models import User, UsersImportSpreadsheet
-from django.contrib.auth.forms import UserChangeForm
 
 
 class UsersImportSpreadsheetAdmin(admin.ModelAdmin):
@@ -56,7 +57,16 @@ class UserAdmin(DjangoUserAdmin):
     def has_add_permission(self, request, obj=None):
         return False
 
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 # Register above ModelAdmins
 admin.site.register(UsersImportSpreadsheet, UsersImportSpreadsheetAdmin)
 admin.site.register(User, UserAdmin)
+
+# Unregister the Group
+admin.site.unregister(Group)
