@@ -143,7 +143,7 @@ def insert_themes(apps, schema_editor):
     """
 
     themes = [
-        "Grammer",
+        "Grammar",
         "Vocabulary"
     ]
 
