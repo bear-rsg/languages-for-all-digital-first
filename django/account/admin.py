@@ -58,7 +58,11 @@ class UserAdmin(DjangoUserAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        return False
+        # Only allow changes to the password
+        if '/password/' in request.get_full_path():
+            return True
+        else:
+            return False
 
     def has_delete_permission(self, request, obj=None):
         return False
