@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.apps import apps
 from django.db import models
 import os
+from . import storage
 
 
 class UserRole(models.Model):
@@ -25,6 +26,7 @@ class UsersImportSpreadsheet(models.Model):
 Ensure the structure complies with the latest version of the template spreadsheet or the import may fail.<br>\
 Contact the software developer for support if you require help.<br>\
 Once you've uploaded the file, you can begin <a href="/account/importdata/">the import process</a>""",
+                                   storage=storage.ReplaceFileStorage(),
                                    blank=True,
                                    null=True)
     lastupdated = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
@@ -91,6 +93,9 @@ class User(AbstractUser):
         return self.username
 
     def save(self, *args, **kwargs):
+        # Force email to be lower case
+        self.email = self.email.strip().lower()
+
         # Username to be same as email
         self.username = self.email
 
