@@ -1,7 +1,7 @@
 from django.views.generic import (TemplateView, UpdateView, RedirectView)
 from django.urls import reverse_lazy
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import (PasswordChangeView, PasswordResetView, PasswordResetConfirmView)
 from django.urls import reverse
 from django.contrib import messages
@@ -13,6 +13,16 @@ import pandas as pd
 import os
 import random
 import string
+
+
+class AdminUserRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
+    """
+    A custom mixin to only allow admin users to access the view that uses this mixin
+    Example use: class MyClassBasedView(AdminUserRequiredMixin, TemplateView): ...
+    """
+
+    def test_func(self):
+        return self.request.user.role.name == 'admin'
 
 
 class MyAccountUpdateView(LoginRequiredMixin, UpdateView):
@@ -40,7 +50,7 @@ class MyAccountUpdateView(LoginRequiredMixin, UpdateView):
         return context
 
 
-class MyAccountUpdateSuccessTemplateView(TemplateView):
+class MyAccountUpdateSuccessTemplateView(LoginRequiredMixin, TemplateView):
     """
     Class-based view to show the 'my account' success template
     This is when the user updates their account details on the 'my account' page
@@ -103,7 +113,7 @@ class PasswordResetChangeSuccessTemplateView(TemplateView):
     template_name = 'registration/reset-password-change-success.html'
 
 
-class ImportDataConfirmTemplateView(LoginRequiredMixin, TemplateView):
+class ImportDataConfirmTemplateView(AdminUserRequiredMixin, TemplateView):
     """
     Class-based view to show the import data confirmation template
     Requires user to be logged in
@@ -113,7 +123,7 @@ class ImportDataConfirmTemplateView(LoginRequiredMixin, TemplateView):
     template_name = 'account/importdata-confirm.html'
 
 
-class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
+class ImportDataProcessingView(AdminUserRequiredMixin, RedirectView):
     """
     Class-based view to execute the data import and redirect user to success/failed page
     Requires user to be logged in
@@ -136,8 +146,13 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
             # Process each user
             for user in users:
 
+                # Ensure valid email is provided (skip this record if invalid) and force emails to be lower case
+                user_email = str(user['email']).strip().lower()
+                if '@' not in user_email:
+                    continue
+
                 # Get/create user through unique identifier (email)
-                user_obj, user_is_new = models.User.objects.get_or_create(email=user['email'])
+                user_obj, user_is_new = models.User.objects.get_or_create(email=user_email)
 
                 # Get/create school class thrugh unique identifiers (year group, language, difficulty)
                 if str(user['year_group']) != 'nan' and str(user['language']) != 'nan' and str(user['difficulty']) != 'nan':
@@ -156,8 +171,8 @@ class ImportDataProcessingView(LoginRequiredMixin, RedirectView):
                     user_obj.default_language = None
 
                 # Add additional user data
-                user_obj.first_name = user['first_name']
-                user_obj.last_name = user['last_name']
+                user_obj.first_name = user['first_name'].strip()
+                user_obj.last_name = user['last_name'].strip()
                 user_obj.role = models.UserRole.objects.get(name=user['role'])
                 user_obj.is_internal = user['is_internal']
                 user_obj.internal_id_number = str(user['internal_id_number']) if str(user['internal_id_number']) != 'nan' else ''
@@ -176,7 +191,7 @@ Welcome to Languages for All - Digital First! You've been registered with a new 
 
 Please go to {self.request.build_absolute_uri('/account/login/')} where you can login with the following details:
 
-Username: {user['email']}
+Username: {user_email}
 Password: {password_plain}
 
 Please note that you must change this password after logging in for the first time. If you have any issues you can email us for support at {settings.ADMIN_EMAIL}
@@ -185,7 +200,7 @@ Thanks,
 Languages for All Team
 """,
                               settings.DEFAULT_FROM_EMAIL,
-                              (user['email'],),
+                              (user_email,),
                               fail_silently=True)
 
                 # Save changes to this user
@@ -209,7 +224,7 @@ Languages for All Team
             return reverse('account:importdata-failed')
 
 
-class ImportDataSuccessTemplateView(LoginRequiredMixin, TemplateView):
+class ImportDataSuccessTemplateView(AdminUserRequiredMixin, TemplateView):
     """
     Class-based view to show the import data success template
     Requires user to be logged in
@@ -218,7 +233,7 @@ class ImportDataSuccessTemplateView(LoginRequiredMixin, TemplateView):
     template_name = 'account/importdata-success.html'
 
 
-class ImportDataFailedTemplateView(LoginRequiredMixin, TemplateView):
+class ImportDataFailedTemplateView(AdminUserRequiredMixin, TemplateView):
     """
     Class-based view to show the import data failed template
     Requires user to be logged in
