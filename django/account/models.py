@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.auth.models import AbstractUser, Group, UserManager
 from django.apps import apps
 from django.db import models
 import os
@@ -39,10 +39,22 @@ Once you've uploaded the file, you can begin <a href="/account/importdata/">the 
         return self.spreadsheet_filename
 
 
+class CustomUserManager(UserManager):
+    def get_by_natural_key(self, username):
+        """
+        Allow users to login with case-insensitive username
+
+        E.g. both "My.Name@uni.ac.uk" and "my.name@uni.ac.uk" will allow users to login
+        """
+        return self.get(username__iexact=username)
+
+
 class User(AbstractUser):
     """
     Custom user extends the standard Django user model, providing additional properties
     """
+
+    objects = CustomUserManager()  # Custom user manager used to allow for case-insensitive usernames
 
     role = models.ForeignKey(UserRole, on_delete=models.SET_NULL, blank=True, null=True)
     is_internal = models.BooleanField(default=True, help_text='Is internal to the University of Birmingham, e.g. an active UoB student or staff member')
