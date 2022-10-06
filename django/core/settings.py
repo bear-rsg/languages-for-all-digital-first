@@ -29,7 +29,9 @@ INSTALLED_APPS = [
     'account',
     'exercises',
     'general',
-    'help'
+    'help',
+    # 3rd Party (required at end of list)
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
