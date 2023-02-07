@@ -75,32 +75,8 @@ select {
 }
 
 .audio-control {
-    display: inline-block;
-    vertical-align: middle;
-    height: 2em;
-}
-
-.audio-control span {
-    background: #DDD;
-    display: inline-block;
-    color: #303030;
-    border-radius: 100%;
-    width: 2em;
-    height: 2em;
-    padding-top: 0.35em;
-    padding-left: 0.03em;
-    font-size: 1em;
-    text-align: center;
-    cursor: pointer;
-}
-
-.audio-control span.active {
-    background: #1779C5;
-    color: white;
-}
-
-.audio-control span:not(.active):hover {
-    background: #BBB;
+    display: block;
+    margin: 0 0 0.64rem 0;
 }
 
 .video-container {
@@ -772,10 +748,6 @@ main {
     display: inline-block;
 }
 
-.exerciseformat-fillintheblank-fitb .audio-control {
-    margin-bottom: 0.5em;
-}
-
 .exerciseformat-showanswer i {
     margin: 0.2em;
 }
@@ -827,10 +799,6 @@ main {
     font-weight: bold;
 }
 
-.exerciseformat-multiplechoice-question .audio-control {
-    margin: 0 0.3em;
-}
-
 .exerciseformat-multiplechoice-options-option {
     display: block;
     width: 100%;
@@ -857,15 +825,6 @@ main {
 }
 .exerciseformat-multiplechoice-options-option label:hover {
     background: #BBB;
-}
-
-.exerciseformat-multiplechoice-options-option.hasaudio label {
-    width: calc(100% - 2.7em)
-}
-
-.exerciseformat-multiplechoice-options-option .audio-control {
-    display: inline-block;
-    margin: 0 0.3em;
 }
 
 .exerciseformat-multiplechoice .exerciseformat-showanswer {
@@ -905,10 +864,6 @@ main {
     background: #EEE;
     color: #202020;
     text-align: initial;
-}
-
-.exerciseformat-sentencebuilder-sentence .audio-control {
-    margin-top: 0.9em;
 }
 
 .exerciseformat-sentencebuilder-words button {
