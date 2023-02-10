@@ -1,6 +1,5 @@
 {% if audio %}
     <div class="audio-control" data-id="{{ id }}">
-        <audio id="audio-{{ id }}" src="{{ audio.url }}"></audio>
-        <span><!--content filled in js--></span>
+        <audio id="audio-{{ id }}" src="{{ audio.url }}" controls></audio>
     </div>
 {% endif %}

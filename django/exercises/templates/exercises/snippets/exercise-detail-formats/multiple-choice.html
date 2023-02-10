@@ -5,9 +5,9 @@
         <!-- Question -->
         <div class="exerciseformat-multiplechoice-question" dir="auto">
             {% include "exercises/snippets/force-dir-auto.html" with text=mc.question_text_or_audiomsg %}
-            {% include "exercises/snippets/audio.html" with audio=mc.question_audio id=forloop.counter %}
             <!-- Question text -->
             {{ forloop.counter }}. {{ mc.question_text_or_audiomsg }}
+            {% include "exercises/snippets/audio.html" with audio=mc.question_audio id=forloop.counter %}
         </div>
 
         <!-- Options -->
@@ -15,12 +15,12 @@
             {% for option in mc.options %}
                 <div class="exerciseformat-multiplechoice-options-option{% if option.1 %} hasaudio{% endif %}" dir="auto">
                     {% include "exercises/snippets/force-dir-auto.html" with text=option.0 %}
-                    {% include "exercises/snippets/audio.html" with audio=option.1 id=option.2 %}
                     <!-- Value is 1 if correct answer or 0 if not -->
                     <input type="radio" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{{ option.3 }}">
                     <label for="option-{{ option.2 }}">
                         {{ option.0 }}
                     </label>
+                    {% include "exercises/snippets/audio.html" with audio=option.1 id=option.2 %}
                 </div>
             {% endfor %}
         </div>
