@@ -249,8 +249,8 @@ $(document).ready(function() {
                     break;
 
                 case 'sentencebuilder':
-                    var answerAttempt = $(this).find('.exerciseformat-sentencebuilder-sentence-text').text();
-                    var answerCorrect = $(this).find('.answer').attr('data-answer');
+                    var answerAttempt = $(this).find('.exerciseformat-sentencebuilder-sentence-text').text().replaceAll('\xa0', ' ');
+                    var answerCorrect = $(this).find('.answer').attr('data-answer').replaceAll('\xa0', ' ');
                     var answerIsCorrect = answerAttempt == answerCorrect;
                     break;
             }
