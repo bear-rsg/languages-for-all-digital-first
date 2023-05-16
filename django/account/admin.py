@@ -64,9 +64,6 @@ class UserAdmin(DjangoUserAdmin):
         else:
             return False
 
-    def has_delete_permission(self, request, obj=None):
-        return False
-
 
 # Register above ModelAdmins
 admin.site.register(UsersImportSpreadsheet, UsersImportSpreadsheetAdmin)
