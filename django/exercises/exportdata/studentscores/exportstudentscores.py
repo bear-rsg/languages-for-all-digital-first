@@ -71,11 +71,24 @@ def create_workbook(request):
     filter_classes = request.GET.getlist('filter_classes', '')
     if filter_classes:
         queryset_studentscores = queryset_studentscores.filter(user__classes__in=filter_classes)
+    # Improve performance
+    queryset_studentscores = queryset_studentscores.select_related(
+        'exercise',
+        'exercise__language',
+        'exercise__exercise_format',
+        'exercise__theme',
+        'exercise__difficulty',
+        'user'
+    )
 
     # Create worksheet
     column_titles_print = [
         "Exercise ID",
         "Exercise URL",
+        "Exercise Language",
+        "Exercise Format",
+        "Exercise Theme",
+        "Exercise Difficulty",
         "Student Email",
         "Student ID",
         "Score",
@@ -88,6 +101,10 @@ def create_workbook(request):
         data_print.append([
             studentscore.exercise.id,
             request.build_absolute_uri(f'/exercises/{studentscore.exercise.id}'),
+            studentscore.exercise.language.name,
+            studentscore.exercise.exercise_format.name,
+            studentscore.exercise.theme.name,
+            studentscore.exercise.difficulty.name,
             studentscore.user.email,
             studentscore.user.internal_id_number,
             studentscore.score,

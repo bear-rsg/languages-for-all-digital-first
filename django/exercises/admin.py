@@ -150,6 +150,7 @@ class SchoolClassAlertExerciseAdminView(admin.ModelAdmin):
     """
     list_display = ('__str__', 'fk_link_school_class', 'start_date', 'end_date', 'is_active')
     list_display_links = ('__str__',)
+    list_filter = ('school_class', 'school_class__language')
     autocomplete_fields = ('exercise', 'school_class')
 
     def fk_link_school_class(self, obj):
