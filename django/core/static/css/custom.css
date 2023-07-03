@@ -885,6 +885,7 @@ main {
     display: none;
 }
 
+.exerciseformat-sentencebuilder-undo,
 .exerciseformat-sentencebuilder-checkanswer,
 .exerciseformat-sentencebuilder-restart {
     float: left;

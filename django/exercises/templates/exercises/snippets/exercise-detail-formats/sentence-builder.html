@@ -21,6 +21,9 @@
             {% endfor %}
         </div>
 
+        <!-- Undo Last Attempt -->
+        <div class="exerciseformat-sentencebuilder-undo"><i class="fas fa-undo"></i> Undo Last Attempt</div>
+
         <!-- Check Answer -->
         {% if not exercise.is_a_formal_assessment %}
             <div class="exerciseformat-sentencebuilder-checkanswer">
@@ -59,7 +62,7 @@
 $(document).ready(function() {
 
     // Click word to add it to sentence
-    $('.exerciseformat-sentencebuilder-words button').on('click', function(){
+    $('body').on('click', '.exerciseformat-sentencebuilder-words button', function(){
         var sentence = $(this).parent().parent().find('.exerciseformat-sentencebuilder-sentence-text');
         var word = (sentence.html() === '' ? $(this).val() : " " + $(this).val());
         sentence.append(word);
@@ -68,6 +71,25 @@ $(document).ready(function() {
         // If this is the last word being clicked, automatically check answer to this question
         if ($(this).parent().find('button:visible').length < 1 ){
             $(this).parent().parent().find('.exerciseformat-sentencebuilder-checkanswer').trigger('click');
+        }
+    });
+
+    // Click to remove last word from sentence and add it back into words list
+    $('.exerciseformat-sentencebuilder-undo').on('click', function(){
+        let thisSentence = $(this).parent().find('.exerciseformat-sentencebuilder-sentence-text');
+        // If there's at least 1 word in the sentence
+        if (thisSentence.text().length){
+            // Separate the last word from rest of words in sentence
+            let sentenceWords = thisSentence.text().split(" ");
+            let sentenceLastWord = sentenceWords.pop();
+            let newSentence = sentenceWords.join(" ");
+            // Set the new sentence text (remove the last word)
+            thisSentence.text(newSentence);
+            // Create the new word button
+            let newButtonHtml = `<button value="${ sentenceLastWord }" dir="auto">${ sentenceLastWord }</button>`
+            $(this).parent().find('.exerciseformat-sentencebuilder-words').append(newButtonHtml);
+            // Clear results for this answer
+            $(this).parent().parent().find('.exerciseformat-sentencebuilder-result').html('');
         }
     });
 
