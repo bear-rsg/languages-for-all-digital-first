@@ -165,6 +165,7 @@ class UserExerciseAttemptAdminView(admin.ModelAdmin):
     """
     list_display = ('__str__', 'user', 'exercise', 'score_percentage', 'attempt_duration', 'submit_timestamp')
     list_display_links = ('__str__',)
+    list_filter = ('exercise__language', 'exercise__exercise_format', 'exercise__theme', 'exercise__difficulty')
     search_fields = ('attempt_duration', 'exercise__name', 'score', 'submit_timestamp', 'user__first_name', 'user__last_name', 'user__email')
     autocomplete_fields = ('exercise',)
 
