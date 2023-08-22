@@ -19,6 +19,7 @@ class HelpItem(models.Model):
     visible_only_to_user_groups = models.ManyToManyField(UserRole, blank=True, related_name='helpitems')
     created_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Created")
     lastupdated_datetime = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
+    order = models.IntegerField(blank=True, null=True)
 
     # Admin
     admin_published = models.BooleanField(default=False, verbose_name='published')
@@ -54,3 +55,6 @@ class HelpItem(models.Model):
 
     def get_absolute_url(self):
         return reverse('help:detail', args=[str(self.id)])
+
+    class Meta:
+        ordering = ('order', 'name', 'id')

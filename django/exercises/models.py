@@ -184,6 +184,7 @@ class Exercise(models.Model):
     difficulty = models.ForeignKey(Difficulty, on_delete=models.RESTRICT)
     instructions = models.TextField(blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " If left blank then the default instructions for this exercise format will be used (suitable for most cases)")
     instructions_image = models.ImageField(upload_to='exercises-exercise-instructions', blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " Include an image here to illustrate the instructions for the entire exercise. E.g. if all questions relate to this image.")
+    instructions_image_width_percent = models.IntegerField(blank=True, null=True, help_text="Optional. Set the percentage width of the instructions box. Images will fill width of instructions box by default.", verbose_name="Instructions image width (%)")
     is_a_formal_assessment = models.BooleanField(default=False, help_text="Marking this as a formal assessment (i.e. a test that counts to the student's grade) will put restrictions on this exercise, like preventing students from being able to check answers and only allowing a single attempt")
     is_published = models.BooleanField(default=True, verbose_name="Published")
     owned_by = models.ForeignKey(User, related_name="exercise_owned_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The only teacher who can manage this exercise")

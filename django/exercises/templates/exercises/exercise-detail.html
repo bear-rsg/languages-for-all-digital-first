@@ -94,7 +94,7 @@
             {% endif %}
             <!-- Image -->
             {% if exercise.instructions_image %}
-                <a href="{{ exercise.instructions_image.url }}"><img src="{{ exercise.instructions_image.url }}" alt="exercise instructions image"></a>
+                <a href="{{ exercise.instructions_image.url }}"><img src="{{ exercise.instructions_image.url }}" alt="exercise instructions image"{% if exercise.instructions_image_width_percent %} style="width: {{ exercise.instructions_image_width_percent }}%;"{% endif %}></a>
             {% endif %}
         </div>
         {% if user.is_staff %}

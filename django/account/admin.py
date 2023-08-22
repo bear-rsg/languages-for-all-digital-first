@@ -26,13 +26,13 @@ class UserAdmin(DjangoUserAdmin):
     form = UserChangeForm
     model = User
     list_display = ['username',
+                    'internal_id_number',
                     'first_name',
                     'last_name',
                     'email',
                     'role',
                     'default_language',
                     'is_internal',
-                    'internal_id_number',
                     'is_active',
                     'date_joined',
                     'last_login']
