@@ -6,8 +6,10 @@
         <div class="exerciseformat-multiplechoice-question" dir="auto">
             {% include "exercises/snippets/force-dir-auto.html" with text=mc.question_text_or_audiomsg %}
             <!-- Question text -->
-            {{ forloop.counter }}. {{ mc.question_text_or_audiomsg }}
-            {% include "exercises/snippets/audio.html" with audio=mc.question_audio id=forloop.counter %}
+            <div>
+                {{ forloop.counter }}. {{ mc.question_text_or_audiomsg }}
+                {% include "exercises/snippets/audio.html" with audio=mc.question_audio id=forloop.counter %}
+            </div>
         </div>
 
         <!-- Options -->

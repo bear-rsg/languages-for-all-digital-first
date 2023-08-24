@@ -66,7 +66,7 @@ def create_workbook(request):
 
     # Build queryset
     # Only return student scores (i.e. not attempts by teachers and admins)
-    queryset_studentscores = models.UserExerciseAttempt.objects.filter(user__role__name='student')
+    queryset_studentscores = models.UserExerciseAttempt.objects.all()#filter(user__role__name='student')
     # Filter by classes, if param is provided
     filter_classes = request.GET.getlist('filter_classes', '')
     if filter_classes:
@@ -92,6 +92,7 @@ def create_workbook(request):
         "Student Email",
         "Student ID",
         "Score",
+        "Attempt Detail",
         "Attempt Duration (milliseconds)",
         "Submit Timestamp"
     ]
@@ -101,13 +102,14 @@ def create_workbook(request):
         data_print.append([
             studentscore.exercise.id,
             request.build_absolute_uri(f'/exercises/{studentscore.exercise.id}'),
-            studentscore.exercise.language.name,
-            studentscore.exercise.exercise_format.name,
-            studentscore.exercise.theme.name,
-            studentscore.exercise.difficulty.name,
+            str(studentscore.exercise.language),
+            str(studentscore.exercise.exercise_format),
+            str(studentscore.exercise.theme),
+            str(studentscore.exercise.difficulty),
             studentscore.user.email,
             studentscore.user.internal_id_number,
             studentscore.score,
+            studentscore.attempt_detail,
             studentscore.attempt_duration,
             studentscore.submit_timestamp.strftime("%Y-%m-%d %H:%M:%S")
         ])

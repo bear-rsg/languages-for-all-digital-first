@@ -5,8 +5,10 @@
         <!-- Question -->
         <div class="exerciseformat-sentencebuilder-question" dir="auto">
             {% include "exercises/snippets/force-dir-auto.html" with text=sb.sentence_source_text_or_audiomsg %}
-            {{ forloop.counter }}. <span dir="auto">{{ sb.sentence_source_text_or_audiomsg }}</span>
-            {% include "exercises/snippets/audio.html" with audio=sb.sentence_source_audio id=forloop.counter|add:100000 %}
+            <div>
+                {{ forloop.counter }}. <span dir="auto">{{ sb.sentence_source_text_or_audiomsg }}</span>
+                {% include "exercises/snippets/audio.html" with audio=sb.sentence_source_audio id=forloop.counter|add:100000 %}
+            </div>
         </div>
 
         <!-- Sentence -->

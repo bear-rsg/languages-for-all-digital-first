@@ -605,6 +605,7 @@ class UserExerciseAttempt(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     score = models.FloatField(blank=True, null=True)
+    attempt_detail = models.TextField(blank=True, null=True)
     attempt_duration = models.IntegerField(blank=True, null=True, verbose_name='attempt duration (milliseconds)')
     submit_timestamp = models.DateTimeField(auto_now_add=True)
 

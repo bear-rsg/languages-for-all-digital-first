@@ -31,6 +31,10 @@ class UserExerciseAttemptView(View):
         score = self.request.POST.get('score', '')
         if score != '':
             attempt['score'] = score
+        # Add attempt_detail to attempt dict if it's provided
+        attempt_detail = self.request.POST.get('attempt_detail', '')
+        if attempt_detail != '':
+            attempt['attempt_detail'] = attempt_detail
         # Add attempt_duration to attempt dict if it's provided
         attempt_duration = self.request.POST.get('attempt_duration', '')
         if attempt_duration != '':
