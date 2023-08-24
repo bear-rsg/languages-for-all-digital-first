@@ -66,7 +66,7 @@ def create_workbook(request):
 
     # Build queryset
     # Only return student scores (i.e. not attempts by teachers and admins)
-    queryset_studentscores = models.UserExerciseAttempt.objects.all()#filter(user__role__name='student')
+    queryset_studentscores = models.UserExerciseAttempt.objects.filter(user__role__name='student')
     # Filter by classes, if param is provided
     filter_classes = request.GET.getlist('filter_classes', '')
     if filter_classes:
