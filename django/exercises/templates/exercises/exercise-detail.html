@@ -94,7 +94,7 @@
             {% endif %}
             <!-- Image -->
             {% if exercise.instructions_image %}
-                <a href="{{ exercise.instructions_image.url }}"><img src="{{ exercise.instructions_image.url }}" alt="exercise instructions image"></a>
+                <a href="{{ exercise.instructions_image.url }}"><img src="{{ exercise.instructions_image.url }}" alt="exercise instructions image"{% if exercise.instructions_image_width_percent %} style="width: {{ exercise.instructions_image_width_percent }}%;"{% endif %}></a>
             {% endif %}
         </div>
         {% if user.is_staff %}
@@ -199,6 +199,7 @@
                             <!-- Hidden values -->
                             <input id="exercise-attempt-form-exercise" type="hidden" name="exercise" value="{{ exercise.id }}">
                             <input id="exercise-attempt-form-score" type="hidden" name="score" val="empty">
+                            <input id="exercise-attempt-form-attemptdetail" type="hidden" name="attempt_detail" val="empty">
                             <input id="exercise-attempt-form-attemptduration" type="hidden" name="attempt_duration" val="empty">
                             <button type="submit" class="popup-submit">
                                 <i class="fas fa-check"></i> Submit
@@ -229,16 +230,18 @@ $(document).ready(function() {
 
             // Define exercise format specific values
             // Get format from class name, e.g. multiplechoice in .exerciseformat-multiplechoice
-            switch (answerClass.split('-')[1]) {
+            switch (answerClass.split('-')[1]){
                 case 'multiplechoice':
-                    var answerAttempt = $(this).find('input:radio:checked').val();
-                    var answerCorrect = 1;
-                    var answerIsCorrect = answerAttempt == answerCorrect;
+                    var answerAttempts = $(this).find('input:checkbox:checked').map(function(){return $(this).val();}).get();
+                    var answerCorrect = '1';
+                    var answerIncorrect = '0';
+                    // The answer is correct if at least 1 correct answer is given and no incorrect answers
+                    var answerIsCorrect = answerAttempts.indexOf(answerCorrect) > -1 && answerAttempts.indexOf(answerIncorrect) == -1;
                     break;
 
                 case 'imagematch':
                     var answerAttempt = $(this).find("select").val();
-                    var answerCorrect = 1;
+                    var answerCorrect = '1';
                     var answerIsCorrect = answerAttempt == answerCorrect;
                     break;
 
@@ -255,7 +258,7 @@ $(document).ready(function() {
                     break;
             }
 
-            // Calculate score for this answer
+            // Increase the score by 1 if this answer is correct
             if (answerIsCorrect) score++;
 
             // Display Correct/Incorrect/Unanswered result for this answer only
@@ -309,6 +312,59 @@ $(document).ready(function() {
             if(totalScorePercent == '0') totalScorePercent=0.1 // 0 is ignored by backend, so change to 0.1 (will be rounded to 0)
             $('#exercise-attempt-form-score').val(totalScorePercent);
         {% endif %}
+
+        // Record attempt detail as JSON string (allow for each exercise format)
+        var attempt_detail = []
+        // Format: multiple choice
+        $('.exerciseformat-multiplechoice').each(function(){
+            attempt_detail.push({
+                'question': $(this).find('.exerciseformat-multiplechoice-question div').text().trim(),
+                'answer': $(this).find('.exerciseformat-multiplechoice-options-option input[type="radio"]:checked').next('label').text().trim(),
+                'result': ($(this).find('.exercise-result-correct').length ? true : false)
+            });
+        });
+        // Format: image match
+        $('.exerciseformat-imagematch').each(function(){
+            attempt_detail.push({
+                'question': $(this).find('.exerciseformat-imagematch-title').text().trim(),
+                'image': $(this).find('img').attr('src'),
+                'answer': $(this).find('select option:selected').text().trim(),
+                'result': ($(this).find('.exercise-result-correct').length ? true : false)
+            });
+        });
+        // Format: fill in the blank
+        $('.exerciseformat-fillintheblank').each(function(){
+            // Get array of answers
+            answers = []
+            $(this).find('input').each(function(i, answer){answers.push($(answer).val());});
+            // Get array of results
+            results = []
+            $(this).find('.exerciseformat-fillintheblank-fitb-item-result').each(function(i, result){results.push(($(result).find('.exercise-result-correct').length ? true : false))});
+
+            attempt_detail.push({
+                'question': $(this).find('.exerciseformat-fillintheblank-source div').text().trim(),
+                'answers': answers,
+                'results': results
+            });
+        });
+        // Format: sentence builder
+        $('.exerciseformat-sentencebuilder').each(function(){
+            attempt_detail.push({
+                'question': $(this).find('.exerciseformat-sentencebuilder-question div').text().trim(),
+                'answer': $(this).find('.exerciseformat-sentencebuilder-sentence-text').text().trim(),
+                'result': ($(this).find('.exercise-result-correct').length ? true : false)
+            });
+        });
+        // Format: translation
+        $('.exerciseformat-translation').each(function(){
+            attempt_detail.push({
+                'sourceImage': $(this).find('img').attr('src'),
+                'sourceText': $(this).find('.exerciseformat-translation-source-text').text().trim(),
+                'translation': $(this).find('textarea').val().trim()
+            });
+        });
+        // Store the hidden value as a JSON string, ready to pass to back-end
+        if (attempt_detail.length) $('#exercise-attempt-form-attemptdetail').val(JSON.stringify(attempt_detail))
     });
 
     // Calculate how long it takes the user to attempt the exercise

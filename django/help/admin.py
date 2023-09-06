@@ -36,6 +36,7 @@ class HelpAdminView(admin.ModelAdmin):
                     'image',
                     'video',
                     'pdf',
+                    'order',
                     'admin_published')
     list_display_links = ('name',)
     list_filter = ('admin_published',)
@@ -47,7 +48,6 @@ class HelpAdminView(admin.ModelAdmin):
                      'pdf',
                      'admin_notes')
     actions = (publish, unpublish)
-    ordering = ('name',)
 
 
 # Register admin views

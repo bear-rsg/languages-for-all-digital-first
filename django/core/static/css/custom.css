@@ -336,19 +336,6 @@ main {
     text-align: center;
 }
 
-#welcome-banner-content p {
-    font-weight: bold;
-    font-size: 1.2em;
-    color: white;
-    text-align: center;
-    width: fit-content;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0.1em 0.4em;
-    background-color: #1779C5;
-}
-
 #welcome-banner-content a {
     display: block;
     background: white;
@@ -570,7 +557,7 @@ main {
 }
 
 #exercise-detail-instructions img {
-    max-width: 90%;
+    max-width: 100%;
     height: initial;
     display: block;
     margin: 2em auto;
@@ -808,7 +795,7 @@ main {
     display: none;
 }
 
-.exerciseformat-multiplechoice-options-option input[type="radio"]:checked+label {
+.exerciseformat-multiplechoice-options-option input[type="checkbox"]:checked+label {
     background: #1779C5;
     color: white;
 }
@@ -885,6 +872,7 @@ main {
     display: none;
 }
 
+.exerciseformat-sentencebuilder-undo,
 .exerciseformat-sentencebuilder-checkanswer,
 .exerciseformat-sentencebuilder-restart {
     float: left;
