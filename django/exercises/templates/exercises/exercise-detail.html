@@ -230,16 +230,18 @@ $(document).ready(function() {
 
             // Define exercise format specific values
             // Get format from class name, e.g. multiplechoice in .exerciseformat-multiplechoice
-            switch (answerClass.split('-')[1]) {
+            switch (answerClass.split('-')[1]){
                 case 'multiplechoice':
-                    var answerAttempt = $(this).find('input:radio:checked').val();
-                    var answerCorrect = 1;
-                    var answerIsCorrect = answerAttempt == answerCorrect;
+                    var answerAttempts = $(this).find('input:checkbox:checked').map(function(){return $(this).val();}).get();
+                    var answerCorrect = '1';
+                    var answerIncorrect = '0';
+                    // The answer is correct if at least 1 correct answer is given and no incorrect answers
+                    var answerIsCorrect = answerAttempts.indexOf(answerCorrect) > -1 && answerAttempts.indexOf(answerIncorrect) == -1;
                     break;
 
                 case 'imagematch':
                     var answerAttempt = $(this).find("select").val();
-                    var answerCorrect = 1;
+                    var answerCorrect = '1';
                     var answerIsCorrect = answerAttempt == answerCorrect;
                     break;
 
@@ -256,7 +258,7 @@ $(document).ready(function() {
                     break;
             }
 
-            // Calculate score for this answer
+            // Increase the score by 1 if this answer is correct
             if (answerIsCorrect) score++;
 
             // Display Correct/Incorrect/Unanswered result for this answer only
