@@ -795,7 +795,7 @@ main {
     display: none;
 }
 
-.exerciseformat-multiplechoice-options-option input[type="radio"]:checked+label {
+.exerciseformat-multiplechoice-options-option input[type="checkbox"]:checked+label {
     background: #1779C5;
     color: white;
 }

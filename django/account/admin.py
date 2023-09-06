@@ -12,6 +12,7 @@ def delete_users(modeladmin, request, queryset):
     """
     queryset.delete()
 
+
 delete_users.short_description = "PERMANENTLY DELETE selected users from database"
 
 
