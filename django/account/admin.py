@@ -6,6 +6,15 @@ from account import forms
 from .models import User, UsersImportSpreadsheet
 
 
+def delete_users(modeladmin, request, queryset):
+    """
+    Sets all selected items in queryset to published
+    """
+    queryset.delete()
+
+delete_users.short_description = "PERMANENTLY DELETE selected users from database"
+
+
 class UsersImportSpreadsheetAdmin(admin.ModelAdmin):
     """
     Customise the admin interface: UsersImportSpreadsheet
@@ -53,6 +62,7 @@ class UserAdmin(DjangoUserAdmin):
               'date_joined',
               'last_login')
     fieldsets = None
+    actions = (delete_users,)
 
     def has_add_permission(self, request, obj=None):
         return False

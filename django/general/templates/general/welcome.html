@@ -7,9 +7,6 @@
 <section id="welcome-banner">
     <div id="welcome-banner-content">
         <img src="{% static 'images/logos/lfadf.png' %}" alt="Languages for All Digital First logo">
-        <p>
-            A new era of language learning
-        </p>
         <a href="{% url 'exercises:list' %}"><i class="fas fa-check-circle"></i> Exercises</a>
         {% if exercises_todo_count %}
             <a href="{% url 'exercises:list' %}?myexercises=todo"><i class="fas fa-clipboard-check"></i> To Do ({{ exercises_todo_count }})</a>

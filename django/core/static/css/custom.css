@@ -336,19 +336,6 @@ main {
     text-align: center;
 }
 
-#welcome-banner-content p {
-    font-weight: bold;
-    font-size: 1.2em;
-    color: white;
-    text-align: center;
-    width: fit-content;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0.1em 0.4em;
-    background-color: #1779C5;
-}
-
 #welcome-banner-content a {
     display: block;
     background: white;
