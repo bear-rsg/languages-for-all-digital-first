@@ -31,11 +31,11 @@
         <!-- User's attempt -->
         <div class="exerciseformat-translation-userattempt">
             <!-- Header -->
-            <label for="translation-translate">
+            <label for="translation-translate-{{ forloop.counter }}">
                 Write your translation below:
             </label>
             <!-- Input -->
-            <textarea id="translation-translate" dir="auto"></textarea>
+            <textarea id="translation-translate-{{ forloop.counter }}" class="translation-translate" dir="auto"></textarea>
             {% if not exercise.is_a_formal_assessment %}
                 <!-- Show answer -->
                 <div class="exerciseformat-showanswer exerciseformat-showanswer-selfmark">

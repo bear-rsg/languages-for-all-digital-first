@@ -31,6 +31,10 @@ class UserExerciseAttemptView(View):
         score = self.request.POST.get('score', '')
         if score != '':
             attempt['score'] = score
+        # Add attempt_detail to attempt dict if it's provided
+        attempt_detail = self.request.POST.get('attempt_detail', '')
+        if attempt_detail != '':
+            attempt['attempt_detail'] = attempt_detail
         # Add attempt_duration to attempt dict if it's provided
         attempt_duration = self.request.POST.get('attempt_duration', '')
         if attempt_duration != '':
@@ -102,7 +106,7 @@ class ExerciseCreateView(PermissionRequiredMixin, CreateView):
 
     template_name = 'exercises/exercise-add.html'
     model = models.Exercise
-    fields = ['name', 'language', 'exercise_format', 'theme', 'difficulty', 'instructions', 'instructions_image', 'is_a_formal_assessment']
+    fields = ['name', 'language', 'exercise_format', 'theme', 'difficulty', 'instructions', 'instructions_image', 'instructions_image_width_percent', 'is_a_formal_assessment', 'is_published']
     permission_required = ('exercises.add_exercise')
     success_url = reverse_lazy('exercises:list')
 
@@ -128,7 +132,7 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
 
     template_name = 'exercises/exercise-edit.html'
     model = models.Exercise
-    fields = ['name', 'language', 'theme', 'difficulty', 'instructions', 'instructions_image', 'is_a_formal_assessment', 'owned_by']
+    fields = ['name', 'language', 'theme', 'difficulty', 'instructions', 'instructions_image', 'instructions_image_width_percent', 'is_a_formal_assessment', 'owned_by', 'is_published']
     permission_required = ('exercises.change_exercise')
 
     def get_queryset(self):
@@ -201,15 +205,16 @@ class ExerciseDetailView(LoginRequiredMixin, DetailView):
     Class-based view for exercise detail template
     """
     template_name = 'exercises/exercise-detail.html'
-    queryset = models.Exercise.objects.filter(is_published=True)
+    model = models.Exercise
+
+    def get_queryset(self):
+        return self.model.objects.filter(Q(is_published=True) | Q(owned_by=self.request.user))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # If user is logged in, return past scores for current exercise
         if self.request.user.is_authenticated:
-            this_exercise = self.queryset.get(pk=self.kwargs['pk'])
-            this_user = self.request.user
-            context['pastscores'] = models.UserExerciseAttempt.objects.filter(exercise=this_exercise, user=this_user)
+            context['pastscores'] = models.UserExerciseAttempt.objects.filter(exercise=self.object, user=self.request.user)
         return context
 
 
@@ -232,7 +237,7 @@ class ExerciseListView(LoginRequiredMixin, ListView):
         """
 
         # 1. Enforcing privacy rules
-        queryset = self.model.objects.filter(is_published=True)
+        queryset = self.model.objects.filter(Q(is_published=True) | Q(owned_by=self.request.user))
 
         # 2. Searching
         search = self.request.GET.get('search', '').strip()

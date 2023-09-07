@@ -6,13 +6,15 @@
         <div class="exerciseformat-fillintheblank-source" dir="auto">
             {% include "exercises/snippets/force-dir-auto.html" with text=fitb.source_text_or_audiomsg %}
 
-            <!-- Only show counter if there are multiple -->
-            {% if exercise.exerciseformatfillintheblank_set.all.count > 1 %}
-                {{ forloop.counter }}.
-            {% endif %}
-            {{ fitb.source_text_or_audiomsg }}
+            <div>
+                {% if exercise.exerciseformatfillintheblank_set.all.count > 1 %}
+                    <!-- Only show counter if there are multiple -->
+                    {{ forloop.counter }}.
+                {% endif %}
+                {{ fitb.source_text_or_audiomsg }}
 
-            {% include "exercises/snippets/audio.html" with audio=fitb.source_audio id=forloop.counter|add:100000 %}
+                {% include "exercises/snippets/audio.html" with audio=fitb.source_audio id=forloop.counter|add:100000 %}
+            </div>
         </div>
 
         <!-- Fill in the blanks -->

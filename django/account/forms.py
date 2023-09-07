@@ -26,11 +26,10 @@ class PublicUserChangeForm(UserChangeForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.label_suffix = ""  # removes : from label, e.g. Email: becomes Email
-        self.fields['default_language'].help_text = "The main language that you're registered to study/teach within Languages for All. Exercises will be filtered by this language by default."
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'default_language')
+        fields = ('first_name', 'last_name', 'email',)
 
 
 class PublicPasswordChangeForm(PasswordChangeForm):

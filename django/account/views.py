@@ -158,7 +158,7 @@ class ImportDataProcessingView(AdminUserRequiredMixin, RedirectView):
                 if str(user['year_group']) != 'nan' and str(user['language']) != 'nan' and str(user['difficulty']) != 'nan':
                     school_class_obj = exercise_models.SchoolClass.objects.get_or_create(
                         year_group=exercise_models.YearGroup.objects.get(name=user['year_group']),
-                        language=exercise_models.Language.objects.get(name=user['language']),
+                        language=exercise_models.Language.objects.get_or_create(name=user['language'])[0],
                         difficulty=exercise_models.Difficulty.objects.get(name=user['difficulty'])
                     )[0]
                     # Add the related class
@@ -166,16 +166,16 @@ class ImportDataProcessingView(AdminUserRequiredMixin, RedirectView):
 
                 # Set default language (if provided, else None)
                 if str(user['language']) != 'nan':
-                    user_obj.default_language = exercise_models.Language.objects.get(name=user['language'])
+                    user_obj.default_language = exercise_models.Language.objects.get_or_create(name=user['language'])[0]
                 else:
                     user_obj.default_language = None
 
                 # Add additional user data
+                user_obj.internal_id_number = str(user['internal_id_number']).replace('.0', '') if str(user['internal_id_number']) != 'nan' else ''
                 user_obj.first_name = user['first_name'].strip()
                 user_obj.last_name = user['last_name'].strip()
                 user_obj.role = models.UserRole.objects.get(name=user['role'])
                 user_obj.is_internal = user['is_internal']
-                user_obj.internal_id_number = str(user['internal_id_number']) if str(user['internal_id_number']) != 'nan' else ''
 
                 # If this iteration created a new user then process additional steps
                 if user_is_new:
