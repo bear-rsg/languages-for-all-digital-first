@@ -12,4 +12,25 @@
     </form>
 </section>
 
+
+<script>
+    $(document).ready(function() {
+
+        // Show/hide specific fields dynamically:
+        // Reverse image match
+        $('#id_exercise_format').on('click', function(){
+            let fieldToShowHide = $('#id_exercise_format_reverse_image_match').parent();
+            if ($(this).find('option:selected').text() === 'Image Match') fieldToShowHide.show();
+            else fieldToShowHide.hide();
+        }).trigger('click');
+        
+        // Filter select lists
+        // "Owned By" and "Collaborators" lists to hide students and guests
+        $('#id_owned_by option, #id_collaborators option').each(function(){
+            if ($(this).text().includes('(student)') || $(this).text().includes('(guest)')) $(this).remove();
+        });
+
+    });
+</script>
+
 {% endblock %}

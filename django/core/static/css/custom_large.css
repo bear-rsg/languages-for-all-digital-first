@@ -128,6 +128,15 @@
         display: inline-block;
         width: calc(25% - 3.3em);
     }
+
+    /* Exercise: Detail: Format: ImageMatch (Reversed) */
+
+    .exerciseformat-imagematchreversed-image {
+        display: inline-block;
+        margin: 1em;
+        width: calc(25% - 2.3em);
+        vertical-align: top;
+    }
     
     /* Exercise: Detail: Format: Translation */
 
