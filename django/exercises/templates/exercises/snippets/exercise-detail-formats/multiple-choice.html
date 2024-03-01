@@ -7,7 +7,7 @@
             {% include "exercises/snippets/force-dir-auto.html" with text=mc.question_text_or_audiomsg %}
             <!-- Question text -->
             <div>
-                {{ forloop.counter }}. {{ mc.question_text_or_audiomsg }}
+                {{ forloop.counter }}. {{ mc.question_text_or_audiomsg | safe }}
                 {% include "exercises/snippets/audio.html" with audio=mc.question_audio id=forloop.counter %}
             </div>
         </div>
@@ -20,7 +20,7 @@
                     <!-- Value is 1 if correct answer or 0 if not -->
                     <input type="checkbox" id="option-{{ mc.id }}-{{ forloop.counter }}" name="{{ mc.id }}" value="{{ option.3 }}">
                     <label for="option-{{ option.2 }}">
-                        {{ option.0 }}
+                        {{ option.0 | safe }}
                     </label>
                     {% include "exercises/snippets/audio.html" with audio=option.1 id=option.2 %}
                 </div>
@@ -32,8 +32,11 @@
                 <label><i class="fas fa-eye"></i> Show answer</label>
                 <div class="answer">
                     <div class="answer-text">Answer:<br>{{ mc.answer_text | safe }}</div>
-                    {% if mc.correct_answer_feedback %}
-                        <div class="answer-feedback">{{ mc.correct_answer_feedback | safe }}</div>
+                    {% if mc.correct_answer_feedback or mc.correct_answer_feedback_audio %}
+                        <div class="answer-feedback">
+                            {{ mc.correct_answer_feedback | safe }}
+                            {% include "exercises/snippets/audio.html" with audio=mc.correct_answer_feedback_audio id=forloop.counter|add:100000 %}
+                        </div>
                     {% endif %}
                 </div>
             </div>

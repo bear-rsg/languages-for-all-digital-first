@@ -3,12 +3,17 @@ from django.urls import reverse
 from account.models import User, UserRole
 from datetime import date
 import random
+import re
 
+
+AUDIO_RECORD_LINK = ' <a href="https://online-voice-recorder.com/" target="_blank">Record your audio clip</a> and then upload the file here'
 OPTIONAL_HELP_TEXT = "(Optional)"
 OPTIONAL_IF_AUDIO_HELP_TEXT = "Optional if supplying audio instead, otherwise required"
-AUDIO_HELP_TEXT = OPTIONAL_HELP_TEXT + " <a href='https://online-voice-recorder.com/' target='_blank'>Record your audio clip</a> and then upload the file here"
+AUDIO_HELP_TEXT = OPTIONAL_HELP_TEXT + AUDIO_RECORD_LINK
 AUDIO_UPLOAD_PATH = "exercises-exercise-audio"
+IMAGE_URL_HELP_TEXT = "Include a URL/link to an existing image on the internet, instead of needing to download and upload it using the above file upload facility."
 CORRECT_ANSWER_FEEDBACK_HELP_TEXT = OPTIONAL_HELP_TEXT + " Provide feedback about the correct answer (if relevant) to help aid student learning"
+CORRECT_ANSWER_FEEDBACK_AUDIO_HELP_TEXT = CORRECT_ANSWER_FEEDBACK_HELP_TEXT + ", using an audio file alongside or instead of feedback text." + AUDIO_RECORD_LINK
 EXERCISE_ITEM_ORDER_HELP_TEXT = OPTIONAL_HELP_TEXT + " Specify the order you'd like this item to appear on the exercise page. Leave blank to order automatically."
 
 
@@ -24,6 +29,42 @@ def text_or_audiomsg(text_field, audio_field):
         return "(Please play the audio clip)"
     else:
         return ""
+
+
+def image_path(image_file, image_url):
+    """
+    Images can be either uploaded via an ImageField or linked to elsewhere on the internet via a URL field.
+    This function is used by dynamic properties on models for each image/image_url combination to return the path to the image.
+    """
+
+    # Prioritise image_file, if available, otherwise return image url (or None if neither is available).
+    if image_file:
+        return image_file.url
+    elif image_url:
+        return image_url
+    else:
+        return None
+
+
+def make_urls_clickable(text):
+    """
+    Find all urls in text and add suitable html <a> tag to make them 'clickable' on the website
+    """
+    # If a valid string with content
+    if type(text) == str and text != '':
+        # Regex to find all urls in the provided text
+        urls = re.findall(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', text)  # NOQA
+        # Loop through all urls found in text
+        for url in urls:
+            # Filter out URLs that are already links
+            before_url = text.split(str(url[0]))[0]
+            # If there isn't a > or " directly before the url
+            if len(before_url) == 0 or (len(before_url) > 1 and before_url[-1] not in ['>', '"']):
+                # Ensure link starts with http
+                link = url[0] if str(url[0]).startswith('http') else f'https://{url[0]}'
+                # Add necessary HTML to convert link into <a href=""></a>
+                text = text.replace(url[0], f'<a href="{link}" target="_blank">{url[0]}</a>')
+    return text
 
 
 class YearGroup(models.Model):
@@ -72,6 +113,21 @@ class Difficulty(models.Model):
     class Meta:
         ordering = ['order', 'name', 'id']
         verbose_name_plural = 'difficulties'
+
+
+class FontSize(models.Model):
+    """
+    A size of font (measured in em) (e.g. Small, Medium, Large)
+    """
+
+    name = models.CharField(max_length=255, unique=True)
+    size_em = models.FloatField(help_text="Size of font (measured in em) as a decimal number. 1.0 is considered default/medium.")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['size_em', 'name', 'id']
 
 
 class SchoolClass(models.Model):
@@ -180,30 +236,49 @@ class Exercise(models.Model):
     name = models.CharField(max_length=255)
     language = models.ForeignKey(Language, on_delete=models.RESTRICT)
     exercise_format = models.ForeignKey(ExerciseFormat, on_delete=models.RESTRICT)
+    exercise_format_reverse_image_match = models.BooleanField(default=False, verbose_name='reverse image match', help_text="Reverse the layout of this image match exercise, so that the student must select the image that matches the word instead of the word that matches the image.")
     theme = models.ForeignKey(Theme, on_delete=models.SET_NULL, blank=True, null=True, help_text=OPTIONAL_HELP_TEXT)
     difficulty = models.ForeignKey(Difficulty, on_delete=models.RESTRICT)
+    font_size = models.ForeignKey(FontSize, on_delete=models.RESTRICT, blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " Set size of all font in exercise. Leave blank for a default font size.")
     instructions = models.TextField(blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " If left blank then the default instructions for this exercise format will be used (suitable for most cases)")
     instructions_image = models.ImageField(upload_to='exercises-exercise-instructions', blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " Include an image here to illustrate the instructions for the entire exercise. E.g. if all questions relate to this image.")
+    instructions_image_url = models.URLField(blank=True, null=True, help_text=f'{OPTIONAL_HELP_TEXT} {IMAGE_URL_HELP_TEXT}')
     instructions_image_width_percent = models.IntegerField(blank=True, null=True, help_text="Optional. Set the percentage width of the instructions box. Images will fill width of instructions box by default.", verbose_name="Instructions image width (%)")
     is_a_formal_assessment = models.BooleanField(default=False, help_text="Marking this as a formal assessment (i.e. a test that counts to the student's grade) will put restrictions on this exercise, like preventing students from being able to check answers and only allowing a single attempt")
     is_published = models.BooleanField(default=True, verbose_name="Published")
-    owned_by = models.ForeignKey(User, related_name="exercise_owned_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The only teacher who can manage this exercise")
-    created_by = models.ForeignKey(User, related_name="exercise_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The teacher who originally created this exercise")
+    owned_by = models.ForeignKey(User, related_name="exercise_owned_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The person who is mainly responsible for managing this exercise")
+    collaborators = models.ManyToManyField(User, blank=True, related_name='exercises', help_text="Persons who can also manage this exercise, in addition to the owner")
+    created_by = models.ForeignKey(User, related_name="exercise_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The person who originally created this exercise")
     created_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Created")
     lastupdated_datetime = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
+
+    @property
+    def instructions_image_path(self):
+        return image_path(self.instructions_image, self.instructions_image_url)
 
     @property
     def image_match_label_options(self):
         """
         If this is an ImageMatch exercise:
-        Return an ordered list of all labels of image match objects that are used in this exercise
+        Return a randomly ordered list of all labels of image match objects that are used in this exercise
         """
         if self.exercise_format == ExerciseFormat.objects.get(name='Image Match'):
             labels = []
             for image_match_object in ExerciseFormatImageMatch.objects.filter(exercise=self):
                 labels.append(image_match_object.label)
-            random.shuffle(labels)  # important to mix up order
+            random.shuffle(labels)
             return labels
+
+    @property
+    def image_match_image_options(self):
+        """
+        If this is a reversed ImageMatch exercise:
+        Return a randomly ordered list of all image match objects that are used in this exercise
+        """
+        if self.exercise_format == ExerciseFormat.objects.get(name='Image Match'):
+            images = list(ExerciseFormatImageMatch.objects.filter(exercise=self))
+            random.shuffle(images)
+            return images
 
     @property
     def items(self):
@@ -226,6 +301,19 @@ class Exercise(models.Model):
     def items_count(self):
         return self.items.count()
 
+    @property
+    def font_size_css(self):
+        size = self.font_size.size_em if self.font_size else 1.0
+        return f'font-size: {size}em;'
+
+    @property
+    def instructions_processed(self):
+        return make_urls_clickable(self.instructions)
+
+    @property
+    def collaborators_list(self):
+        return ", ".join([str(c.name) for c in self.collaborators.all()]) if self.collaborators.all() else None
+
     def __str__(self):
         return self.name
 
@@ -246,10 +334,16 @@ class ExerciseFormatImageMatch(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    image = models.ImageField(upload_to='exercises-exerciseformat-imagematch')
+    image = models.ImageField(upload_to='exercises-exerciseformat-imagematch', blank=True, null=True, help_text='Optional if providing a URL to an image below, otherwise required.')
+    image_url = models.URLField(blank=True, null=True, help_text=f'{OPTIONAL_HELP_TEXT} {IMAGE_URL_HELP_TEXT}')
     label = models.CharField(max_length=255)
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    correct_answer_feedback_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=CORRECT_ANSWER_FEEDBACK_AUDIO_HELP_TEXT, blank=True, null=True)
     # no order field as these load in random order
+
+    @property
+    def image_path(self):
+        return image_path(self.image, self.image_url)
 
     def __str__(self):
         if self.exercise:
@@ -300,6 +394,7 @@ class ExerciseFormatMultipleChoice(models.Model):
     option_f_is_correct = models.BooleanField(default=False, verbose_name="Option F is correct")
 
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    correct_answer_feedback_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=CORRECT_ANSWER_FEEDBACK_AUDIO_HELP_TEXT, blank=True, null=True)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     @property
@@ -482,11 +577,12 @@ class ExerciseFormatSentenceBuilder(models.Model):
                                  on_delete=models.CASCADE,
                                  blank=True,
                                  null=True)
-    sentence_source = models.TextField(help_text=f"Provide an original source text in one language, which will be translated below. {OPTIONAL_IF_AUDIO_HELP_TEXT}", blank=True, null=True, verbose_name='source text')
+    sentence_source = models.TextField(help_text=f"{OPTIONAL_HELP_TEXT} Provide an original source text in one language, which will be translated below", blank=True, null=True, verbose_name='source text')
     sentence_source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='source audio')
     sentence_translated = models.TextField(help_text='Provide a translated/transcribed sentence of the above source text/audio. The words in this target text will be jumbled and the student will have to rebuild it in the correct order.', verbose_name='target text')
     sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate words with a space, e.g. "car apple tree"', blank=True, null=True, verbose_name='extra words for target text')
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    correct_answer_feedback_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=CORRECT_ANSWER_FEEDBACK_AUDIO_HELP_TEXT, blank=True, null=True)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
 
     @property
@@ -533,9 +629,15 @@ class ExerciseFormatTranslation(models.Model):
                                  null=True)
     translation_source_text = models.TextField(blank=True, null=True, help_text='Optional if provided source image instead, otherwise required', verbose_name='source text')
     translation_source_image = models.ImageField(upload_to='exercises-exerciseformat-translation', blank=True, null=True, help_text='Optional if provided source text instead, otherwise required', verbose_name='image of source text')
+    translation_source_image_url = models.URLField(blank=True, null=True, help_text=f'{OPTIONAL_HELP_TEXT} {IMAGE_URL_HELP_TEXT}', verbose_name='URL to image of source text')
     correct_translation = models.TextField(verbose_name='target text')
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
+    correct_answer_feedback_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=CORRECT_ANSWER_FEEDBACK_AUDIO_HELP_TEXT, blank=True, null=True)
     order = models.IntegerField(blank=True, null=True, help_text=EXERCISE_ITEM_ORDER_HELP_TEXT)
+
+    @property
+    def translation_source_image_path(self):
+        return image_path(self.translation_source_image, self.translation_source_image_url)
 
     def __str__(self):
         if self.exercise:

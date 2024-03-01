@@ -9,6 +9,7 @@ django/static/
 node_modules/
 private_testdata*
 outputdata/
+django/general/migrations/
 
 
 ###################### Django Templated gitignore paths  ######################

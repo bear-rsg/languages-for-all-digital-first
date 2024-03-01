@@ -4,6 +4,8 @@ from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMi
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404
+from functools import reduce
+from operator import (or_, and_)
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from account.models import User
@@ -106,7 +108,7 @@ class ExerciseCreateView(PermissionRequiredMixin, CreateView):
 
     template_name = 'exercises/exercise-add.html'
     model = models.Exercise
-    fields = ['name', 'language', 'exercise_format', 'theme', 'difficulty', 'instructions', 'instructions_image', 'instructions_image_width_percent', 'is_a_formal_assessment', 'is_published']
+    fields = ['name', 'language', 'exercise_format', 'exercise_format_reverse_image_match', 'theme', 'difficulty', 'font_size', 'instructions', 'instructions_image', 'instructions_image_url', 'instructions_image_width_percent', 'is_a_formal_assessment', 'is_published']
     permission_required = ('exercises.add_exercise')
     success_url = reverse_lazy('exercises:list')
 
@@ -132,7 +134,7 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
 
     template_name = 'exercises/exercise-edit.html'
     model = models.Exercise
-    fields = ['name', 'language', 'theme', 'difficulty', 'instructions', 'instructions_image', 'instructions_image_width_percent', 'is_a_formal_assessment', 'owned_by', 'is_published']
+    fields = ['name', 'language', 'exercise_format_reverse_image_match', 'theme', 'difficulty', 'font_size', 'instructions', 'instructions_image', 'instructions_image_url', 'instructions_image_width_percent', 'is_a_formal_assessment', 'owned_by', 'collaborators', 'is_published']
     permission_required = ('exercises.change_exercise')
 
     def get_queryset(self):
@@ -140,7 +142,7 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
         Only show this page if the current user is an admin or a teacher who owns the exercise
         """
         q = super().get_queryset()
-        return q if self.request.user.is_superuser else q.filter(owned_by=self.request.user)
+        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user | Q(collaborators__in=[self.request.user])))
 
     def get_success_url(self, **kwargs):
         """
@@ -208,7 +210,7 @@ class ExerciseDetailView(LoginRequiredMixin, DetailView):
     model = models.Exercise
 
     def get_queryset(self):
-        return self.model.objects.filter(Q(is_published=True) | Q(owned_by=self.request.user))
+        return self.model.objects.filter(Q(is_published=True) | Q(owned_by=self.request.user) | Q(collaborators__in=[self.request.user])).distinct()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -237,7 +239,32 @@ class ExerciseListView(LoginRequiredMixin, ListView):
         """
 
         # 1. Enforcing privacy rules
-        queryset = self.model.objects.filter(Q(is_published=True) | Q(owned_by=self.request.user))
+
+        # Only show published, unless user is owner or collaborator on exercise
+        queryset = self.model.objects.filter(
+            Q(is_published=True)
+            |
+            Q(owned_by=self.request.user)
+            |
+            Q(collaborators__in=[self.request.user])
+        ).distinct()
+
+        # Students can only see exercises if they're in that class
+        if self.request.user.role.name == 'student':
+            # Build list of filters: (language and difficulty)
+            filters = []
+            for school_class in self.request.user.classes.all():
+                filters.append(
+                    reduce(
+                        and_,
+                        (
+                            Q(language=school_class.language),
+                            Q(difficulty=school_class.difficulty)
+                        )
+                    )
+                )
+            # Apply filters to queryset (uses or_, as can be any)
+            queryset = queryset.filter(reduce(or_, filters))
 
         # 2. Searching
         search = self.request.GET.get('search', '').strip()
@@ -254,13 +281,8 @@ class ExerciseListView(LoginRequiredMixin, ListView):
         # 3. Filtering
         # language
         language = self.request.GET.get('language', '')
-        # if language is not specified and user is logged in, show default language
-        if language == '' and self.request.user.is_authenticated:
-            DEFAULT_LANGUAGE = User.objects.get(pk=self.request.user.id).default_language
-            if DEFAULT_LANGUAGE is not None:
-                queryset = queryset.filter(language=DEFAULT_LANGUAGE.id)
-        # else if language is specified, filter on that language
-        elif language not in ['*', '']:
+        # if language is specified, filter on that language
+        if language not in ['*', '']:
             queryset = queryset.filter(language=language)
         # format
         format = self.request.GET.get('format', '*')
@@ -294,15 +316,15 @@ class ExerciseListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Language
-        if self.request.user.is_authenticated:
-            DEFAULT_LANGUAGE = User.objects.get(pk=self.request.user.id).default_language
-            if DEFAULT_LANGUAGE is not None and self.request.GET.get('language') != '*':
-                context['language_id'] = DEFAULT_LANGUAGE.id
         # Organise
         context['organise'] = self.request.GET.get('organise', 'name')
         # Add data for related models, e.g. for populating select lists, etc.
-        context['languages'] = models.Language.objects.filter(is_published=True)
+        if self.request.user.role.name == 'student':
+            school_classes = models.SchoolClass.objects.filter(user__id=self.request.user.id)
+            languages = models.Language.objects.filter(is_published=True, schoolclass__in=school_classes)
+        else:
+            languages = models.Language.objects.filter(is_published=True)
+        context['languages'] = languages
         context['themes'] = models.Theme.objects.filter(is_published=True)
         context['formats'] = models.ExerciseFormat.objects.filter(is_published=True)
         context['difficulties'] = models.Difficulty.objects.all()
@@ -331,7 +353,7 @@ class ExerciseContentCreateView(PermissionRequiredMixin, CreateView):
         except self.model.DoesNotExist:
             raise Http404()
         # Only show if current user is admin or teacher who owns parent exercise
-        if self.request.user.is_superuser or exercise.owned_by == self.request.user:
+        if self.request.user.is_superuser or exercise.owned_by == self.request.user or self.request.user in exercise.collaborators:
             # Set the correct form
             if exercise.exercise_format.name == 'Multiple Choice':
                 return forms.ExerciseFormatMultipleChoiceForm
@@ -353,7 +375,7 @@ class ExerciseContentCreateView(PermissionRequiredMixin, CreateView):
         Only show this page if the current user is an admin or a teacher who owns the exercise
         """
         q = super().get_queryset()
-        return q if self.request.user.is_superuser else q.filter(exercise__owned_by=self.request.user)
+        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user | Q(collaborators__in=[self.request.user])))
 
     def form_valid(self, form, **kwargs):
         """
