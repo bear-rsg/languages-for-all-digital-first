@@ -156,19 +156,16 @@ class ImportDataProcessingView(AdminUserRequiredMixin, RedirectView):
 
                 # Get/create school class thrugh unique identifiers (year group, language, difficulty)
                 if str(user['year_group']) != 'nan' and str(user['language']) != 'nan' and str(user['difficulty']) != 'nan':
-                    school_class_obj = exercise_models.SchoolClass.objects.get_or_create(
+                    school_class_obj, school_class_is_new = exercise_models.SchoolClass.objects.get_or_create(
                         year_group=exercise_models.YearGroup.objects.get(name=user['year_group']),
                         language=exercise_models.Language.objects.get_or_create(name=user['language'])[0],
                         difficulty=exercise_models.Difficulty.objects.get(name=user['difficulty'])
-                    )[0]
-                    # Add the related class
-                    user_obj.classes.add(school_class_obj)
-
-                # Set default language (if provided, else None)
-                if str(user['language']) != 'nan':
-                    user_obj.default_language = exercise_models.Language.objects.get_or_create(name=user['language'])[0]
-                else:
-                    user_obj.default_language = None
+                    )
+                    # Add/remove the related class from user
+                    if 'remove_from_class' in user and str(user['remove_from_class']).lower() == 'y':
+                        user_obj.classes.remove(school_class_obj)
+                    else:
+                        user_obj.classes.add(school_class_obj)
 
                 # Add additional user data
                 user_obj.internal_id_number = str(user['internal_id_number']).replace('.0', '') if str(user['internal_id_number']) != 'nan' else ''

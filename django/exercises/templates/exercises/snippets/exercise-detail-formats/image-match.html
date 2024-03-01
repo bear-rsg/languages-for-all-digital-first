@@ -1,40 +1,88 @@
-{% for im in exercise.exerciseformatimagematch_set.all %}
+{# Standard image match layout #}
+{% if not exercise.exercise_format_reverse_image_match %}
+    {% for im in exercise.exerciseformatimagematch_set.all %}
 
-    <div class="exerciseformat-imagematch" id="exerciseformat-imagematch-{{ forloop.counter }}">
+        <div class="exerciseformat-imagematch" id="exerciseformat-imagematch-{{ forloop.counter }}">
 
-        <div class="exerciseformat-imagematch-title">Image {{ forloop.counter }}</div>
+            <div class="exerciseformat-imagematch-title">Image {{ forloop.counter }}</div>
 
-        <select dir="rtl">
-            <option value="">-- Please select --</option>
-            {% for label in exercise.image_match_label_options %}
-                {% comment %}Set value to 1 if a match or 0 if not a match{% endcomment %}
-                <option value="{% if im.label == label %}1{% else %}0{% endif %}" dir="auto">
-                    {{ label }}
-                </option>
-            {% endfor %}
-        </select>
+            <select dir="rtl">
+                <option value="">-- Please select --</option>
+                {% for label in exercise.image_match_label_options %}
+                    {% comment %}Set value to 1 if a match or 0 if not a match{% endcomment %}
+                    <option value="{% if im.label == label %}1{% else %}0{% endif %}" dir="auto">
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
 
-        <a href="{{ im.image.url }}" target="_blank">
-            <img src="{{ im.image.url }}" alt="Match the image to the label">
-        </a>
+            <a href="{{ im.image_path }}" target="_blank">
+                <img src="{{ im.image_path }}" alt="Match the image to the label">
+            </a>
 
-        {% if not exercise.is_a_formal_assessment %}
-            <div class="exerciseformat-showanswer">
-                <label><i class="fas fa-eye"></i> Show answer</label>
-                <div class="answer">
-                    <div class="answer-text">Answer: {{ im.label }}</div>
-                    {% if im.correct_answer_feedback %}
-                        <div class="answer-feedback">{{ im.correct_answer_feedback | safe }}</div>
-                    {% endif %}
+            {% if not exercise.is_a_formal_assessment %}
+                <div class="exerciseformat-showanswer">
+                    <label><i class="fas fa-eye"></i> Show answer</label>
+                    <div class="answer">
+                        <div class="answer-text">Answer: {{ im.label }}</div>
+                        {% if im.correct_answer_feedback or im.correct_answer_feedback_audio %}
+                            <div class="answer-feedback">
+                                {{ im.correct_answer_feedback | safe }}
+                                {% include "exercises/snippets/audio.html" with audio=im.correct_answer_feedback_audio id=forloop.counter|add:100000 %}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-            <div class="exerciseformat-imagematch-result">
-            </div>
-        {% endif %}
+                <div class="exerciseformat-imagematch-result">
+                </div>
+            {% endif %}
 
-        {% include 'exercises/snippets/exercise-content-edit-link.html' with id=im.id %}
+            {% include 'exercises/snippets/exercise-content-edit-link.html' with id=im.id %}
 
-    </div>
-{% empty %}
-    {% include 'exercises/snippets/exercise-content-empty.html' %}
-{% endfor %}
+        </div>
+    {% empty %}
+        {% include 'exercises/snippets/exercise-content-empty.html' %}
+    {% endfor %}
+
+
+
+{# Reversed image match layout #}
+{% else %}
+    {% for im in exercise.exerciseformatimagematch_set.all %}
+
+        <div class="exerciseformat-imagematchreversed" id="exerciseformat-imagematchreversed-{{ forloop.counter }}">
+
+            <div class="exerciseformat-imagematchreversed-title" dir="auto">{{ forloop.counter }}. {{ im.label }}</div>
+
+            {% for image in exercise.image_match_image_options %}
+                <div class="exerciseformat-imagematchreversed-image">
+                    {% comment %}Set value to 1 if a match or 0 if not a match{% endcomment %}
+                    <input type="radio" id="image-{{ forloop.parentloop.counter }}-{{ image.id }}" name="imagematchreversed-{{ forloop.parentloop.counter }}" value="{% if image.label == im.label %}1{% else %}0{% endif %}">
+
+                    <a href="{{ image.image_path }}" target="_blank">
+                        <img src="{{ image.image_path }}" alt="Match the image to the label">
+                    </a>
+                </div>
+            {% endfor %}
+
+            {% if not exercise.is_a_formal_assessment %}
+                <div class="exerciseformat-showanswer">
+                    <label><i class="fas fa-eye"></i> Show answer</label>
+                    <div class="answer">
+                        <div class="answer-text">Answer: <img src="{{ im.image_path }}" alt="image of answer"></div>
+                        {% if im.correct_answer_feedback %}
+                            <div class="answer-feedback">{{ im.correct_answer_feedback | safe }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="exerciseformat-imagematchreversed-result">
+                </div>
+            {% endif %}
+
+            {% include 'exercises/snippets/exercise-content-edit-link.html' with id=im.id %}
+
+        </div>
+    {% empty %}
+        {% include 'exercises/snippets/exercise-content-empty.html' %}
+    {% endfor %}
+{% endif %}

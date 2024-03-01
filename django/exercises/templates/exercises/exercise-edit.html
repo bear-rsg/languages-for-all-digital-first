@@ -15,4 +15,22 @@
     </div>
 </section>
 
+
+<script>
+    $(document).ready(function() {
+
+        // Show/hide specific fields dynamically
+        {% if exercise.exercise_format.name != 'Image Match' %}
+            $('#id_exercise_format_reverse_image_match').parent().hide();
+        {% endif %}
+        
+        // Filter select lists
+        // "Owned By" and "Collaborators" lists to hide students and guests
+        $('#id_owned_by option, #id_collaborators option').each(function(){
+            if ($(this).text().includes('(student)') || $(this).text().includes('(guest)')) $(this).remove();
+        });
+
+    });
+</script>
+
 {% endblock %}

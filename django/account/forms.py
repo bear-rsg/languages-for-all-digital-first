@@ -2,17 +2,6 @@ from django.contrib.auth.forms import UserChangeForm, PasswordChangeForm
 from .models import User
 
 
-class DashboardUserChangeForm(UserChangeForm):
-    """
-    Form to specify fields in the user change form, which is only accessible via the Django admin
-    It's used in admin.py
-    """
-
-    class Meta:
-        model = User
-        fields = ('first_name', 'last_name', 'email', 'role', 'default_language', 'classes')
-
-
 class PublicUserChangeForm(UserChangeForm):
     """
     Form to specify fields in the user change form, which is accessible through the public website
@@ -48,4 +37,4 @@ class PublicPasswordChangeForm(PasswordChangeForm):
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'default_language', 'classes')
+        fields = ('first_name', 'last_name', 'email', 'classes')

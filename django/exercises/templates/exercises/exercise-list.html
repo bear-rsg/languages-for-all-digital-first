@@ -10,7 +10,7 @@
             
             <!-- Filters: -->
             <!-- Language -->
-            {% include "exercises/snippets/list-head-select.html" with page='exercise' dataset=languages label='<i class="fas fa-globe-americas"></i> Language' id='language' default_value=language_id %}
+            {% include "exercises/snippets/list-head-select.html" with page='exercise' dataset=languages label='<i class="fas fa-globe-americas"></i> Language' id='language' %}
             <!-- Exercise Format -->
             {% include "exercises/snippets/list-head-select.html" with page='exercise' dataset=formats label='<i class="fas fa-dice"></i> Format' id='format' %}
             <!-- Theme -->
@@ -60,8 +60,8 @@
         {% endif %}
 
         {% for exercise in exercise_list %}
-            <!-- Only show exercises with content, unless admin or exercise owner -->
-            {% if user.is_superuser or exercise.owned_by == user or exercise.items_count %}
+            <!-- Only show exercises with content, unless admin or exercise owner/collaborator -->
+            {% if user.is_superuser or exercise.owned_by == user or user in exercise.collaborators or exercise.items_count %}
                 <!-- Organise: Exercise Format -->
                 {% if organise == 'exercise_format' %}
                     {% ifchanged exercise.exercise_format %}

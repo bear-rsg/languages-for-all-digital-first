@@ -603,26 +603,36 @@ main {
 }
 
 .exerciseformat-showanswer {
-    color: #505050;
+    color: #1779C5;
     font-size: 0.95em;
     display: none;
 }
 
 .exerciseformat-showanswer label {
     cursor: pointer;
+    font-size: 1.1em;
 }
 
 .exerciseformat-showanswer label:hover {
     opacity: 0.9;
 }
 
+.exerciseformat-showanswer label i {
+    font-size: 1.2em;
+}
+
 .exerciseformat-showanswer .answer {
     display: none;
     padding: 0.5em;
     margin-bottom: 1em;
-    background: #505050;
-    color: #EEE;
+    background: #1779C5;
+    color: #FFF;
     text-align: left;
+}
+
+.exerciseformat-showanswer .answer img {
+    max-width: 10em;
+    display: block;
 }
 
 .exerciseformat-showanswer .answer-feedback {
@@ -773,10 +783,41 @@ main {
     text-align: center;
 }
 
+
+/* Exercise: Detail: Format: ImageMatch (Reversed) */
+
+.exerciseformat-imagematchreversed {
+    margin: 5em 0;
+    overflow: hidden;
+    padding-bottom: 1em;
+    vertical-align: top;
+}
+
+.exerciseformat-imagematchreversed-title {
+    padding: 0.5em 0;
+    font-weight: bold;
+    font-size: 1.5em;
+}
+
+.exerciseformat-imagematchreversed-image {
+}
+
+.exerciseformat-imagematchreversed input {
+    display: block;
+    margin-bottom: 0.5em;
+    scale: 1.5;
+}
+
+.exerciseformat-imagematchreversed img {
+    width: 100%;
+    border: 1px solid #DDD;
+    cursor: zoom-in;
+}
+
 /* Exercise: Detail: Format: MultipleChoice */
 
 .exerciseformat-multiplechoice {
-    margin: 4em auto 10em auto;
+    margin: 3rem auto 7rem auto;
 }
 
 .exerciseformat-multiplechoice-question {

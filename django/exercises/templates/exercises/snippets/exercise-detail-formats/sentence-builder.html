@@ -6,7 +6,7 @@
         <div class="exerciseformat-sentencebuilder-question" dir="auto">
             {% include "exercises/snippets/force-dir-auto.html" with text=sb.sentence_source_text_or_audiomsg %}
             <div>
-                {{ forloop.counter }}. <span dir="auto">{{ sb.sentence_source_text_or_audiomsg }}</span>
+                {{ forloop.counter }}. <span dir="auto">{{ sb.sentence_source_text_or_audiomsg | safe }}</span>
                 {% include "exercises/snippets/audio.html" with audio=sb.sentence_source_audio id=forloop.counter|add:100000 %}
             </div>
         </div>
@@ -41,9 +41,12 @@
             <div class="exerciseformat-showanswer">
                 <label><i class="fas fa-eye"></i> Show answer</label>
                 <div class="answer" data-answer="{{ sb.sentence_translated }}">
-                    <div class="answer-text">Answer: {{ sb.sentence_translated }}</div>
-                    {% if sb.correct_answer_feedback %}
-                        <div class="answer-feedback">{{ sb.correct_answer_feedback | safe }}</div>
+                    <div class="answer-text">Answer: {{ sb.sentence_translated | safe }}</div>
+                    {% if sb.correct_answer_feedback or sb.correct_answer_feedback_audio %}
+                        <div class="answer-feedback">
+                            {{ sb.correct_answer_feedback | safe }}
+                            {% include "exercises/snippets/audio.html" with audio=sb.correct_answer_feedback_audio id=forloop.counter|add:100000 %}
+                        </div>
                     {% endif %}
                 </div>
             </div>

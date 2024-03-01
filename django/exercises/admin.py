@@ -118,6 +118,24 @@ class DifficultyAdminView(admin.ModelAdmin):
         return False
 
 
+class FontSizeAdminView(admin.ModelAdmin):
+    """
+    Customise the admin interface: FontSize
+    """
+    list_display = ('name', 'size_em')
+    list_display_links = ('name',)
+    search_fields = ('name', 'size_em')
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 class ExerciseAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: Exercise
@@ -186,6 +204,7 @@ admin.site.register(models.Language, LanguageAdminView)
 admin.site.register(models.SchoolClass, SchoolClassAdminView)
 admin.site.register(models.Theme, ThemeAdminView)
 admin.site.register(models.Difficulty, DifficultyAdminView)
+admin.site.register(models.FontSize, FontSizeAdminView)
 admin.site.register(models.Exercise, ExerciseAdminView)
 
 admin.site.register(models.SchoolClassAlertExercise, SchoolClassAlertExerciseAdminView)

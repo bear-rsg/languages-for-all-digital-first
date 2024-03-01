@@ -1,5 +1,7 @@
-{% if perms.exercises.change_exercise and exercise.owned_by == user %}
-    <a href="{% url 'exercises:content-edit' exercise.id id %}" class="admin-link exercise-content-edit">
-        <i class="fas fa-pen"></i> Edit
-    </a>
+{% if perms.exercises.change_exercise %}
+    {% if exercise.owned_by == user or user in exercise.collaborators.all %}
+        <a href="{% url 'exercises:content-edit' exercise.id id %}" class="admin-link exercise-content-edit">
+            <i class="fas fa-pen"></i> Edit
+        </a>
+    {% endif %}
 {% endif %}
