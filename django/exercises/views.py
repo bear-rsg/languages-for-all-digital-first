@@ -142,7 +142,7 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
         Only show this page if the current user is an admin or a teacher who owns the exercise
         """
         q = super().get_queryset()
-        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user) | Q(collaborators__in=[self.request.user]))
+        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user) | Q(collaborators__in=[self.request.user])).distinct()
 
     def get_success_url(self, **kwargs):
         """
@@ -375,7 +375,7 @@ class ExerciseContentCreateView(PermissionRequiredMixin, CreateView):
         Only show this page if the current user is an admin or a teacher who owns the exercise
         """
         q = super().get_queryset()
-        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user) | Q(collaborators__in=[self.request.user]))
+        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user) | Q(collaborators__in=[self.request.user])).distinct()
 
     def form_valid(self, form, **kwargs):
         """
