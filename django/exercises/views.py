@@ -15,6 +15,23 @@ from .exportdata.studentscores import exportstudentscores
 import os
 
 
+def custom_permission_exercise_edit(user, exercise_obj):
+    """
+    Allow a specific/custom permission for editing exercises
+    Exercises can be edited if the user is:
+    - An admin
+    - The owner of the exercise
+    - A collaborator
+
+    Return True if at least one of these conditions is met, else return false
+    """
+
+    return \
+        user.is_superuser \
+        or exercise_obj.owned_by == user \
+        or user in exercise_obj.collaborators.all()
+
+
 # UserExerciseAttempt
 
 
@@ -137,12 +154,15 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
     fields = ['name', 'language', 'exercise_format_reverse_image_match', 'theme', 'difficulty', 'font_size', 'instructions', 'instructions_image', 'instructions_image_url', 'instructions_image_width_percent', 'is_a_formal_assessment', 'owned_by', 'collaborators', 'is_published']
     permission_required = ('exercises.change_exercise')
 
-    def get_queryset(self):
+    def get_object(self):
         """
-        Only show this page if the current user is an admin or a teacher who owns the exercise
+        Only show this page if the current user passes custom permission check
         """
-        q = super().get_queryset()
-        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user) | Q(collaborators__in=[self.request.user])).distinct()
+        exercise = super().get_object()
+        if custom_permission_exercise_edit(self.request.user, exercise):
+            return exercise
+        else:
+            raise PermissionDenied()
 
     def get_success_url(self, **kwargs):
         """
@@ -214,6 +234,7 @@ class ExerciseDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['custom_permission_exercise_edit'] = custom_permission_exercise_edit(self.request.user, self.object)
         # If user is logged in, return past scores for current exercise
         if self.request.user.is_authenticated:
             context['pastscores'] = models.UserExerciseAttempt.objects.filter(exercise=self.object, user=self.request.user)
@@ -353,7 +374,7 @@ class ExerciseContentCreateView(PermissionRequiredMixin, CreateView):
         except self.model.DoesNotExist:
             raise Http404()
         # Only show if current user is admin or teacher who owns parent exercise
-        if self.request.user.is_superuser or exercise.owned_by == self.request.user or self.request.user in exercise.collaborators:
+        if custom_permission_exercise_edit(self.request.user, exercise):
             # Set the correct form
             if exercise.exercise_format.name == 'Multiple Choice':
                 return forms.ExerciseFormatMultipleChoiceForm
@@ -369,13 +390,6 @@ class ExerciseContentCreateView(PermissionRequiredMixin, CreateView):
                 return forms.ExerciseFormatExternalForm
         else:
             raise PermissionDenied()
-
-    def get_queryset(self):
-        """
-        Only show this page if the current user is an admin or a teacher who owns the exercise
-        """
-        q = super().get_queryset()
-        return q if self.request.user.is_superuser else q.filter(Q(owned_by=self.request.user) | Q(collaborators__in=[self.request.user])).distinct()
 
     def form_valid(self, form, **kwargs):
         """
@@ -416,19 +430,23 @@ class ExerciseContentUpdateView(PermissionRequiredMixin, UpdateView):
             exercise = models.Exercise.objects.get(pk=self.kwargs['pk_exercise'])
         except self.model.DoesNotExist:
             raise Http404()
-        # Set the correct queryset
-        if exercise.exercise_format.name == 'Multiple Choice':
-            return models.ExerciseFormatMultipleChoice.objects.all()
-        elif exercise.exercise_format.name == 'Fill in the Blank':
-            return models.ExerciseFormatFillInTheBlank.objects.all()
-        elif exercise.exercise_format.name == 'Image Match':
-            return models.ExerciseFormatImageMatch.objects.all()
-        elif exercise.exercise_format.name == 'Sentence Builder':
-            return models.ExerciseFormatSentenceBuilder.objects.all()
-        elif exercise.exercise_format.name == 'Translation':
-            return models.ExerciseFormatTranslation.objects.all()
-        elif exercise.exercise_format.name == 'External':
-            return models.ExerciseFormatExternal.objects.all()
+        # Only show if current user is admin or teacher who owns parent exercise
+        if custom_permission_exercise_edit(self.request.user, exercise):
+            # Set the correct queryset
+            if exercise.exercise_format.name == 'Multiple Choice':
+                return models.ExerciseFormatMultipleChoice.objects.all()
+            elif exercise.exercise_format.name == 'Fill in the Blank':
+                return models.ExerciseFormatFillInTheBlank.objects.all()
+            elif exercise.exercise_format.name == 'Image Match':
+                return models.ExerciseFormatImageMatch.objects.all()
+            elif exercise.exercise_format.name == 'Sentence Builder':
+                return models.ExerciseFormatSentenceBuilder.objects.all()
+            elif exercise.exercise_format.name == 'Translation':
+                return models.ExerciseFormatTranslation.objects.all()
+            elif exercise.exercise_format.name == 'External':
+                return models.ExerciseFormatExternal.objects.all()
+        else:
+            raise PermissionDenied()
 
     def get_form_class(self, **kwargs):
         """
