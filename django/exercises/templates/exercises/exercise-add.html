@@ -25,9 +25,9 @@
         }).trigger('click');
         
         // Filter select lists
-        // "Owned By" and "Collaborators" lists to hide students and guests
+        // "Owned By" and "Collaborators" lists to hide non-teacher users
         $('#id_owned_by option, #id_collaborators option').each(function(){
-            if ($(this).text().includes('(student)') || $(this).text().includes('(guest)')) $(this).remove();
+            if (!$(this).text().includes('(teacher)')) $(this).remove();
         });
 
     });

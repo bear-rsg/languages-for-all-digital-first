@@ -60,8 +60,8 @@
         {% endif %}
 
         {% for exercise in exercise_list %}
-            <!-- Only show exercises with content, unless admin or exercise owner/collaborator -->
-            {% if user.is_superuser or exercise.owned_by == user or user in exercise.collaborators or exercise.items_count %}
+            <!-- Only show exercises with content, unless user can edit -->
+            {% if custom_permission_exercise_edit or exercise.items_count %}
                 <!-- Organise: Exercise Format -->
                 {% if organise == 'exercise_format' %}
                     {% ifchanged exercise.exercise_format %}
