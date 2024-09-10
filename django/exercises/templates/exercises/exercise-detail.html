@@ -75,7 +75,7 @@
                     </div>
                 </div>
 
-                {% if exercise.owned_by == user or user in exercise.collaborators.all %}
+                {% if custom_permission_exercise_edit %}
                     <!-- Edit -->
                     <a id="exercise-controls-edit" class="admin-link" href="{% url 'exercises:edit' exercise.id %}">
                         <i class="fas fa-pen"></i> Edit
@@ -115,12 +115,10 @@
 
 <section id="exercise-content" class="container" style="{{ exercise.font_size_css }}">
 
-    {% if perms.exercises.change_exercise %}
-        {% if exercise.owned_by == user or user in exercise.collaborators.all %}
-            <a id="exercise-content-add" class="admin-link" href="{% url 'exercises:content-add' exercise.id %}">
-                <i class="fas fa-plus"></i> Add item to exercise
-            </a>
-        {% endif %}
+    {% if custom_permission_exercise_edit %}
+        <a id="exercise-content-add" class="admin-link" href="{% url 'exercises:content-add' exercise.id %}">
+            <i class="fas fa-plus"></i> Add item to exercise
+        </a>
     {% endif %}
 
     <!-- Exercise format specific content -->
