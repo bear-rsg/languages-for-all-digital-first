@@ -90,9 +90,8 @@ $(document).ready(function() {
             let newSentence = sentenceWords.join(" ");
             // Set the new sentence text (remove the last word)
             thisSentence.text(newSentence);
-            // Create the new word button
-            let newButtonHtml = `<button value="${ sentenceLastWord }" dir="auto">${ sentenceLastWord }</button>`
-            $(this).parent().find('.exerciseformat-sentencebuilder-words').append(newButtonHtml);
+            // Show the last word button
+            $(this).parent().find(`.exerciseformat-sentencebuilder-words button[value="${ sentenceLastWord }"]`).prop('disabled', false);
             // Clear results for this answer
             $(this).parent().parent().find('.exerciseformat-sentencebuilder-result').html('');
         }

@@ -5,14 +5,24 @@ from django.contrib.auth.models import Group
 from .models import User, UsersImportSpreadsheet
 
 
-def delete_users(modeladmin, request, queryset):
+def users_active(modeladmin, request, queryset):
     """
-    Sets all selected items in queryset to published
+    Sets all selected users in queryset as 'active'
     """
-    queryset.delete()
+    queryset.update(is_active=True)
 
 
-delete_users.short_description = "PERMANENTLY DELETE selected users from database"
+users_active.short_description = "Make selected users 'active' (they can login)"
+
+
+def users_inactive(modeladmin, request, queryset):
+    """
+    Sets all selected users in queryset as 'inactive'
+    """
+    queryset.update(is_active=False)
+
+
+users_inactive.short_description = "Make selected users 'inactive' (they can not login)"
 
 
 class UsersImportSpreadsheetAdmin(admin.ModelAdmin):
@@ -59,10 +69,13 @@ class UserAdmin(DjangoUserAdmin):
               'date_joined',
               'last_login')
     fieldsets = None
-    actions = (delete_users,)
+    actions = (users_active, users_inactive)
     ordering = ['first_name', 'last_name']
 
     def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
         return False
 
     def has_change_permission(self, request, obj=None):
