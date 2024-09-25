@@ -125,7 +125,7 @@ class ExerciseCreateView(PermissionRequiredMixin, CreateView):
 
     template_name = 'exercises/exercise-add.html'
     model = models.Exercise
-    fields = ['name', 'language', 'exercise_format', 'exercise_format_reverse_image_match', 'theme', 'difficulty', 'font_size', 'instructions', 'instructions_image', 'instructions_image_url', 'instructions_image_width_percent', 'is_a_formal_assessment', 'is_published']
+    fields = ['name', 'language', 'exercise_format', 'exercise_format_reverse_image_match', 'theme', 'difficulty', 'font_size', 'instructions', 'instructions_image', 'instructions_image_url', 'instructions_image_width_percent', 'instructions_video_url', 'is_a_formal_assessment', 'is_published']
     permission_required = ('exercises.add_exercise')
     success_url = reverse_lazy('exercises:list')
 
@@ -151,7 +151,7 @@ class ExerciseUpdateView(PermissionRequiredMixin, UpdateView):
 
     template_name = 'exercises/exercise-edit.html'
     model = models.Exercise
-    fields = ['name', 'language', 'exercise_format_reverse_image_match', 'theme', 'difficulty', 'font_size', 'instructions', 'instructions_image', 'instructions_image_url', 'instructions_image_width_percent', 'is_a_formal_assessment', 'owned_by', 'collaborators', 'is_published']
+    fields = ['name', 'language', 'exercise_format_reverse_image_match', 'theme', 'difficulty', 'font_size', 'instructions', 'instructions_image', 'instructions_image_url', 'instructions_image_width_percent', 'instructions_video_url', 'is_a_formal_assessment', 'owned_by', 'collaborators', 'is_published']
     permission_required = ('exercises.change_exercise')
 
     def get_object(self):

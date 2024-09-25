@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static embed_video_tags %}
 
 {% block main %}
 
@@ -95,6 +95,14 @@
             <!-- Image -->
             {% if exercise.instructions_image_path %}
                 <a href="{{ exercise.instructions_image_path }}"><img src="{{ exercise.instructions_image_path }}" alt="exercise instructions image"{% if exercise.instructions_image_width_percent %} style="width: {{ exercise.instructions_image_width_percent }}%;"{% endif %}></a>
+            {% endif %}
+            <!-- Video -->
+            {% if exercise.instructions_video_url %}
+                <div id="exercise-detail-instructions-video" class="video-container">
+                    {% video exercise.instructions_video_url as instructions_video %}
+                        {% video instructions_video %}
+                    {% endvideo %}
+                </div>
             {% endif %}
         </div>
         {% if user.is_staff %}
@@ -312,11 +320,12 @@ $(document).ready(function() {
 
     // Click to prompt confirm submission of exercise attempt
     $('#exercise-detail-footer-completed').on('click', function(){
+        $('.exerciseformat-showanswer, .answer').show();
         {% if exercise.exercise_format.is_marked_automatically_by_system %}
             // Add score to popup
             $('#exercise-attempt-popup-score').text(totalScorePercent);
             // Set score val in exercise attempt form
-            if(totalScorePercent == '0') totalScorePercent=0.1 // 0 is ignored by backend, so change to 0.1 (will be rounded to 0)
+            if(totalScorePercent == '0') totalScorePercent=0.1; // 0 is ignored by backend, so change to 0.1 (will be rounded to 0)
             $('#exercise-attempt-form-score').val(totalScorePercent);
         {% endif %}
 
@@ -380,8 +389,6 @@ $(document).ready(function() {
         });
         // Store the hidden value as a JSON string, ready to pass to back-end
         if (attempt_detail.length) $('#exercise-attempt-form-attemptdetail').val(JSON.stringify(attempt_detail))
-
-        console.log(attempt_detail)
     });
 
     // Calculate how long it takes the user to attempt the exercise
