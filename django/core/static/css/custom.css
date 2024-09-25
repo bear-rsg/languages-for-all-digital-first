@@ -121,7 +121,7 @@ select {
 
 .popup {
     display: none;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(0, 0, 0, 0.2);
     position: fixed;
     top: 0;
     left: 0;
@@ -563,6 +563,10 @@ main {
     margin: 2em auto;
 }
 
+#exercise-detail-instructions-video {
+    margin: 2em auto;
+}
+
 #exercise-detail-ownership {
     font-size: 0.8em;
     margin-top: -3em;
@@ -916,7 +920,7 @@ main {
 .exerciseformat-sentencebuilder-undo,
 .exerciseformat-sentencebuilder-checkanswer,
 .exerciseformat-sentencebuilder-restart {
-    float: left;
+    float: right;
     clear: both;
     font-size: 0.95em;
     color: #505050;

@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from account.models import User, UserRole
 from datetime import date
+from embed_video.fields import EmbedVideoField
 import random
 import re
 
@@ -51,7 +52,7 @@ def make_urls_clickable(text):
     Find all urls in text and add suitable html <a> tag to make them 'clickable' on the website
     """
     # If a valid string with content
-    if type(text) == str and text != '':
+    if type(text) is str and text != '':
         # Regex to find all urls in the provided text
         urls = re.findall(r'''(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))''', text)  # NOQA
         # Loop through all urls found in text
@@ -244,6 +245,7 @@ class Exercise(models.Model):
     instructions_image = models.ImageField(upload_to='exercises-exercise-instructions', blank=True, null=True, help_text=OPTIONAL_HELP_TEXT + " Include an image here to illustrate the instructions for the entire exercise. E.g. if all questions relate to this image.")
     instructions_image_url = models.URLField(blank=True, null=True, help_text=f'{OPTIONAL_HELP_TEXT} {IMAGE_URL_HELP_TEXT}')
     instructions_image_width_percent = models.IntegerField(blank=True, null=True, help_text="Optional. Set the percentage width of the instructions box. Images will fill width of instructions box by default.", verbose_name="Instructions image width (%)")
+    instructions_video_url = EmbedVideoField(blank=True, null=True, help_text=f'{OPTIONAL_HELP_TEXT} Provide the URL of a YouTube or Vimeo video to include the embedded video in the exercise instructions.')
     is_a_formal_assessment = models.BooleanField(default=False, help_text="Marking this as a formal assessment (i.e. a test that counts to the student's grade) will put restrictions on this exercise, like preventing students from being able to check answers and only allowing a single attempt")
     is_published = models.BooleanField(default=True, verbose_name="Published")
     owned_by = models.ForeignKey(User, related_name="exercise_owned_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The person who is mainly responsible for managing this exercise")
