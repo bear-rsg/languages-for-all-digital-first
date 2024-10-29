@@ -581,7 +581,7 @@ class ExerciseFormatSentenceBuilder(models.Model):
                                  null=True)
     sentence_source = models.TextField(help_text=f"{OPTIONAL_HELP_TEXT} Provide an original source text in one language, which will be translated below", blank=True, null=True, verbose_name='source text')
     sentence_source_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=AUDIO_HELP_TEXT, blank=True, null=True, verbose_name='source audio')
-    sentence_translated = models.TextField(help_text='Provide a translated/transcribed sentence of the above source text/audio. The words in this target text will be jumbled and the student will have to rebuild it in the correct order.', verbose_name='target text')
+    sentence_translated = models.TextField(help_text='Provide a translated/transcribed sentence of the above source text/audio. The sentence will be separated into words automatically. If you instead want to set custom breakpoints to group words together then simply insert a * at each point, e.g. "this is * an example of * multiple words grouped * together". The words in this target text will be jumbled and the student will have to rebuild it in the correct order.', verbose_name='target text')  # NOQA
     sentence_translated_extra_words = models.TextField(help_text='(Optional) Include extra words to show as options to make the exercise more challenging. Separate words with a space, e.g. "car apple tree"', blank=True, null=True, verbose_name='extra words for target text')
     correct_answer_feedback = models.TextField(blank=True, null=True, help_text=CORRECT_ANSWER_FEEDBACK_HELP_TEXT)
     correct_answer_feedback_audio = models.FileField(upload_to=AUDIO_UPLOAD_PATH, help_text=CORRECT_ANSWER_FEEDBACK_AUDIO_HELP_TEXT, blank=True, null=True)
@@ -597,9 +597,17 @@ class ExerciseFormatSentenceBuilder(models.Model):
         Return the list of words that will be shown as options for building the translated sentence
         I.e. join sentence_translated and sentence_translated_extra_words into a randomly ordered list
         """
-        words = self.sentence_translated.split() + self.sentence_translated_extra_words.split()
-        random.shuffle(words)
-        return words
+        all_words = []
+        # Words
+        sep = '*' if '*' in self.sentence_translated else ' '
+        all_words += self.sentence_translated.split(sep)
+        # Extra words
+        sep = '*' if '*' in self.sentence_translated_extra_words else ' '
+        all_words += self.sentence_translated_extra_words.split(sep)
+        # Shuffle
+        random.shuffle(all_words)
+        # Remove any whitespace around individual words and return full list
+        return [word.strip() for word in all_words if len(word)]
 
     def has_audio(self):
         return bool(self.sentence_source_audio)
