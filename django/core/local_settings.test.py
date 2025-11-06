@@ -29,6 +29,10 @@ DATABASES = {
     }
 }
 
+# Provide the username for users that can edit users directly in admin dashboard
+# This should be strictly kept to a minimum, e.g. just the software developer
+CAN_MANAGE_USERS_IN_ADMIN_DASHBOARD = ('...@bham.ac.uk',)
+
 # Provide the email address for the site admin (e.g. the researcher/research team)
 ADMIN_EMAIL = '...@bham.ac.uk'
 

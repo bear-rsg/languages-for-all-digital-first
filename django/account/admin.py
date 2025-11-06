@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 from django.contrib.auth.forms import UserChangeForm
@@ -64,6 +65,7 @@ class UserAdmin(DjangoUserAdmin):
               'internal_id_number',
               'is_staff',
               'is_superuser',
+              'api_key',
               'classes',
               'is_active',
               'date_joined',
@@ -73,17 +75,22 @@ class UserAdmin(DjangoUserAdmin):
     ordering = ['first_name', 'last_name']
 
     def has_add_permission(self, request, obj=None):
+        if request.user.username in settings.CAN_MANAGE_USERS_IN_ADMIN_DASHBOARD:
+            return True
         return False
 
     def has_delete_permission(self, request, obj=None):
+        if request.user.username in settings.CAN_MANAGE_USERS_IN_ADMIN_DASHBOARD:
+            return True
         return False
 
     def has_change_permission(self, request, obj=None):
-        # Only allow changes to the password
+        if request.user.username in settings.CAN_MANAGE_USERS_IN_ADMIN_DASHBOARD:
+            return True
+        # Can change the password for users
         if '/password/' in request.get_full_path():
             return True
-        else:
-            return False
+        return False
 
 
 # Register above ModelAdmins

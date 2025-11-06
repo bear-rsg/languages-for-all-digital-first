@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMixin)
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from functools import reduce
 from operator import (or_, and_)
 from django.shortcuts import redirect
@@ -11,7 +11,7 @@ from django.urls import reverse_lazy
 from account.models import User
 from . import models
 from . import forms
-from .exportdata.studentscores import exportstudentscores
+from .exportdata.studentscores import export_studentscores_excel
 import os
 
 
@@ -75,44 +75,6 @@ class UserExerciseAttemptSuccessTemplateView(TemplateView):
         # Get the last attempt of this user (i.e. the one that has just been completed)
         context['last_attempt'] = models.UserExerciseAttempt.objects.filter(user=self.request.user).order_by('-submit_timestamp').first()
         return context
-
-
-# Export Data: Student Scores
-
-
-class ExportDataStudentScoresOptionsTemplateView(LoginRequiredMixin, TemplateView):
-    """
-    Class-based view for export data: student scores options template
-    """
-    template_name = 'exercises/exportdata-studentscores-options.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Return all classes if user is an admin
-        if self.request.user.role.name == 'admin':
-            context['classes'] = models.SchoolClass.objects.all()
-        elif self.request.user.role.name == 'teacher':
-            context['classes'] = models.SchoolClass.objects.filter(user__id=self.request.user.id)
-
-        return context
-
-
-@login_required
-def exportdata_studentscores(request):
-    """
-    Creates an Excel spreadsheet containing student scores and return it to the user to download
-    """
-
-    # Only allow admins and teachers to export scores
-    if request.user.role.name in ['admin', 'teacher']:
-        file_path = exportstudentscores.create_workbook(request)
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
-                response['Content-Disposition'] = f'inline; filename={os.path.basename(file_path)}'
-                return response
-    raise Http404
 
 
 # Exercise
@@ -534,3 +496,141 @@ class ExerciseContentDeleteView(PermissionRequiredMixin, DeleteView):
         Redirect to the current exercise that this createview is adding content to
         """
         return reverse_lazy('exercises:detail', kwargs={'pk': self.kwargs['pk_exercise']})
+
+
+# Export Data: Student Scores (Excel)
+
+
+class ExportDataStudentScoresExcelOptionsTemplateView(LoginRequiredMixin, TemplateView):
+    """
+    Class-based view for export data: student scores options template
+    """
+    template_name = 'exercises/exportdata-studentscores-excel-options.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Return all classes if user is an admin
+        if self.request.user.role.name == 'admin':
+            context['classes'] = models.SchoolClass.objects.all()
+        elif self.request.user.role.name == 'teacher':
+            context['classes'] = models.SchoolClass.objects.filter(user__id=self.request.user.id)
+
+        return context
+
+
+@login_required
+def exportdata_studentscores_excel(request):
+    """
+    Creates an Excel spreadsheet containing student scores and return it to the user to download
+    """
+
+    # Only allow admins and teachers to export scores
+    if request.user.role.name in ['admin', 'teacher']:
+        file_path = export_studentscores_excel.create_workbook(request)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+                response['Content-Disposition'] = f'inline; filename={os.path.basename(file_path)}'
+                return response
+    raise Http404
+
+
+# Export Data: Exercises (JSON)
+
+
+def api_authentication(request):
+    """
+    Complete authentication checks and return a tuple of: (True/False, message)
+    """
+
+    username = request.GET.get('username')
+    api_key = request.GET.get('api_key')
+    if not (username and api_key):
+        return (False, 'Authentication parameters not provided: username, api_key')
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return (False, 'Authentication failed: no user found with this username')
+    if not user.api_authentication(api_key):
+        return (False, 'Authentication failed: no user found with matching username and api_key')
+    # Passes authentication check
+    return (True, 'Authentication success')
+
+
+def exportdata_exercises_json(request):
+    """
+    Returns JSON data containing Exercise objects and related data
+    Requires 'username' and 'api_key' in GET query parameters.
+    """
+
+    if request.method != 'GET':
+        return JsonResponse({'error': 'GET required'}, status=405)
+
+    # User Authentication
+    authentication_success, authentication_msg = api_authentication(request)
+    if not authentication_success:
+        return JsonResponse({'error': authentication_msg}, status=400)
+
+    # Define the Exercise data to include
+    exercises = models.Exercise.objects.all().select_related(
+        'exercise_format',
+        'language',
+        'theme',
+        'difficulty',
+        'owned_by',
+        'created_by'
+    ).order_by('id')
+    exercises_list = []
+
+    # Loop through the objects and build a dictionary for each
+    for exercise in exercises:
+        # Build exercise items data for current Exercise object
+        exercise_items_model = None
+        exercise_items_data = None
+        # Determine the model
+        exercise_format = exercise.exercise_format.name.lower()
+        if exercise_format == 'image match':
+            exercise_items_model = models.ExerciseFormatImageMatch
+        elif exercise_format == 'multiple choice':
+            exercise_items_model = models.ExerciseFormatMultipleChoice
+        elif exercise_format == 'fill in the blank':
+            exercise_items_model = models.ExerciseFormatFillInTheBlank
+        elif exercise_format == 'sentence builder':
+            exercise_items_model = models.ExerciseFormatSentenceBuilder
+        elif exercise_format == 'translation':
+            exercise_items_model = models.ExerciseFormatTranslation
+        elif exercise_format == 'external':
+            exercise_items_model = models.ExerciseFormatExternal
+
+        # Get all data for objects of the chosen model that belong to this Exercise
+        if exercise_items_model:
+            exercise_items_data = list(exercise_items_model.objects.filter(exercise=exercise).values())
+
+        # Add this Exercise to the list of exercises
+        exercises_list.append({
+            'id': exercise.id,
+            'name': exercise.name,
+            'language': str(exercise.language),
+            'exercise_format': str(exercise.exercise_format),
+            'exercise_format_reverse_image_match': exercise.exercise_format_reverse_image_match,
+            'theme': str(exercise.theme),
+            'difficulty': str(exercise.difficulty),
+            'font_size': exercise.font_size,
+            'instructions': exercise.instructions,
+            'instructions_image': exercise.instructions_image.url if exercise.instructions_image else None,
+            'instructions_image_url': exercise.instructions_image_url,
+            'instructions_image_width_percent': exercise.instructions_image_width_percent,
+            'instructions_video_url': exercise.instructions_video_url,
+            'is_a_formal_assessment': exercise.is_a_formal_assessment,
+            'is_published': exercise.is_published,
+            'owned_by': str(exercise.owned_by),
+            'created_by': str(exercise.created_by),
+            'created_datetime': exercise.created_datetime,
+            'lastupdated_datetime': exercise.lastupdated_datetime,
+
+            # Exercise items data
+            'exercise_items': exercise_items_data
+        })
+
+    return JsonResponse(exercises_list, safe=False)

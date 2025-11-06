@@ -60,6 +60,7 @@ class User(AbstractUser):
     is_internal = models.BooleanField(default=True, help_text='Is internal to the University of Birmingham, e.g. an active UoB student or staff member')
     internal_id_number = models.CharField(max_length=255, help_text='If internal to the University of Birmingham, please provide a unique ID, e.g. student number, staff number', blank=True)
     classes = models.ManyToManyField('exercises.SchoolClass', blank=True)
+    api_key = models.CharField(max_length=255, blank=True, null=True, help_text='Provide an API key to export data via API with this user')
 
     @property
     def name(self):
@@ -99,6 +100,13 @@ class User(AbstractUser):
                 if a.is_active and a.exercise.id not in self.exercises_completed:
                     exercises.append(a.exercise.id)
         return exercises
+
+    def api_authentication(self, api_key):
+        """
+        Ensure this user has provided a valid API key to interact with the web API
+        Return True if authenticated successfully or False if authentication fails
+        """
+        return self.api_key and self.api_key == api_key
 
     def __str__(self):
         return f'{self.name} - {self.username} ({self.role})'
