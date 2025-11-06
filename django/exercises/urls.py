@@ -21,7 +21,10 @@ urlpatterns = [
     path('<pk_exercise>/content/<pk>/edit/', views.ExerciseContentUpdateView.as_view(), name='content-edit'),
     path('<pk_exercise>/content/<pk>/delete/', views.ExerciseContentDeleteView.as_view(), name='content-delete'),
 
-    # Export data: student scores
-    path('exportdata/studentscores/options/', views.ExportDataStudentScoresOptionsTemplateView.as_view(), name='export-studentscores-options'),
-    path('exportdata/studentscores/', views.exportdata_studentscores, name='export-studentscores'),
+    # Export data: student scores (Excel)
+    path('exportdata/studentscores/excel/options/', views.ExportDataStudentScoresExcelOptionsTemplateView.as_view(), name='exportdata-studentscores-excel-options'),
+    path('exportdata/studentscores/excel/', views.exportdata_studentscores_excel, name='exportdata-studentscores-excel'),
+
+    # Export data: exercises (JSON)
+    path('exportdata/exercises/json/', views.exportdata_exercises_json, name='exportdata-exercises-json'),
 ]

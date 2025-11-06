@@ -18,7 +18,7 @@
         <a href="{% url 'account:importdata-confirm' %}">{% translate 'Import Users' %}</a> /
     {% endif %}
     {% if user.is_active and user.is_staff %}
-        <a href="{% url 'exercises:export-studentscores-options' %}">{% translate 'Export Student Scores' %}</a> /
+        <a href="{% url 'exercises:exportdata-studentscores-excel-options' %}">{% translate 'Export Student Scores' %}</a> /
     {% endif %}
     {% if user.has_usable_password %}
         <a href="{% url 'admin:password_change' %}">{% translate 'Change password' %}</a> /
