@@ -3,7 +3,6 @@ from django.db.models import Q
 from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMixin)
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404, JsonResponse
 from functools import reduce
 from operator import (or_, and_)
@@ -14,7 +13,6 @@ from . import models
 from . import forms
 from .exportdata.studentscores import export_studentscores_excel
 import os
-import json
 
 
 def custom_permission_exercise_edit(user, exercise_obj):
@@ -498,7 +496,6 @@ class ExerciseContentDeleteView(PermissionRequiredMixin, DeleteView):
         Redirect to the current exercise that this createview is adding content to
         """
         return reverse_lazy('exercises:detail', kwargs={'pk': self.kwargs['pk_exercise']})
-
 
 
 # Export Data: Student Scores (Excel)
