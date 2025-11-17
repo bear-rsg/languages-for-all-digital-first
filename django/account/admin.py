@@ -58,6 +58,7 @@ class UserAdmin(DjangoUserAdmin):
     filter_horizontal = ('classes',)
     readonly_fields = ['date_joined', 'last_login', 'is_staff', 'is_superuser']
     fields = ('username',
+              'email',
               'first_name',
               'last_name',
               'role',
