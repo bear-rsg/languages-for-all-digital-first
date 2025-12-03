@@ -1,5 +1,6 @@
 from django.views.generic import (View, DetailView, ListView, CreateView, UpdateView, DeleteView, TemplateView)
 from django.db.models import Q
+from django.db import models as django_models
 from django.contrib.auth.mixins import (LoginRequiredMixin, PermissionRequiredMixin)
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
@@ -13,6 +14,9 @@ from . import models
 from . import forms
 from .exportdata.studentscores import export_studentscores_excel
 import os
+
+
+# Reusable code
 
 
 def custom_permission_exercise_edit(user, exercise_obj):
@@ -30,6 +34,26 @@ def custom_permission_exercise_edit(user, exercise_obj):
         user.is_superuser \
         or exercise_obj.owned_by == user \
         or user in exercise_obj.collaborators.all()
+
+
+def api_authentication(request):
+    """
+    Complete authentication checks for API (data export/import) views
+    Returns a tuple of: (True/False, message)
+    """
+
+    username = request.GET.get('username')
+    api_key = request.GET.get('api_key')
+    if not (username and api_key):
+        return (False, 'Authentication parameters not provided: username, api_key')
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return (False, 'Authentication failed: no user found with this username')
+    if not user.api_authentication(api_key):
+        return (False, 'Authentication failed: no user found with matching username and api_key')
+    # Passes authentication check
+    return (True, 'Authentication success')
 
 
 # UserExerciseAttempt
@@ -498,14 +522,14 @@ class ExerciseContentDeleteView(PermissionRequiredMixin, DeleteView):
         return reverse_lazy('exercises:detail', kwargs={'pk': self.kwargs['pk_exercise']})
 
 
-# Export Data: Student Scores (Excel)
+# Export Data: Excel
 
 
-class ExportDataStudentScoresExcelOptionsTemplateView(LoginRequiredMixin, TemplateView):
+class ExportDataExcelStudentScoresOptionsTemplateView(LoginRequiredMixin, TemplateView):
     """
     Class-based view for export data: student scores options template
     """
-    template_name = 'exercises/exportdata-studentscores-excel-options.html'
+    template_name = 'exercises/exportdata-excel-studentscores-options.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -520,7 +544,7 @@ class ExportDataStudentScoresExcelOptionsTemplateView(LoginRequiredMixin, Templa
 
 
 @login_required
-def exportdata_studentscores_excel(request):
+def exportdata_excel_studentscores(request):
     """
     Creates an Excel spreadsheet containing student scores and return it to the user to download
     """
@@ -536,32 +560,66 @@ def exportdata_studentscores_excel(request):
     raise Http404
 
 
-# Export Data: Exercises (JSON)
+# Export Data: JSON
 
 
-def api_authentication(request):
+class ExportDataJsonTemplateView(LoginRequiredMixin, TemplateView):
     """
-    Complete authentication checks and return a tuple of: (True/False, message)
+    Class-based view for export data (JSON) information template
+    """
+    template_name = 'exercises/exportdata-json.html'
+
+
+def exportdata_json_studentscores(request):
+    """
+    Returns JSON data containing UserExerciseAttempt objects and related data
+    Requires 'username' and 'api_key' in GET query parameters
     """
 
-    username = request.GET.get('username')
-    api_key = request.GET.get('api_key')
-    if not (username and api_key):
-        return (False, 'Authentication parameters not provided: username, api_key')
-    try:
-        user = User.objects.get(username=username)
-    except User.DoesNotExist:
-        return (False, 'Authentication failed: no user found with this username')
-    if not user.api_authentication(api_key):
-        return (False, 'Authentication failed: no user found with matching username and api_key')
-    # Passes authentication check
-    return (True, 'Authentication success')
+    if request.method != 'GET':
+        return JsonResponse({'error': 'GET required'}, status=405)
+
+    # User Authentication
+    authentication_success, authentication_msg = api_authentication(request)
+    if not authentication_success:
+        return JsonResponse({'error': authentication_msg}, status=400)
+
+    studentscores = models.UserExerciseAttempt.objects.filter(user__role__name='student')\
+        .select_related(
+        'exercise',
+        'exercise__language',
+        'exercise__exercise_format',
+        'exercise__theme',
+        'exercise__difficulty',
+        'user'
+    )
+    studentscores_list = []
+
+    for studentscore in studentscores:
+        studentscores_list.append({
+            'exercise_id': studentscore.exercise.id,
+            'exercise_url': request.build_absolute_uri(f'/exercises/{studentscore.exercise.id}'),
+            'exercise_language': str(studentscore.exercise.language),
+            'exercise_format': str(studentscore.exercise.exercise_format),
+            'exercise_theme': str(studentscore.exercise.theme),
+            'exercise_difficulty': str(studentscore.exercise.difficulty),
+            'user_id': studentscore.user.id,
+            'user_username': studentscore.user.username,
+            'user_internal_id': studentscore.user.internal_id_number,
+            'attempt_id': studentscore.id,
+            'attempt_score': studentscore.score,
+            'attempt_detail': studentscore.attempt_detail,
+            'attempt_duration': studentscore.attempt_duration,
+            'attempt_submit_timestamp': studentscore.submit_timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    return JsonResponse(studentscores_list, safe=False)
 
 
-def exportdata_exercises_json(request):
+def exportdata_json_exercises(request):
     """
     Returns JSON data containing Exercise objects and related data
-    Requires 'username' and 'api_key' in GET query parameters.
+    Requires 'username' and 'api_key' in GET query parameters
     """
 
     if request.method != 'GET':
@@ -634,3 +692,126 @@ def exportdata_exercises_json(request):
         })
 
     return JsonResponse(exercises_list, safe=False)
+
+
+def exportdata_json_generic(request, model, fields):
+    """
+    This is a simple, generic function that can be used to export JSON data
+    for most models, where each model will require separate functional view calling this
+    e.g. return exportdata_json_generic(request, models.Difficulty, ['id', 'name'])
+
+    Returns JSON data for specified model (or error message)
+
+    Requires 'username' and 'api_key' in GET query parameters
+    """
+
+    if request.method != 'GET':
+        return JsonResponse({'error': 'GET required'}, status=405)
+
+    # User Authentication
+    authentication_success, authentication_msg = api_authentication(request)
+    if not authentication_success:
+        return JsonResponse({'error': authentication_msg}, status=400)
+    
+    # Define the Exercise data to include
+    data_queryset = model.objects.all()
+    data_list = []
+
+    for data_object in data_queryset:
+        data_item = {}
+        for field in fields:
+            field_type = type(model._meta.get_field(field))
+            field_value = getattr(data_object, field)
+            # Force FK fields where value isn't None to be strings, so can be processed as JSON
+            if field_value and field_type == django_models.fields.related.ForeignKey:
+                field_value = str(field_value)
+            # Add field value to the data item
+            data_item[field] = field_value
+        data_list.append(data_item)
+
+    return JsonResponse(data_list, safe=False)
+
+
+def exportdata_json_yeargroups(request):
+    """
+    Return JSON data of all YearGroup objects
+    """
+
+    model = models.YearGroup
+    fields = ['id', 'name', 'date_start', 'date_end', 'is_published']
+    return exportdata_json_generic(request, model, fields)
+
+
+def exportdata_json_difficulties(request):
+    """
+    Return JSON data of all Difficulty objects
+    """
+
+    model = models.Difficulty
+    fields = ['id', 'name', 'order']
+    return exportdata_json_generic(request, model, fields)
+
+
+def exportdata_json_languages(request):
+    """
+    Return JSON data of all Language objects
+    """
+
+    model = models.Language
+    fields = ['id', 'name', 'is_published']
+    return exportdata_json_generic(request, model, fields)
+
+
+def exportdata_json_fontsizes(request):
+    """
+    Return JSON data of all FontSize objects
+    """
+
+    model = models.FontSize
+    fields = ['id', 'name', 'size_em']
+    return exportdata_json_generic(request, model, fields)
+
+
+def exportdata_json_schoolclasses(request):
+    """
+    Return JSON data of all SchoolClass objects
+    """
+
+    model = models.SchoolClass
+    fields = [
+        'id',
+        'year_group',
+        'language',
+        'difficulty',
+        'unique_feature',
+        'is_published',
+        'is_active'
+    ]
+    return exportdata_json_generic(request, model, fields)
+
+
+def exportdata_json_themes(request):
+    """
+    Return JSON data of all Theme objects
+    """
+
+    model = models.Theme
+    fields = ['id', 'name', 'is_published']
+    return exportdata_json_generic(request, model, fields)
+
+
+def exportdata_json_exerciseformats(request):
+    """
+    Return JSON data of all ExerciseFormat objects
+    """
+
+    model = models.ExerciseFormat
+    fields = [
+        'id',
+        'name',
+        'icon',
+        'instructions',
+        'is_marked_automatically_by_system',
+        'is_published'
+    ]
+    return exportdata_json_generic(request, model, fields)

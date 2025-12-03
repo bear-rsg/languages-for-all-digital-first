@@ -21,10 +21,19 @@ urlpatterns = [
     path('<pk_exercise>/content/<pk>/edit/', views.ExerciseContentUpdateView.as_view(), name='content-edit'),
     path('<pk_exercise>/content/<pk>/delete/', views.ExerciseContentDeleteView.as_view(), name='content-delete'),
 
-    # Export data: student scores (Excel)
-    path('exportdata/studentscores/excel/options/', views.ExportDataStudentScoresExcelOptionsTemplateView.as_view(), name='exportdata-studentscores-excel-options'),
-    path('exportdata/studentscores/excel/', views.exportdata_studentscores_excel, name='exportdata-studentscores-excel'),
+    # Export data: Excel
+    path('exportdata/excel/studentscores/options/', views.ExportDataExcelStudentScoresOptionsTemplateView.as_view(), name='exportdata-excel-studentscores-options'),
+    path('exportdata/excel/studentscores/', views.exportdata_excel_studentscores, name='exportdata-excel-studentscores'),
 
-    # Export data: exercises (JSON)
-    path('exportdata/exercises/json/', views.exportdata_exercises_json, name='exportdata-exercises-json'),
+    # Export data: JSON
+    path('exportdata/json/', views.ExportDataJsonTemplateView.as_view(), name='exportdata-json'),
+    path('exportdata/json/studentscores/', views.exportdata_json_studentscores, name='exportdata-json-studentscores'),
+    path('exportdata/json/exercises/', views.exportdata_json_exercises, name='exportdata-json-exercises'),
+    path('exportdata/json/yeargroups/', views.exportdata_json_yeargroups, name='exportdata-json-yeargroups'),
+    path('exportdata/json/difficulties/', views.exportdata_json_difficulties, name='exportdata-json-difficulties'),
+    path('exportdata/json/languages/', views.exportdata_json_languages, name='exportdata-json-languages'),
+    path('exportdata/json/fontsizes/', views.exportdata_json_fontsizes, name='exportdata-json-fontsizes'),
+    path('exportdata/json/schoolclasses/', views.exportdata_json_schoolclasses, name='exportdata-json-schoolclasses'),
+    path('exportdata/json/themes/', views.exportdata_json_themes, name='exportdata-json-themes'),
+    path('exportdata/json/exerciseformats/', views.exportdata_json_exerciseformats, name='exportdata-json-exerciseformats'),
 ]
