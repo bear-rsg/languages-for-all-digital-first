@@ -15,7 +15,7 @@
         If you have any issues please <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us for support</a>.
     </p>
 
-    <form class="full-form" action="{% url 'exercises:exportdata-studentscores-excel' %}">
+    <form class="full-form" action="{% url 'exercises:exportdata-excel-studentscores' %}">
 
         <h3>Classes</h3>
         {% for class in classes %}

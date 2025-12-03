@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load settings_value %}
+{% load static %}
+
+{% block main %}
+
+<section class="container">
+
+    <h2>Export Data (JSON)</h2>
+
+    <p>
+        To download data from the LFA Digital First platform in JSON format, please use one of the following API endpoints:
+    </p>
+    <ul>
+        <li>/exercises/exportdata/json/studentscores/ <em>- Student exercise attempts</em></li>
+        <li>/exercises/exportdata/json/exercises/ <em>- Exercises</em></li>
+
+        <li>/exercises/exportdata/json/yeargroups/ <em>- Year Groups</em></li>
+        <li>/exercises/exportdata/json/difficulties/ <em>- Exercise Difficulties</em></li>
+        <li>/exercises/exportdata/json/languages/ <em>- Languages</em></li>
+        <li>/exercises/exportdata/json/fontsizes/ <em>- Font Sizes</em></li>
+        <li>/exercises/exportdata/json/schoolclasses/ <em>- School Classes</em></li>
+        <li>/exercises/exportdata/json/themes/ <em>- Exercise Themes</em></li>
+        <li>/exercises/exportdata/json/exerciseformats/ <em>- Exercise Formats</em></li>
+    </ul>
+    <p>
+        All of these endpoints require the following parameters:
+    </p>
+    <ul>
+        <li>username <em>- your username (typically your email address)</em></li>
+        <li>api_key <em>- your API key (contact us if you don't know yours)</em></li>
+    </ul>
+    <p>
+        So a typical request may look like: <em>/exercises/exportdata/json/studentscores/?username=example@email.com&api_key=myapikeygoeshere</em>
+    </p>
+    <p>
+        If you have any issues please <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us for support</a>.
+    </p>
+
+</section>
+
+{% endblock %}
