@@ -712,7 +712,7 @@ def exportdata_json_generic(request, model, fields):
     authentication_success, authentication_msg = api_authentication(request)
     if not authentication_success:
         return JsonResponse({'error': authentication_msg}, status=400)
-    
+
     # Define the Exercise data to include
     data_queryset = model.objects.all()
     data_list = []
