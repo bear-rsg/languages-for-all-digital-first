@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load settings_value %}
+{% load static %}
+
+{% block main %}
+
+<section class="container">
+
+    <h2>Import Exercises</h2>
+
+    <p>
+        To import/upload new exercises from a CSV file, please follow the 3 steps:
+        <ol>
+            <li>Choose the individual exercise format (e.g. multiple choice)</li>
+            <li>Download the template CSV file for the chosen exercise format and fill it with data of new exercises</li>
+            <li>Upload this new CSV data file</li>
+        </ol>
+    </p>
+    <p>
+        If you have any issues please <a href="mailto:{% settings_value 'ADMIN_EMAIL' %}">contact us for support</a>.
+    </p>
+
+    <form id="" class="full-form" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <p>
+            <label for="exerciseformat">1. Exercise Format</label>
+            <select id="exerciseformat" name="exerciseformat" required>
+                <option>-- Please select --</option>
+                <option value="fitb">Fill in the Blanks</option>
+                <option value="mc">Multiple Choice</option>
+                <option value="sb">Sentence Builder</option>
+            </select>
+        </p>
+
+        <p>
+            <label>2. Download CSV file template and complete with data for new exercises</label>
+            <a href="{% static 'importdatatemplates/exercise-fitb.csv' %}">Fill in the Blanks</a>
+            <br>
+            <a href="{% static 'importdatatemplates/exercise-mc.csv' %}">Multiple Choice</a>
+            <br>
+            <a href="{% static 'importdatatemplates/exercise-sb.csv' %}">Sentence Builder</a>
+
+            <div class="helptext">
+                Notes for completing the CSV file:
+                <br>
+                - You MUST stick strictly to the column structure in the template. The column names must match. Do not add or remove any columns.
+                <br>
+                - You only need to include exercise data once and don't need to repeat this data for each row that represents an item of the exercise format (e.g. each multiple choice question)
+                <br>
+                - For True/False values, input 1 for True or 0 for False
+                <br>
+                - Leave values blank if there is no data for it. E.g. don't input "NA" or "-" for blank values.
+                <br>
+                - It is HIGHLY recommended that before you start the import process on the live database that you contact the software developer who can run this on a test version of the database. This will allow you to work through any errors before modifying live data.
+            </div>
+        </p>
+
+        <p>
+            <label for="datafile">3. Upload completed CSV data file:</label>
+            <input type="file" 
+                name="datafile" 
+                id="datafile" 
+                accept=".csv" 
+                required>
+        </p>
+
+        <button type="submit"><i class="fas fa-file-import"></i> Start Import</button>
+    </form>
+
+</section>
+
+{% endblock %}

@@ -7,13 +7,15 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, Http404, JsonResponse
 from functools import reduce
 from operator import (or_, and_)
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from account.models import User
 from . import models
 from . import forms
 from .exportdata.studentscores import export_studentscores_excel
 import os
+import csv
+import io
 
 
 # Reusable code
@@ -815,3 +817,144 @@ def exportdata_json_exerciseformats(request):
         'is_published'
     ]
     return exportdata_json_generic(request, model, fields)
+
+
+# Import Data: CSV
+
+
+def csv_value_fk(fk_model, value):
+    if value:
+        value = str(value).strip()
+        if value not in ['', '-', 'NA']:
+            return fk_model.objects.get(name__iexact=value)
+
+
+def csv_value_bool(value, default_value=False):
+    if value in [1, True, 'True', 'true', 'yes', 'Yes', 'Y', 'y']:
+        return True
+    if value in [0, False, 'False', 'false', 'no', 'No', 'N', 'n']:
+        return False
+    return default_value
+
+
+@login_required
+def importdata_csv_exercises(request):
+    """
+    If GET, show template to allow users to complete form to trigger the process
+
+    If POST, extract data from CSV file and create new Exercise objects
+    and related data for the specified exercise format
+    """
+
+    # Show the template to trigger the import process
+    if request.method == 'GET':
+        return render(request, 'exercises/importdata-csv-exercises.html')
+
+    # Process the data import
+    elif request.method == 'POST':
+        format = request.POST.get('exerciseformat')
+        file = request.FILES.get('datafile')
+
+        if format and format in ['fitb', 'mc', 'sb'] and file:
+
+            # Create parent ImportDataFile object
+            import_data_file_obj = models.ImportDataFile.objects.create(
+                data_file=file,
+                created_by=request.user
+            )
+
+            # Extract data from file as list of dicts
+            data = list(csv.DictReader(io.StringIO(import_data_file_obj.data_file.read().decode("utf-8"))))
+
+            prev_exercise_name = ''
+            errors = []
+            new_exercise_count = 0
+            exercise_part_order = 0
+
+            for row in data:
+                # Create new Exercise object if exercise name is empty or different to prev row
+                exercise_name = row['name']
+
+                try:
+                    if exercise_name != prev_exercise_name or exercise_name in [None, '', '-' 'NA']:
+                        exercise = models.Exercise.objects.create(
+                            name=exercise_name,
+                            language=csv_value_fk(models.Language, row['language']),
+                            exercise_format=csv_value_fk(models.ExerciseFormat, row['format']),
+                            theme=csv_value_fk(models.Theme, row['theme']),
+                            difficulty=csv_value_fk(models.Difficulty, row['difficulty']),
+                            font_size=csv_value_fk(models.FontSize, row['font_size']),
+                            instructions=row['instructions'],
+                            is_a_formal_assessment=csv_value_bool(row['is_a_formal_assessment']),
+                            is_published=csv_value_bool(row['published']),
+
+                            owned_by=request.user,
+                            created_by=request.user,
+                            import_data_file=import_data_file_obj
+                        )
+
+                        # Update variables based on new exercise being created
+                        new_exercise_count += 1
+                        prev_exercise_name = exercise_name
+                        exercise_part_order = 0
+
+                    # Create exercise format objects:
+                    # Fill in the blank
+                    if format == 'fitb':
+                        models.ExerciseFormatFillInTheBlank.objects.create(
+                            exercise=exercise,
+                            source=row['source'],
+                            text_with_blanks_to_fill=row['text_with_blanks_to_fill'],
+                            order=exercise_part_order,
+                        )
+
+                    # Multiple choice
+                    elif format == 'mc':
+                        models.ExerciseFormatMultipleChoice.objects.create(
+                            exercise=exercise,
+
+                            option_a=row['option_a'],
+                            option_b=row['option_b'],
+                            option_c=row['option_c'],
+                            option_d=row['option_d'],
+                            option_e=row['option_e'],
+                            option_f=row['option_f'],
+
+                            option_a_is_correct=csv_value_bool(row['option_a_is_correct']),
+                            option_b_is_correct=csv_value_bool(row['option_b_is_correct']),
+                            option_c_is_correct=csv_value_bool(row['option_c_is_correct']),
+                            option_d_is_correct=csv_value_bool(row['option_d_is_correct']),
+                            option_e_is_correct=csv_value_bool(row['option_e_is_correct']),
+                            option_f_is_correct=csv_value_bool(row['option_f_is_correct']),
+
+                            correct_answer_feedback=row['correct_answer_feedback'],
+                            order=exercise_part_order,
+                        )
+
+                    # Sentence builder
+                    elif format == 'sb':
+                        models.ExerciseFormatFillInTheBlank.objects.create(
+                            exercise=exercise,
+                            sentence_source=row['sentence_source'],
+                            sentence_translated=row['sentence_translated'],
+                            sentence_translated_extra_words=row['sentence_translated_extra_words'],
+                            correct_answer_feedback=row['correct_answer_feedback'],
+                            order=exercise_part_order,
+                        )
+
+                    exercise_part_order += 1
+
+                except Exception as e:
+                    errors.append(e)
+
+            # Successfully processed (return success page)
+            context = {
+                'success': True,
+                'message': f'Created {new_exercise_count} new exercises',
+                'errors': errors
+            }
+            return render(request, 'exercises/importdata-csv-result.html', context)
+
+    # Process failed
+    context = {'success': False, 'message': '<insert error message>'}
+    return render(request, 'exercises/importdata-csv-result.html', context)

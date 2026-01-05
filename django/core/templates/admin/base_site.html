@@ -16,6 +16,7 @@
     {% endif %}
     {% if user.is_active and user.is_superuser %}
         <a href="{% url 'account:importdata-confirm' %}">{% translate 'Import Users' %}</a> /
+        <a href="{% url 'exercises:importdata-csv-exercises' %}">{% translate 'Import Exercises' %}</a> /
     {% endif %}
     {% if user.is_active and user.is_staff %}
         <a href="{% url 'exercises:exportdata-excel-studentscores-options' %}">{% translate 'Export Data (Excel)' %}</a> /

@@ -36,4 +36,8 @@ urlpatterns = [
     path('exportdata/json/schoolclasses/', views.exportdata_json_schoolclasses, name='exportdata-json-schoolclasses'),
     path('exportdata/json/themes/', views.exportdata_json_themes, name='exportdata-json-themes'),
     path('exportdata/json/exerciseformats/', views.exportdata_json_exerciseformats, name='exportdata-json-exerciseformats'),
+
+    # Import data: CSV
+    # Exercises
+    path('importdata/csv/exercises/', views.importdata_csv_exercises, name='importdata-csv-exercises'),
 ]
