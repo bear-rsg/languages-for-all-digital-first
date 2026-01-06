@@ -211,6 +211,20 @@ class Theme(models.Model):
         ordering = ['name', 'id']
 
 
+class ImportDataFile(models.Model):
+    """
+    A file uploaded containing data for other models to import
+    E.g. a CSV file of exercises
+    """
+
+    data_file = models.FileField(upload_to='exercises-importdata')
+    created_by = models.ForeignKey(User, related_name="import_data_file_created_by", on_delete=models.SET_NULL, blank=True, null=True)
+    created_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Created")
+
+    def __str__(self):
+        return self.data_file.name
+
+
 class ExerciseFormat(models.Model):
     """
     A format/type of exercise, e.g. multiple choice, fill in the blank, etc.
@@ -253,6 +267,7 @@ class Exercise(models.Model):
     created_by = models.ForeignKey(User, related_name="exercise_created_by", on_delete=models.SET_NULL, blank=True, null=True, help_text="The person who originally created this exercise")
     created_datetime = models.DateTimeField(auto_now_add=True, verbose_name="Created")
     lastupdated_datetime = models.DateTimeField(auto_now=True, verbose_name="Last Updated")
+    import_data_file = models.ForeignKey(ImportDataFile, on_delete=models.CASCADE, blank=True, null=True, help_text='If this exercise was created via a data import file (e.g. csv file) then it will be linked here')
 
     @property
     def instructions_image_path(self):

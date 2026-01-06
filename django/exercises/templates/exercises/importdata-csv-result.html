@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load settings_value %}
+{% load static %}
+
+{% block main %}
+
+<section class="container">
+
+    <h2>Import Data: {% if success %}Success{% else %}Failed{% endif %}</h2>
+
+    <p>
+        {{ message }}
+    </p>
+
+    {% if errors %}
+        <ul>
+            {% for error in errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+</section>
+
+{% endblock %}

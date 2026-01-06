@@ -136,6 +136,20 @@ class FontSizeAdminView(admin.ModelAdmin):
         return False
 
 
+class ImportDataFileAdminView(admin.ModelAdmin):
+    """
+    Customise the admin interface: ImportDataFile
+    """
+    list_display = ('id', 'data_file', 'created_by', 'created_datetime')
+    search_fields = ('data_file',)
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 class ExerciseAdminView(admin.ModelAdmin):
     """
     Customise the admin interface: Exercise
@@ -156,9 +170,6 @@ class ExerciseAdminView(admin.ModelAdmin):
         return False
 
     def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
         return False
 
 
@@ -205,6 +216,7 @@ admin.site.register(models.SchoolClass, SchoolClassAdminView)
 admin.site.register(models.Theme, ThemeAdminView)
 admin.site.register(models.Difficulty, DifficultyAdminView)
 admin.site.register(models.FontSize, FontSizeAdminView)
+admin.site.register(models.ImportDataFile, ImportDataFileAdminView)
 admin.site.register(models.Exercise, ExerciseAdminView)
 
 admin.site.register(models.SchoolClassAlertExercise, SchoolClassAlertExerciseAdminView)
