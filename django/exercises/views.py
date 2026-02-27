@@ -278,7 +278,8 @@ class ExerciseListView(LoginRequiredMixin, ListView):
                     )
                 )
             # Apply filters to queryset (uses or_, as can be any)
-            queryset = queryset.filter(reduce(or_, filters))
+            if len(filters):
+                queryset = queryset.filter(reduce(or_, filters))
 
         # 2. Searching
         search = self.request.GET.get('search', '').strip()
